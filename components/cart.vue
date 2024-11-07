@@ -1,14 +1,17 @@
 <template>
     <div>
         <div>
-            <h1>شاشة البيع</h1>
+            <h1>السلة <n-icon>
+                    <CartIcon />
+                </n-icon></h1>
             <div>
                 <n-button>أداة</n-button>
                 <n-button>قائمة</n-button>
+                <n-button>إضافة عميل</n-button>
+
             </div>
         </div>
         <div>
-            <n-button>إضافة عميل</n-button>
             <!-- <modal /> -->
         </div>
         <div>
@@ -57,7 +60,7 @@
 
 import {
     TrashBinOutline
-        as TrashIcon, CashOutline as CashIcon
+        as TrashIcon, CashOutline as CashIcon, CartOutline as CartIcon
 } from '@vicons/ionicons5'
 
 
