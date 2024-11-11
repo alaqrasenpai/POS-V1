@@ -20,7 +20,7 @@
                     <n-flex justify="space-around">
                         <span>{{ item.name }}</span>
 
-                        <n-input-number style="width: 10vh;" v-model:value="item.quantity" />
+                        <n-input-number style="width: 11vh;" v-model:value="item.quantity" />
                         <span>{{ item.price }}</span>
                     </n-flex>
 

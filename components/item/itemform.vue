@@ -2,40 +2,59 @@
     <div>
         <form @submit.prevent="handleSubmit">
             <div>
-                <label for="name">Name:</label>
-                <input v-model="newItem.name" id="name" required />
+                <n-form-item label="Name :">
+                    <n-input placeholder="Name" v-model:value="newItem.name" id="name" required />
+                </n-form-item>
+
             </div>
             <div>
-                <label for="price">Price:</label>
-                <input v-model="newItem.price" id="price" type="number" required />
+                <n-form-item label="Price :">
+                    <n-input placeholder="Price" v-model:value="newItem.price" id="price" type="number" required />
+                </n-form-item>
+
             </div>
             <div>
-                <label for="buyprice">Buy Price:</label>
-                <input v-model="newItem.buyprice" id="buyprice" type="number" required />
+                <n-form-item label="Buy Price :">
+                    <n-input placeholder="Buy Price" v-model:value="newItem.buyprice" id="buyprice" type="number"
+                        required />
+                </n-form-item>
+
             </div>
             <div>
-                <label for="color">Color:</label>
-                <input v-model="newItem.color" id="color" />
+                <n-form-item label="Color :">
+                    <n-input placeholder="Color" v-model:value="newItem.color" id="color" />
+
+                </n-form-item>
+
             </div>
             <div>
-                <label for="category">Category:</label>
-                <input v-model="newItem.category" id="category" />
+                <n-form-item label="Category :">
+                    <n-input placeholder="Category" v-model:value="newItem.category" id="category" />
+
+                </n-form-item>
             </div>
             <div>
-                <label for="quantity">Quantity:</label>
-                <input v-model="newItem.quantity" id="quantity" type="number" />
+                <n-form-item label="Quantity :">
+                    <n-input placeholder="Quantity" v-model:value="newItem.quantity" id="quantity" type="number" />
+
+                </n-form-item>
+
+                
             </div>
             <div>
-                <input v-model="newItem.isFav" id="isFav" type="checkbox" />
-                <label for="isFav">Is Favorite</label>
+                <n-checkbox v-model:value="newItem.isFav" id="isFav" size="large" label="Is Favorite" />
+
             </div>
             <div>
-                <input v-model="newItem.deleted" id="deleted" type="checkbox" />
-                <label for="deleted">Is Deleted</label>
+                <n-checkbox v-model:value="newItem.deleted" size="large" label="Is Deleted" id="deleted"
+                    type="checkbox" />
             </div>
             <div>
-                <label for="barcode">Barcode:</label>
-                <input v-model="newItem.barcode" id="barcode" />
+                <n-form-item label="Barcode :">
+                    <n-input placeholder="Barcode" v-model:value="newItem.barcode" id="barcode" />
+
+                </n-form-item>
+
             </div>
             <button v-if="props.isAdd" type="submit" @click="$emit('closePOP')">Add
                 Item</button>
