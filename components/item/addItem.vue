@@ -1,35 +1,4 @@
-<!-- <script setup>
-const isOpen = ref(false)
-const closeDialog = () => {
-    console.log("closed")
-    isOpen.value = false;
-}
-</script>
 
-<template>
-    <div>
-        <button  @click="isOpen = true">اضافة منتج</button>
-
-        <USlideover  v-model="isOpen">
-            <UCard 
-                :ui="{ ring: '', divide: 'divide-y divide-gray-100 dark:divide-gray-800' }">
-                <template #header>
-                    <div >
-                        <h3 >
-                            Adding Items
-                        </h3>
-
-
-                        <UButton color="gray" variant="ghost" icon="i-heroicons-x-mark-20-solid" 
-                            @click="isOpen = false" />
-                    </div>
-                </template>
-                <ItemItemform :close="closeDialog" :isAdd="true" />
-                <Placeholder  />
-            </UCard>
-        </USlideover>
-    </div>
-</template> -->
 <template>
     <n-button @click="isOpen = true">
         اضافة منتج

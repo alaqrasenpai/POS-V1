@@ -1,25 +1,27 @@
 <template>
     <section class="">
 
-        <div >
-            <div >
-                <h1 >شاشة المنتجات</h1>
+        <div>
+            <div>
+                <h1>شاشة المنتجات</h1>
             </div>
-            <div >
+            <div>
 
-                <div >
-                    <div >
-                        <input v-model="searchTerm" type="text" placeholder="البحث باسم المنتج"
-                            >
-                        <div >
-                            <ItemAddItem/>
-                        </div>
-                    </div>
-                    <div >
+                <div>
+                    <n-layout content-style="padding: 24px;" :native-scrollbar="false">
+                        <n-flex vertical justify="space-between">
+                            <n-flex justify="space-between" size="large">
+                                <n-input round style="width: 20vh;" v-model:value="searchTerm" type="text"
+                                    placeholder="البحث باسم المنتج" />
+                                <!-- <input v-model="searchTerm" type="text" placeholder="البحث باسم المنتج"> -->
+                                <ItemAddItem />
 
-                        <InventoryInventorytable :listOfItems="filteredItems" />
+                            </n-flex>
 
-                    </div>
+                            <InventoryInventorytable :listOfItems="filteredItems" />
+                        </n-flex>
+                    </n-layout>
+
                 </div>
             </div>
         </div>
