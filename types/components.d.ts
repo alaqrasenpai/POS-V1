@@ -13,7 +13,6 @@ declare module 'vue' {
     NDataTable: typeof import('naive-ui')['NDataTable']
     NFlex: typeof import('naive-ui')['NFlex']
     NFormItem: typeof import('naive-ui')['NFormItem']
-    NGradientText: typeof import('naive-ui')['NGradientText']
     NH2: typeof import('naive-ui')['NH2']
     NIcon: typeof import('naive-ui')['NIcon']
     NInput: typeof import('naive-ui')['NInput']
