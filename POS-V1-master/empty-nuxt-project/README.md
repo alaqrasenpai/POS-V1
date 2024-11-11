@@ -1,3 +1,6 @@
+# Whats this project ??
+This project is my starter project when i want to build new project using Vue - Nuxt with Naive ui
+it have auto import to naive components 
 # Nuxt Minimal Starter
 
 Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
