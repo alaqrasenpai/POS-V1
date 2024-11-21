@@ -1,35 +1,70 @@
 <template>
-    <div class="tabs-container">
-        <div class="tabs">
-            <button :class="{ active: activeTab === 0 }" class="hover:border-t-amber-500" @click="activeTab = 0">Tab
-                1</button>
-            <button :class="{ active: activeTab === 1 }" @click="activeTab = 1">Tab 2</button>
-        </div>
-        <div class="tab-content">
-            <div v-if="activeTab === 0">
-                <UTable :rows="sellOrders" />
-            </div>
-            <div v-if="activeTab === 1">
-                <!-- <InventoryInventorytable :listOfItems="filteredItems" /> -->
-                <UTable :rows="sellOrdersDtl" />
 
-            </div>
-            <div v-if="activeTab === 2">Content for Tab 3</div>
-        </div>
-    </div>
+    <n-tabs type="segment" animated>
+        <n-tab-pane name="Sell Order" tab="Sell Order">
+            <n-data-table :columns="columns" :data="sellOrders" :pagination="pagination" :bordered="false" />
+        </n-tab-pane>
+        <n-tab-pane name="Sell Order DTL" tab="Sell Order DTL">
+            <n-data-table :columns="columnsDTL" :data="sellOrdersDtl" :pagination="pagination" :bordered="false" />
+        </n-tab-pane>
+  
+    </n-tabs>
+
 </template>
 
 <script setup>
 import { ref } from 'vue'
 const searchTerm = ref('');
 useSellOrderDtl
-const { getItems, getItemsFiltered, getFavItems, getItemById } = useInventory();
-const { addSellOrder, getAlldSellOrders, getSellOrderById } = useSellOrder();
-const { getaSellOrdeDtlrById, addSellOrdeDtl, getAllSellOrdeDtl } = useSellOrderDtl();
+const { getItems, getItemsFiltered } = useInventory();
+const { getAlldSellOrders } = useSellOrder();
+const { getAllSellOrdeDtl } = useSellOrderDtl();
 const items = getItems();
 const sellOrders = getAlldSellOrders();
 const sellOrdersDtl = getAllSellOrdeDtl();
+console.log(sellOrdersDtl)
+const columns = [
+    {
+        title: 'Order Number',
+        key: 'id', // Match the property in listOfItems for Product name
+    },
+    {
+        title: 'Sell Date',
+        key: 'selldate', // Match the property in listOfItems for Product name
+    },
+    {
+        title: 'Setial number',
+        key: 'serialnumber', // Match the property in listOfItems for Color
+    },
+    {
+        title: 'Total discound',
+        key: 'totalDisc', // Match the property in listOfItems for Category
+    },
+    {
+        title: 'Total Price',
+        key: 'totalPrice', // Match the property in listOfItems for Price
+    }
 
+]
+const columnsDTL = [
+    {
+        title: 'Item Name',
+        key: 'itemName', // Match the property in listOfItems for Product name
+    },
+    {
+        title: 'Total Price',
+        key: 'totalPrice', // Match the property in listOfItems for Color
+    },
+    {
+        title: 'Quantity',
+        key: 'itemQuan', // Match the property in listOfItems for Category
+    },
+    {
+        title: 'Order Number',
+        key: 'orderId', // Match the property in listOfItems for Price
+    }
+
+]
 const filteredItems = computed(() => {
     if (!searchTerm.value) {
         return items;
@@ -39,7 +74,7 @@ const filteredItems = computed(() => {
 const activeTab = ref(0)
 </script>
 
-<style scoped>
+<!-- <style scoped>
 .tabs-container {
     display: flex;
     flex-direction: column;
@@ -71,4 +106,4 @@ const activeTab = ref(0)
     border: 1px solid #ddd;
     border-top: none;
 }
-</style>
+</style> -->
