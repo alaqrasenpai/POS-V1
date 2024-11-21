@@ -1,25 +1,29 @@
 <template>
     <section class="">
 
-        <div >
-            <div >
-                <h1 >شاشة التصنيفات</h1>
+        <div>
+            <div>
+                <h1>شاشة التصنيفات</h1>
             </div>
-            <div >
+            <div>
 
-                <div >
-                    <div >
-                        <input v-model="searchTerm" type="text" placeholder="البحث باسم التصنيف"
-                            >
-                        <div >
-                            <CategoryAddCategory/>
-                        </div>
-                    </div>
-                    <div >
+                <div>
 
-                        <CategoryCategoriestable :listOfCategories="filteredItems" />
+                    <n-layout content-style="padding: 24px;" :native-scrollbar="false">
+                        <n-flex vertical justify="space-between">
+                            <n-flex justify="space-between" size="large">
+                                <n-input round style="width: 20vh;" v-model:value="searchTerm" type="text"
+                                    placeholder="البحث باسم التصنيف" />
+                                <!-- <input v-model="searchTerm" type="text" placeholder="البحث باسم المنتج"> -->
+                                <CategoryAddCategory />
 
-                    </div>
+                            </n-flex>
+
+                            <CategoryCategoriestable :listOfCategories="filteredItems" />
+                        </n-flex>
+                    </n-layout>
+
+
                 </div>
             </div>
         </div>

@@ -8,9 +8,9 @@
         </td>
 
         <td >
-            <button  >
+            <n-button @click="handleSubmit" >
                 Add
-            </button>   
+            </n-button>   
         </td>
     </tr>
 </template>
@@ -25,11 +25,11 @@ const props = defineProps({
     },
 
 });
-const { addItem } = useCart();
+const { addCategory } = useCategory();
 
 const handleAddItem = () => {
     props.itemobejct.quantity=1;
-    addItem(props.itemobejct);
-    toast.add({ title: 'Added to cart!' })
+    addCategory(props.itemobejct);
+    console.log({ title: 'Added to category!' })
 };
 </script>

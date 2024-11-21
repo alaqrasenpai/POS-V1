@@ -1,30 +1,30 @@
 <template>
-    <div >
-        <form @submit.prevent="handleSubmit" >
-            <div>
-                <label for="name" >Category Name:</label>
-                <input v-model="newItem.name" id="name" required
-                     />
-            </div>
+    <div>
+        <form @submit.prevent="handleSubmit">
+            <!-- Form Field for Category Name -->
+            <n-form-item label="Category Name:">
+                <n-input placeholder="Enter category name" v-model:value="newCategory.name" id="name" required />
+            </n-form-item>
 
-    
-            <button v-if="props.isAdd" type="submit" @click="$emit('closePOP')"
-                >Add
-                Category</button>
-            <button v-if="!props.isAdd" @click="$emit('closePOP')" type="submit"
-                >Edit
-                Category</button>
+            <!-- Add and Edit Buttons -->
+            <n-button v-if="isAdd" type="primary" @click="handleAdd">
+                Add Category
+            </n-button>
+            <n-button v-else type="primary" @click="handleEdit">
+                Edit Category
+            </n-button>
         </form>
-
-
     </div>
 </template>
 
 <script setup>
-const { getItems, getItemsFiltered, getFavItems, getItemById, addItem, editItem } = useInventory();
+// Import necessary modules
+import { ref } from 'vue'
+// import { useCategory } from '@/composables' // Adjust import path as needed
 
+// Define props with defineProps
 const props = defineProps({
-    itemId: {
+    categoryId: {
         type: Number,
         required: false
     },
@@ -34,63 +34,42 @@ const props = defineProps({
     },
     isAdd: {
         type: Boolean,
-        required: false
+        required: true
     }
-
-});
-let newItem = ref({
-    id: null,
-    name: "",
-    price: null,
-    color: "",
-    category: "",
-    buyprice: null,
-    quantity: 0,
-    isFav: 0,
-    barcode: "",
-    deleted: false,
 })
-if (!props.isAdd)
-    newItem = getItemById(props.itemId);
-const editMyItem = () => {
-    editItem(props.itemId, newItem.value)
-    toast.add({ title: 'Item Edited' })
 
-    props.close();
+// Set up category data and functions
+const { addCategory, editCategory, getCategoryById } = useCategory()
+
+// Initialize newCategory with reactive state
+let newCategory = ref({
+    id: null,
+    name: ""
+})
+
+// Load existing category data only if editing and categoryId is provided
+if (!props.isAdd && props.categoryId) {
+    newCategory.value = getCategoryById(props.categoryId)
 }
-const addNewItem = () => {
-    const { getItems, getItemsFiltered, getFavItems, getItemById, addItem } = useInventory();
-    // const props = defineProps({
-    //     close: {
-    //         type: Boolean
-    //     }
-    // });
-    // Assign a new id to the new item
-    addItem(newItem.value);
-    // Add the new item to the items array
-    // props.close = false;
-    toast.add({ title: 'Item Added' })
-    // Reset the form
-    newItem = {
+
+// Add new category function
+const handleAdd = () => {
+    addCategory(newCategory.value)
+    props.close() // Close the modal after adding
+    resetForm()
+}
+
+// Edit existing category function
+const handleEdit = () => {
+    editCategory(props.categoryId, newCategory.value)
+    props.close() // Close the modal after editing
+}
+
+// Reset form function
+const resetForm = () => {
+    newCategory.value = {
         id: null,
-        name: "",
-        price: null,
-        color: "",
-        category: "",
-        buyprice: null,
-        quantity: 0,
-        isFav: 0,
-        barcode: "",
-        deleted: false,
-    };
-    props.close();
-
-}
-const handleSubmit = () => {
-    if (props.isAdd) {
-        addNewItem();
-    } else {
-        editMyItem();
+        name: ""
     }
-};
+}
 </script>
