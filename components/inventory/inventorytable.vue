@@ -28,6 +28,9 @@ const columns: DataTableColumns<any> = [
     {
         title: 'Category',
         key: 'category', // Match the property in listOfItems for Category
+    },{
+        title: 'quantity',
+        key: 'quantity', // Match the property in listOfItems for Category
     },
     {
         title: 'Price',
