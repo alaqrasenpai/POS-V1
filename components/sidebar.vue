@@ -25,7 +25,7 @@
         <NuxtLink to="/tabs">
             <n-layout>
                 <n-layout-content content-style="padding: 24px;">
-                    Tabs
+                    Sell Orders
                 </n-layout-content>
             </n-layout>
         </NuxtLink>
@@ -36,7 +36,13 @@
                 </n-layout-content>
             </n-layout>
         </NuxtLink>
-
+        <NuxtLink to="/suppliers">
+            <n-layout>
+                <n-layout-content content-style="padding: 24px;">
+                    Suppliers
+                </n-layout-content>
+            </n-layout>
+        </NuxtLink>
 
 
 
