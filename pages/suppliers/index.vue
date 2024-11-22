@@ -3,7 +3,7 @@
 
         <div>
             <div>
-                <h1>شاشة المنتجات</h1>
+                <h1>شاشة الموزعون</h1>
             </div>
             <div>
 
@@ -17,7 +17,7 @@
 
                             </n-flex>
 
-                            <SuppliersSupplierstable :listOfItems="filteredItems" />
+                            <SuppliersSupplierstable :listOfItems="filteredSuppliers" />
                         </n-flex>
                     </n-layout>
 
@@ -33,11 +33,11 @@
 const searchTerm = ref('');
 // const { getItems, getItemsFiltered, getFavItems, getItemById } = useInventory();
 const { getSuppliers, getSuppliersFiltered, addSupplier, geSupplierById } = useSuppliers();
-const items = getSuppliers();
+const suppliers = getSuppliers();
 
-const filteredItems = computed(() => {
+const filteredSuppliers = computed(() => {
     if (!searchTerm.value) {
-        return items;
+        return suppliers;
     }
     return getSuppliersFiltered(searchTerm.value)
 });
