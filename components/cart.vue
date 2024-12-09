@@ -7,8 +7,7 @@
             <div>
                 <n-button>أداة</n-button>
                 <n-button>قائمة</n-button>
-                <n-button>إضافة عميل</n-button>
-
+                <CustomersAddcustomer />
 
             </div>
         </div>
