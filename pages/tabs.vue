@@ -7,7 +7,9 @@
         <n-tab-pane name="Sell Order DTL" tab="Sell Order DTL">
             <n-data-table :columns="columnsDTL" :data="sellOrdersDtl" :pagination="pagination" :bordered="false" />
         </n-tab-pane>
-  
+        <n-tab-pane name="Transactions" tab="Transactions">
+            <InventoryInventorytranstable :listOfItems="filteredItems" />
+        </n-tab-pane>
     </n-tabs>
 
 </template>
@@ -17,9 +19,11 @@ import { ref } from 'vue'
 const searchTerm = ref('');
 useSellOrderDtl
 const { getItems, getItemsFiltered } = useInventory();
+const { getItemsTrans, getItemsTransFiltered } = useInventoryTrans();
+
 const { getAlldSellOrders } = useSellOrder();
 const { getAllSellOrdeDtl } = useSellOrderDtl();
-const items = getItems();
+const items = getItemsTrans();
 const sellOrders = getAlldSellOrders();
 const sellOrdersDtl = getAllSellOrdeDtl();
 console.log(sellOrdersDtl)
@@ -69,7 +73,7 @@ const filteredItems = computed(() => {
     if (!searchTerm.value) {
         return items;
     }
-    return getItemsFiltered(searchTerm.value)
+    return getItemsTransFiltered(searchTerm.value)
 });
 const activeTab = ref(0)
 </script>

@@ -14,8 +14,10 @@
                                 <n-input round style="width: 20vh;" v-model:value="searchTerm" type="text"
                                     placeholder="البحث باسم المنتج" />
                                 <!-- <input v-model="searchTerm" type="text" placeholder="البحث باسم المنتج"> -->
-                                <ItemAddItem />
-
+                                <div>
+                                    <ItemAddItem />
+                                    <InventoryAddTransToInventory />
+                                </div>
                             </n-flex>
 
                             <InventoryInventorytable :listOfItems="filteredItems" />

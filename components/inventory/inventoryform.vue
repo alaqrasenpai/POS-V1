@@ -8,8 +8,26 @@
                 </n-form-item>
             </div>
             <div>
-                <n-form-item label="Price :">
-                    <n-input placeholder="Price" v-model:value="newItem.price" id="price" type="number" required />
+                <n-form-item label="Items :">
+                    <n-select placeholder="Please Select Item" :options="itemsList" @update:value="handleUpdateValue" />
+
+                </n-form-item>
+            </div>
+
+            <div>
+                <n-form-item label="Suppliers :">
+                    <n-select placeholder="Please Select Supplier" :options="suppliersList"
+                        @update:value="handleUpdateValue" />
+                </n-form-item>
+            </div>
+            <div>
+                <n-form-item label="Transaction Type :">
+                    <n-select placeholder="Please Select Type" :options="options" @update:value="handleUpdateValue" />
+                </n-form-item>
+            </div>
+            <div>
+                <n-form-item label="Quantity :">
+                    <n-input placeholder="Quantity" v-model:value="newItem.price" id="price" type="number" required />
                 </n-form-item>
             </div>
 
@@ -26,8 +44,30 @@ import { ref } from 'vue'
 import { useMessage } from 'naive-ui'
 
 // Mocked functions from the inventory system
-const { getItemById, addItem, editItem } = useInventory()
-
+const { getItemById, getItems, addItem, editItem } = useInventory()
+const { addItemTrans } = useInventoryTrans()
+const { getSuppliers } = useSuppliers()
+const items = getItems();
+const suppliers = getSuppliers();
+// console.log(items[0].name)
+const itemsList = items.map(item => ({
+    label: item.name,
+    value: item.id
+}));
+const suppliersList = suppliers.map(supplier => ({
+    label: supplier.name,
+    value: supplier.id
+}));
+const options = [
+    {
+        label: 'Add Quantity',
+        value: '1',
+    },
+    {
+        label: 'Del Quantity',
+        value: '0'
+    }];
+console.log(itemsList)
 const props = defineProps({
     itemId: {
         type: Number,
@@ -46,8 +86,6 @@ const props = defineProps({
 let newItem = ref({
     id: null,
     name: "",
-    price: null,
-    color: "",
     category: "",
     buyprice: null,
     quantity: 0,

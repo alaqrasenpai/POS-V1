@@ -7,7 +7,7 @@
 
         <n-layout position="absolute" style="top: 64px; bottom: 64px" has-sider>
 
-            <n-layout-sider content-style="padding: 24px;" :native-scrollbar="false" bordered>
+            <n-layout-sider content-style="padding: 24px;width:100%" :native-scrollbar="false" bordered>
                 <cart />
 
             </n-layout-sider>

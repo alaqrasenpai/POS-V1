@@ -22,23 +22,30 @@ const columns: DataTableColumns<any> = [
         key: 'name', // Match the property in listOfItems for Product name
     },
     {
-        title: 'Color',
-        key: 'color', // Match the property in listOfItems for Color
+        title: 'Transaction Type',
+        key: 'TransType', // Match the property in listOfItems for Color
     },
     {
-        title: 'Category',
-        key: 'category', // Match the property in listOfItems for Category
+        title: 'Supplier',
+        key: 'supplier', // Match the property in listOfItems for Category
+    }, {
+        title: 'itemId',
+        key: 'itemId', // Match the property in listOfItems for Category
     },
     {
-        title: 'Price',
-        key: 'price', // Match the property in listOfItems for Price
-    },
-    {
-        title: 'Edit',
-        key: 'edit',
-        render(row) {
-            return h(EditItem, { itemId: row.id }) // Render EditItem component with itemId
-        }
+        title: 'date',
+        key: 'date', // Match the property in listOfItems for Price
     }
 ]
+
+const searchTerm = ref('');
+const { getItems, getItemsFiltered, getFavItems, getItemById } = useInventory();
+const items = getItems();
+
+const filteredItems = computed(() => {
+    if (!searchTerm.value) {
+        return items;
+    }
+    return getItemsFiltered(searchTerm.value)
+});
 </script>
