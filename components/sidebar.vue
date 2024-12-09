@@ -1,5 +1,5 @@
 <template>
-    <div >
+    <div>
         <NuxtLink to="/">
             <n-layout>
                 <n-layout-content content-style="padding: 24px;">
@@ -43,14 +43,19 @@
                 </n-layout-content>
             </n-layout>
         </NuxtLink>
+        <NuxtLink to="/customers">
+            <n-layout>
+                <n-layout-content content-style="padding: 24px;">
+                    customers
+                </n-layout-content>
+            </n-layout>
+        </NuxtLink>
 
 
 
-
-        <div
-            >
-            <i ></i>
-            <span >Logout</span>
+        <div>
+            <i></i>
+            <span>Logout</span>
         </div>
     </div>
 

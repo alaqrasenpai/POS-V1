@@ -8,7 +8,7 @@
             <template #header-extra>
                 Adding Items !
             </template>
-            <InventoryInventoryform :close="closeDialog" :isAdd="true" />
+            <InventoryInventorytransform :close="closeDialog" :isAdd="true" />
 
         </n-card>
     </n-modal>

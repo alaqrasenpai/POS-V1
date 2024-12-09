@@ -33,14 +33,12 @@ export const useInventoryTrans = () => {
         return state.itemsTrans.find(item => item.id === id);
     };
     const getItemsTrans = () => {
-        console.log("hello")
         return state.itemsTrans
     };
     const getFavitemsTrans = () => {
         return state.itemsTrans.filter(item => item.isFav === true);
     };
     const getItemsTransFiltered = (itemName) => {
-        console.log("test test")
         console.log(state.itemsTrans)
 
         if (!itemName) {
