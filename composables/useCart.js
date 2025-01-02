@@ -1,33 +1,53 @@
 import { reactive } from 'vue';
+import { useInventory } from '@/composables/useInventory'; // تأكد من المسار الصحيح
+
 const state = reactive({
     cartItems: []
 });
 
 export const useCart = () => {
-
-    const getItemById = (id) => {
-        return state.cartItems.find(item => item.id === id);
-    };
+    const { getItemById, updateItemQuantity } = useInventory();
 
     const getCartItems = () => {
         return state.cartItems;
     };
 
     const addItem = (newItem) => {
-        // Find the item in the cartItems array
-        const existingItem = state.cartItems.find(item => item.id === newItem.id);
+        const itemInInventory = getItemById(newItem.id); // الحصول على العنصر من المخزون
 
-        if (existingItem) {
-            // If item exists, increment the quantity
-            existingItem.quantity += newItem.quantity;
+        if (itemInInventory && itemInInventory.quantity >= newItem.quantity) {
+            const existingItem = state.cartItems.find(item => item.id === newItem.id);
+
+            if (existingItem) {
+                // إذا كان العنصر موجودًا في السلة، تأكد من أن الكلية لا تتجاوز الكمية المتاحة
+                if (existingItem.quantity + 1 <= itemInInventory.quantity) {
+                    existingItem.quantity += 1; // تحديث الكمية في السلة
+                } else {
+                    alert(`الكمية المطلوبة (${existingItem.quantity + newItem.quantity}) تتجاوز الكمية المتاحة في المخزون (${itemInInventory.quantity})!`);
+                }
+            } else {
+                // إذا كان العنصر غير موجود في السلة، أضفه بشرط ألا تتجاوز الكمية المتاحة
+                if (newItem.quantity <= itemInInventory.quantity) {
+                    state.cartItems.push({ ...newItem, quantity: 1 });
+                } else {
+                    alert(`الكمية المطلوبة (${newItem.quantity}) تتجاوز الكمية المتاحة في المخزون (${itemInInventory.quantity})!`);
+                }
+            }
         } else {
-            // If item does not exist, add it to the cart with a quantity of 1
-            state.cartItems.push({ ...newItem, quantity: 1 });
+            alert("الكمية غير متاحة في المخزون!");
         }
     };
+
     const clearCart = () => {
         state.cartItems = [];
     };
 
-    return { getCartItems, getItemById, addItem, clearCart };
+    const completeSale = () => {
+        for (const item of state.cartItems) {
+            updateItemQuantity(item.id, item.quantity); // تحديث كمية المستودع
+        }
+        clearCart(); // إفراغ السلة بعد إتمام البيع
+    };
+
+    return { getCartItems, addItem, clearCart, completeSale };
 };

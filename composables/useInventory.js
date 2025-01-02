@@ -51,6 +51,13 @@ export const useInventory = () => {
     const getFavItems = () => {
         return state.items.filter(item => item.isFav === true);
     };
+    const updateItemQuantity = (id, quantity) => {
+        const item = state.items.find(item => item.id === id);
+        if (item) {
+            item.quantity -= quantity; // تحديث الكمية في المستودع
+        }
+    };
+
     const getItemsFiltered = (itemName) => {
         console.log("test test")
         console.log(state.items)
@@ -94,5 +101,5 @@ export const useInventory = () => {
     };
 
 
-    return { getItems, getItemsFiltered, addItem, getFavItems, getItemById,editItem };
+    return { getItems, getItemsFiltered, addItem, getFavItems, getItemById, editItem ,updateItemQuantity};
 };

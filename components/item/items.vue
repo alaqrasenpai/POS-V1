@@ -9,8 +9,7 @@ import { NButton } from 'naive-ui'
 import type { DataTableColumns } from 'naive-ui'
 
 const { addItem } = useCart();
-
-
+const { getItemById } = useInventory();
 
 // Define props to receive the list of items
 const props = defineProps({
@@ -20,13 +19,21 @@ const props = defineProps({
     }
 })
 
-// Define a custom function to handle edit action
 function handleAddtoCart(row: any) {
-    console.log(`Add ${row.name}`)
-    row.quantity = 1;
-    addItem(row);
-    // toast.add({ title: 'Added to cart!' })
-    // You can add other edit logic here, like routing or opening a modal
+    const itemInInventory = getItemById(row.id); // الحصول على العنصر من المخزون
+
+    if (itemInInventory && itemInInventory.quantity > 0) {
+        // التحقق من أن الكمية المضافة لا تتجاوز الكمية المتاحة
+        if (1 <= itemInInventory.quantity) { // هنا نتحقق من أن الكمية المضافة (1) لا تتجاوز الكمية المتاحة
+            var tempItem=row   // إنشاء نسخة مؤقتة من العنصر لتجنب تغيير القيمة الأصلية
+            addItem(tempItem); // إضافة العنصر إلى السلة
+            console.log(`Added ${row.name} to cart`);
+        } else {
+            alert(`الكمية المطلوبة (1) تتجاوز الكمية المتاحة في المخزون (${itemInInventory.quantity})!`);
+        }
+    } else {
+        alert("الكمية غير متاحة في المخزون!");
+    }
 }
 
 // Define the columns configuration for the n-data-table
