@@ -1,14 +1,14 @@
 import { reactive } from 'vue';
-import { useInventory } from '@/composables/useInventory'; // تأكد من المسار الصحيح
+import { useInventory } from '@/composables/useInventory'; // استيراد الدالة المستخدمة للوصول إلى المخزون
 
-const state = reactive({
+const state = reactive({    // تعريف الحالة الخاصة بالسلة
     cartItems: []
 });
 
-export const useCart = () => {
+export const useCart = () => { // تعريف الدالة المستخدمة للوصول إلى السلة
     const { getItemById, updateItemQuantity } = useInventory();
 
-    const getCartItems = () => {
+    const getCartItems = () => { // الدالة المستخدمة للحصول على العناصر الموجودة في السلة
         return state.cartItems;
     };
 

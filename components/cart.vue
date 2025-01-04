@@ -5,8 +5,8 @@
                     <CartIcon />
                 </n-icon></h1>
             <div>
-                <n-button>أداة</n-button>
-                <n-button>قائمة</n-button>
+                <!-- <n-button>أداة</n-button>
+                <n-button>قائمة</n-button> -->
                 <CustomersAddcustomer />
             </div>
         </div>
@@ -14,6 +14,14 @@
             <!-- <modal /> -->
         </div>
         <div>
+            <!-- Dropdown لاختيار العميل -->
+            <n-select
+                v-model:value="selectedCustomerId"
+                :options="customerOptions"
+                placeholder="اختر عميل"
+                clearable
+                filterable
+            />
             <ul>
                 <li v-for="item in cartItems" :key="item.id">
                     <n-flex justify="space-around">
@@ -63,11 +71,17 @@ import {
     CartOutline as CartIcon
 } from '@vicons/ionicons5';
 import { computed, ref, watch } from 'vue';
+// import { useCustomers } from '@/path-to-your-customers-file'; // تأكد من استيراد useCustomers بشكل صحيح
+// import { useCart } from '@/path-to-your-cart-file'; // استيراد useCart
+// import { useSellOrder, useSellOrderDtl } from '@/path-to-your-sell-order-file'; // استيراد الدوال اللازمة
+// import { useInventory, useInventoryTrans } from '@/path-to-your-inventory-file'; // استيراد الدوال اللازمة
 
 const { getCartItems, clearCart } = useCart();
 const { addSellOrder } = useSellOrder();
 const { addSellOrdeDtl } = useSellOrderDtl();
 const { getItemById, updateItemQuantity } = useInventory(); // استيراد الدوال اللازمة لإدارة المخزون
+const { getCustomers } = useCustomers(); // استيراد getCustomers من useCustomers
+const { addItemTrans } = useInventoryTrans(); // استيراد addItemTrans من useInventoryTrans
 
 const cartItems = computed(() => getCartItems());
 let totalPrice = ref(0);
@@ -81,6 +95,17 @@ let sellOrder = ref({
     totalPrice: null,
     totalDisc: null,
     deleted: false,
+});
+
+// حالة العميل المختار
+let selectedCustomerId = ref(null);
+
+// تحويل قائمة العملاء إلى خيارات للقائمة المنسدلة
+const customerOptions = computed(() => {
+    return getCustomers().map(customer => ({
+        label: customer.name,
+        value: customer.id,
+    }));
 });
 
 // الحصول على الحد الأقصى للكمية المتاحة في المخزون
@@ -115,6 +140,11 @@ const handleSaveCart = () => {
         sellOrder.value.totalPrice = totalPrice.value;
         sellOrder.value.totalDisc = discount.value;
 
+        // إضافة العميل المختار إلى الطلب
+        if (selectedCustomerId.value) {
+            sellOrder.value.customerId = selectedCustomerId.value;
+        }
+
         let sellOrderId = addSellOrder(sellOrder.value);
 
         for (let i = 0; i < cartItems.value.length; i++) {
@@ -137,6 +167,16 @@ const handleSaveCart = () => {
                 const newQuantity = itemInInventory.quantity - cartItems.value[i].quantity;
                 updateItemQuantity(cartItems.value[i].id, newQuantity); // تحديث الكمية في المخزون
             }
+
+            // إضافة سجل sell في الـ transactions
+            const newTransaction = {
+                name: cartItems.value[i].name,
+                TransType: "sell",
+                supplier: "N/A", // يمكنك تغيير هذا إذا كان لديك معلومات المورد
+                itemId: cartItems.value[i].id,
+                date: new Date().toISOString(), // تاريخ اليوم
+            };
+            addItemTrans(newTransaction); // إضافة السجل إلى الـ transactions
         }
 
         discount.value = null;

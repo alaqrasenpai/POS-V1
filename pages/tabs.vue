@@ -1,5 +1,4 @@
 <template>
-
     <n-tabs type="segment" animated>
         <n-tab-pane name="Sell Order" tab="Sell Order">
             <n-data-table :columns="columns" :data="sellOrders" :pagination="pagination" :bordered="false" />
@@ -11,103 +10,80 @@
             <InventoryInventorytranstable :listOfItems="filteredItems" />
         </n-tab-pane>
     </n-tabs>
-
 </template>
 
 <script setup>
-import { ref } from 'vue'
-const searchTerm = ref('');
-useSellOrderDtl
-const { getItems, getItemsFiltered } = useInventory();
-const { getItemsTrans, getItemsTransFiltered } = useInventoryTrans();
+import { ref, computed } from 'vue';
 
+const { getCustomerById } = useCustomers(); // استيراد getCustomerById من useCustomers
 const { getAlldSellOrders } = useSellOrder();
 const { getAllSellOrdeDtl } = useSellOrderDtl();
+const { getItemsTrans, getItemsTransFiltered } = useInventoryTrans();
+
+const searchTerm = ref('');
 const items = getItemsTrans();
 const sellOrders = getAlldSellOrders();
 const sellOrdersDtl = getAllSellOrdeDtl();
-console.log(sellOrdersDtl)
+
+// دالة مساعدة للحصول على اسم الزبون بناءً على الـ customerId
+const getCustomerNameById = (customerId) => {
+    const customer = getCustomerById(customerId);
+    return customer ? customer.name : 'Unknown Customer';
+};
+
 const columns = [
     {
         title: 'Order Number',
-        key: 'id', // Match the property in listOfItems for Product name
+        key: 'id',
     },
     {
         title: 'Sell Date',
-        key: 'selldate', // Match the property in listOfItems for Product name
+        key: 'selldate',
     },
     {
-        title: 'Setial number',
-        key: 'serialnumber', // Match the property in listOfItems for Color
+        title: 'Customer Name',
+        key: 'customerId',
+        render: (row) => getCustomerNameById(row.customerId), // استخدام render لعرض اسم الزبون
+    },
+    {
+        title: 'Serial number',
+        key: 'serialnumber',
     },
     {
         title: 'Total discound',
-        key: 'totalDisc', // Match the property in listOfItems for Category
+        key: 'totalDisc',
     },
     {
         title: 'Total Price',
-        key: 'totalPrice', // Match the property in listOfItems for Price
-    }
+        key: 'totalPrice',
+    },
+];
 
-]
 const columnsDTL = [
     {
         title: 'Item Name',
-        key: 'itemName', // Match the property in listOfItems for Product name
+        key: 'itemName',
     },
     {
         title: 'Total Price',
-        key: 'totalPrice', // Match the property in listOfItems for Color
+        key: 'totalPrice',
     },
     {
         title: 'Quantity',
-        key: 'itemQuan', // Match the property in listOfItems for Category
+        key: 'itemQuan',
     },
     {
         title: 'Order Number',
-        key: 'orderId', // Match the property in listOfItems for Price
-    }
+        key: 'orderId',
+    },
+];
 
-]
 const filteredItems = computed(() => {
     if (!searchTerm.value) {
         return items;
     }
-    return getItemsTransFiltered(searchTerm.value)
+    return getItemsTransFiltered(searchTerm.value);
 });
-const activeTab = ref(0)
+
+const activeTab = ref(0);
 </script>
-
-<!-- <style scoped>
-.tabs-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
-
-.tabs {
-    display: flex;
-    border-bottom: 2px solid #ddd;
-}
-
-.tabs button {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    background: #f4f4f4;
-    cursor: pointer;
-    transition: background 0.3s, color 0.3s;
-}
-
-.tabs button.active {
-    background: #007bff;
-    color: white;
-    font-weight: bold;
-}
-
-.tab-content {
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-top: none;
-}
-</style> -->

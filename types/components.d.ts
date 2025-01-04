@@ -11,6 +11,7 @@ declare module 'vue' {
     NCard: typeof import('naive-ui')['NCard']
     NCheckbox: typeof import('naive-ui')['NCheckbox']
     NDataTable: typeof import('naive-ui')['NDataTable']
+    NDivider: typeof import('naive-ui')['NDivider']
     NFlex: typeof import('naive-ui')['NFlex']
     NFormItem: typeof import('naive-ui')['NFormItem']
     NGi: typeof import('naive-ui')['NGi']
