@@ -16,5 +16,10 @@ export default defineNuxtConfig({
     ]
   },
 
+  app: {
+    baseURL: '/pOS-V1/',
+    buildAssetsDir: '/_nuxt/'
+  },
+
   compatibilityDate: '2024-11-11',
 })
