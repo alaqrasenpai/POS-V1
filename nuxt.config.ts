@@ -1,22 +1,22 @@
-import AutoImport from 'unplugin-auto-import/vite'
-import Components from 'unplugin-vue-components/vite'
-import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
 
+// nuxt.config.ts
 export default defineNuxtConfig({
-  vite: {
-    plugins: [
-      AutoImport({
-        imports: [
-          'vue',
-          'vue-router',
-        ],
-        dts: 'types/auto-imports.d.ts',
-      }),
-      Components({
-        resolvers: [NaiveUiResolver()],
-        dts: 'types/components.d.ts',
-      }),
-    ],
+  ssr: false,
+
+  modules: [
+    'nuxtjs-naive-ui'
+  ],
+
+  build: {
+    transpile:
+      process.env.NODE_ENV === 'production'
+        ? [
+          'naive-ui',
+          'vueuc',
+          '@css-render/vue3-ssr',
+          '@vicons/ionicons5'
+        ]
+        : ['@vicons/ionicons5']
   },
 
   compatibilityDate: '2024-11-11',

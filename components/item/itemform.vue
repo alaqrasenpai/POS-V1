@@ -20,7 +20,7 @@
 
                 <n-form-item-gi label="التصنيف">
                     <n-select v-model:value="newItem.category" :options="categoryOptions" placeholder="اختر التصنيف"
-                        filterable clearable placement="bottom-start" />
+                        filterable clearable />
                 </n-form-item-gi>
                 <n-form-item-gi label="الكمية">
                     <n-input-number placeholder="الكمية المتوفرة" v-model:value="newItem.quantity" :min="0"

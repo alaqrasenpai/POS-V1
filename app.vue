@@ -2,67 +2,85 @@
   <n-config-provider :locale="arDZ" :date-locale="dateArDZ" :theme-overrides="themeOverrides">
     <n-message-provider>
       <n-dialog-provider>
-        <!-- إذا كانت الصفحة هي صفحة تسجيل الدخول (عادية أو سوبر)، نعرضها بدون الهيدر والمينيو -->
-        <div v-if="isLoginPage">
-          <NuxtPage />
-        </div>
-
-        <!-- باقي صفحات النظام التي تتطلب الهيدر والقائمة الجانبية -->
-        <div v-else class="app-container">
-          <div class="app-header">
-            <div class="header-right">
-              <n-button quaternary v-if="isMobile" @click="showMobileMenu = true">
-                <template #icon><n-icon>
-                    <MenuOutline />
-                  </n-icon></template>
-              </n-button>
-              <n-text strong class="system-title">{{ settings.shopName }}</n-text>
-            </div>
-            <div class="header-left">
-              <div class="user-info" v-if="!isMobile && currentUser">
-                <n-text strong>{{ currentUser.name }}</n-text>
-                <n-text depth="3" style="font-size: 0.8rem;"> ({{ currentUser.role }})</n-text>
-              </div>
-            </div>
+        <n-notification-provider>
+          <!-- إذا كانت الصفحة هي صفحة تسجيل الدخول (عادية أو سوبر)، نعرضها بدون الهيدر والمينيو -->
+          <div v-if="isLoginPage">
+            <NuxtPage />
           </div>
 
-          <n-layout has-sider class="main-layout" style="height: calc(100vh - 56px);">
-            <Sidebar v-if="!isMobile" />
-
-            <n-drawer v-model:show="showMobileMenu" :width="240" placement="right">
-              <SidebarContent @select="showMobileMenu = false" />
-            </n-drawer>
-
-            <n-layout-content :content-style="contentStyle" :native-scrollbar="false">
-              <div class="page-padding">
-                <NuxtPage />
+          <!-- باقي صفحات النظام التي تتطلب الهيدر والقائمة الجانبية -->
+          <div v-else class="app-container">
+            <div class="app-header">
+              <div class="header-right">
+                <n-button quaternary v-if="isMobile" @click="showMobileMenu = true">
+                  <template #icon><n-icon>
+                      <MenuOutline />
+                    </n-icon></template>
+                </n-button>
+                <n-text strong class="system-title">{{ settings.shopName }}</n-text>
               </div>
-            </n-layout-content>
-          </n-layout>
-        </div>
+              <div class="header-left">
+                <div v-if="!isMobile && currentUser" class="user-info-wrapper">
+                  <n-dropdown :options="userMenuOptions" @select="handleUserMenuClick">
+                    <div class="user-info">
+                      <n-text strong>{{ currentUser.name }}</n-text>
+                      <n-text depth="3" style="font-size: 0.8rem;"> ({{ currentUser.role }})</n-text>
+                    </div>
+                  </n-dropdown>
+                </div>
+                <n-divider vertical v-if="!isMobile" />
+                <Notifications />
+              </div>
+            </div>
+
+            <n-layout has-sider class="main-layout" style="height: calc(100vh - 56px);">
+              <Sidebar v-if="!isMobile" />
+
+              <n-drawer v-model:show="showMobileMenu" :width="240" placement="right">
+                <SidebarContent @select="showMobileMenu = false" />
+              </n-drawer>
+
+              <n-layout-content :content-style="contentStyle" :native-scrollbar="false">
+                <div class="page-padding">
+                  <NuxtPage />
+                </div>
+              </n-layout-content>
+            </n-layout>
+          </div>
+        </n-notification-provider>
       </n-dialog-provider>
     </n-message-provider>
   </n-config-provider>
 </template>
 
 <script setup>
-import { MenuOutline } from '@vicons/ionicons5'
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { MenuOutline, PersonOutline, LogOutOutline, SettingsOutline } from '@vicons/ionicons5'
+import { ref, computed, onMounted, onUnmounted, h } from 'vue'
 import { useRoute } from 'vue-router'
-import { arDZ, dateArDZ } from 'naive-ui'
+import { arDZ, dateArDZ, NIcon } from 'naive-ui'
 
 const route = useRoute()
-// الصفحات التي تظهر بدون الإطار العام (layout)
 const isLoginPage = computed(() => ['/login', '/super-login'].includes(route.path))
-
 const showMobileMenu = ref(false)
 const windowWidth = ref(0)
 const isMounted = ref(false)
-
 const { settings } = useSettings()
-const { checkAuth, currentUser } = useAuth()
+const { checkAuth, currentUser, logout } = useAuth()
 
 const isMobile = computed(() => isMounted.value && windowWidth.value < 768)
+
+const renderIcon = (icon) => () => h(NIcon, null, { default: () => h(icon) })
+
+const userMenuOptions = [
+  { label: 'الملف الشخصي', key: 'profile', icon: renderIcon(PersonOutline) },
+  { label: 'الإعدادات', key: 'settings', icon: renderIcon(SettingsOutline) },
+  { type: 'divider', key: 'd1' },
+  { label: 'تسجيل الخروج', key: 'logout', icon: renderIcon(LogOutOutline) }
+]
+
+const handleUserMenuClick = (key) => {
+  if (key === 'logout') logout()
+}
 
 const updateWidth = () => {
   if (typeof window !== 'undefined') {
@@ -71,18 +89,14 @@ const updateWidth = () => {
 }
 
 onMounted(() => {
-  // تفعيل الـ RTL على مستوى الـ HTML
-  if (typeof document !== 'undefined') {
-    document.documentElement.setAttribute('dir', 'rtl')
-    document.documentElement.setAttribute('lang', 'ar')
-  }
   isMounted.value = true
-
-  // تحديث حالة المصادقة من الـ cookie
   checkAuth()
-
   updateWidth()
   window.addEventListener('resize', updateWidth)
+
+  if (typeof document !== 'undefined') {
+    document.documentElement.setAttribute('dir', 'ltr')
+  }
 })
 
 const themeOverrides = {
@@ -145,6 +159,17 @@ body {
 .system-title {
   font-size: 1.1rem;
   color: #18a058;
+}
+
+.user-info-wrapper {
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.user-info-wrapper:hover {
+  background: #f3f4f6;
 }
 
 .header-right,
