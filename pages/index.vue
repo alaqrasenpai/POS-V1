@@ -5,7 +5,7 @@
         <n-h1 class="page-title">نظرة عامة على النظام</n-h1>
         <n-text class="page-subtitle">مرحباً بك مجدداً، إليك ملخص أداء متجرك اليوم</n-text>
       </div>
-      <n-flex v-if="!isMobile">
+      <n-flex v-if="!isMobile" :size="16">
         <n-button type="primary" secondary @click="refreshDashboard">
           <template #icon><n-icon>
               <RefreshIcon />
@@ -22,7 +22,7 @@
     </div>
 
     <!-- بطاقات الإحصائيات الرئيسية -->
-    <n-grid :cols="isMobile ? 1 : 4" :x-gap="16" :y-gap="16">
+    <n-grid :cols="isMobile ? 1 : 4" :x-gap="24" :y-gap="24">
       <n-gi>
         <n-card class="stat-card sales-stat" :bordered="false">
           <div class="stat-icon sales">
@@ -83,27 +83,31 @@
       </n-gi>
     </n-grid>
 
-    <n-grid :cols="isMobile ? 1 : 12" :x-gap="16" :y-gap="16" style="margin-top: 24px;">
+    <n-grid :cols="isMobile ? 1 : 12" :x-gap="24" :y-gap="24" style="margin-top: 40px;">
       <!-- مخطط مبيعات الأسبوع -->
       <n-gi span="8">
         <n-card title="حركة المبيعات (آخر 7 أيام)" class="main-content-card" :bordered="false">
           <template #header-extra>
             <n-tag type="success" size="small" round>مباشر</n-tag>
           </template>
-          <Chart type="area" :options="salesChartOptions" :series="salesSeries" />
+          <div style="padding: 10px 0;">
+            <Chart type="area" :options="salesChartOptions" :series="salesSeries" />
+          </div>
         </n-card>
       </n-gi>
 
       <!-- توزيع التصنيفات -->
       <n-gi span="4">
         <n-card title="توزيع مبيعات التصنيفات" class="main-content-card" :bordered="false">
-          <Chart type="donut" :options="categoryChartOptions" :series="categorySeries" />
-          <div style="margin-top: 10px;">
-            <n-list size="small">
+          <div style="padding: 10px 0;">
+            <Chart type="donut" :options="categoryChartOptions" :series="categorySeries" />
+          </div>
+          <div style="margin-top: 20px;">
+            <n-list size="small" bordered>
               <n-list-item v-for="(cat, index) in topCategories" :key="index">
                 <n-flex justify="space-between" align="center">
                   <n-text strong>{{ cat.name }}</n-text>
-                  <n-tag :bordered="false" size="small" type="info">{{ cat.count }} قطة</n-tag>
+                  <n-tag :bordered="false" size="small" type="info">{{ cat.count }} قطعة</n-tag>
                 </n-flex>
               </n-list-item>
             </n-list>
@@ -113,15 +117,16 @@
 
       <!-- تنبيهات المخزون المنخفض -->
       <n-gi :span="isMobile ? 12 : 5">
-        <n-card title="تنبيهات المخزون (تحتاج لطلب)" class="main-content-card" :bordered="false"
+        <n-card title="تنببهات المخزون (تحتاج لطلب)" class="main-content-card" :bordered="false"
           header-style="color: #d03050">
           <template #header-extra>
             <n-button text type="error" @click="$router.push('/inventory')">عرض الكل</n-button>
           </template>
-          <n-empty v-if="lowStockItems.length === 0" description="كل الأصناف متوفرة بشكل جيد" />
+          <n-empty v-if="lowStockItems.length === 0" description="كل الأصناف متوفرة بشكل جيد"
+            style="padding: 40px 0;" />
           <n-scrollbar v-else style="max-height: 350px;">
             <n-list hoverable clickable>
-              <n-list-item v-for="item in lowStockItems" :key="item.id">
+              <n-list-item v-for="item in lowStockItems" :key="item.id" style="padding: 12px;">
                 <template #prefix>
                   <n-avatar round :style="{ backgroundColor: '#fff1f0', color: '#f5222d' }">
                     <n-icon>
@@ -131,8 +136,11 @@
                 </template>
                 <n-thing :title="item.name" :description="item.category">
                   <template #footer>
-                    <n-text depth="3">الكمية المتبقية: </n-text>
-                    <n-tag :type="item.quantity === 0 ? 'error' : 'warning'" size="small">{{ item.quantity }}</n-tag>
+                    <n-flex align="center" :size="8">
+                      <n-text depth="3">الكمية المتبقية: </n-text>
+                      <n-tag :type="item.quantity === 0 ? 'error' : 'warning'" size="small" round>{{ item.quantity
+                        }}</n-tag>
+                    </n-flex>
                   </template>
                 </n-thing>
               </n-list-item>
@@ -144,8 +152,10 @@
       <!-- أحدث العمليات -->
       <n-gi :span="isMobile ? 12 : 7">
         <n-card title="أحدث عمليات البيع" class="main-content-card" :bordered="false">
-          <n-data-table :columns="recentOrdersColumns" :data="recentOrders" :bordered="false" size="small" />
-          <n-flex justify="center" style="margin-top: 16px;">
+          <div style="margin-bottom: 16px;">
+            <n-data-table :columns="recentOrdersColumns" :data="recentOrders" :bordered="false" size="small" />
+          </div>
+          <n-flex justify="center" style="margin-top: 24px; padding-bottom: 10px;">
             <n-button quaternary type="primary" @click="$router.push('/tabs')">عرض سجل العمليات الكامل</n-button>
           </n-flex>
         </n-card>

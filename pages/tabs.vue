@@ -8,78 +8,57 @@
     </div>
 
     <n-card class="main-content-card" :bordered="false">
-      <n-tabs type="line" animated size="large" justify-content="start">
+      <n-tabs type="line" animated size="large" justify-content="start" style="padding: 12px 0;">
         <!-- تبويب طلبات البيع -->
         <n-tab-pane name="sell-orders" tab="طلبات البيع">
-          <div style="padding: 16px 0">
-            <n-flex justify="end" style="margin-bottom: 16px">
-              <n-input 
-                v-model:value="searchTermOrders" 
-                placeholder="البحث في الطلبات..." 
-                clearable
-                :style="{ width: isMobile ? '100%' : '300px' }"
-              >
+          <div style="padding: 24px 0">
+            <n-flex justify="end" style="margin-bottom: 24px">
+              <n-input v-model:value="searchTermOrders" placeholder="البحث في الطلبات..." clearable
+                :style="{ width: isMobile ? '100%' : '320px' }">
                 <template #prefix>
-                  <n-icon><SearchOutline /></n-icon>
+                  <n-icon>
+                    <SearchOutline />
+                  </n-icon>
                 </template>
               </n-input>
             </n-flex>
-            <n-data-table 
-              :columns="ordersColumns" 
-              :data="filteredSellOrders" 
-              :pagination="ordersPagination"
-              :bordered="false"
-              :scroll-x="1200"
-              :loading="loadingOrders"
-            />
+            <n-data-table :columns="ordersColumns" :data="filteredSellOrders" :pagination="ordersPagination"
+              :bordered="false" :scroll-x="1200" :loading="loadingOrders" />
           </div>
         </n-tab-pane>
 
         <!-- تبويب تفاصيل الطلبات -->
         <n-tab-pane name="order-details" tab="تفاصيل الطلبات">
-          <div style="padding: 16px 0">
-            <n-flex justify="end" style="margin-bottom: 16px">
-              <n-input 
-                v-model:value="searchTermDetails" 
-                placeholder="البحث في التفاصيل..." 
-                clearable
-                :style="{ width: isMobile ? '100%' : '300px' }"
-              >
+          <div style="padding: 24px 0">
+            <n-flex justify="end" style="margin-bottom: 24px">
+              <n-input v-model:value="searchTermDetails" placeholder="البحث في التفاصيل..." clearable
+                :style="{ width: isMobile ? '100%' : '320px' }">
                 <template #prefix>
-                  <n-icon><SearchOutline /></n-icon>
+                  <n-icon>
+                    <SearchOutline />
+                  </n-icon>
                 </template>
               </n-input>
             </n-flex>
-            <n-data-table 
-              :columns="detailsColumns" 
-              :data="filteredSellOrdersDtl" 
-              :pagination="detailsPagination"
-              :bordered="false"
-              :scroll-x="1000"
-              :loading="loadingDetails"
-            />
+            <n-data-table :columns="detailsColumns" :data="filteredSellOrdersDtl" :pagination="detailsPagination"
+              :bordered="false" :scroll-x="1000" :loading="loadingDetails" />
           </div>
         </n-tab-pane>
 
         <!-- تبويب المعاملات -->
         <n-tab-pane name="transactions" tab="سجل المخزون">
-          <div style="padding: 16px 0">
-            <n-flex justify="end" style="margin-bottom: 16px">
-              <n-input 
-                v-model:value="searchTermTransactions" 
-                placeholder="البحث في المعاملات..." 
-                clearable
-                :style="{ width: isMobile ? '100%' : '300px' }"
-              >
+          <div style="padding: 24px 0">
+            <n-flex justify="end" style="margin-bottom: 24px">
+              <n-input v-model:value="searchTermTransactions" placeholder="البحث في المعاملات..." clearable
+                :style="{ width: isMobile ? '100%' : '320px' }">
                 <template #prefix>
-                  <n-icon><SearchOutline /></n-icon>
+                  <n-icon>
+                    <SearchOutline />
+                  </n-icon>
                 </template>
               </n-input>
             </n-flex>
-            <InventoryInventorytranstable 
-              :listOfItems="filteredTransactions" 
-              :searchTerm="searchTermTransactions"
-            />
+            <InventoryInventorytranstable :listOfItems="filteredTransactions" :searchTerm="searchTermTransactions" />
           </div>
         </n-tab-pane>
       </n-tabs>
@@ -241,7 +220,7 @@ const detailsPagination = computed(() => ({ pageSize: 10 }))
 const filteredSellOrders = computed(() => {
   if (!searchTermOrders.value) return sellOrders.value
   const term = searchTermOrders.value.toLowerCase()
-  return sellOrders.value.filter(order => 
+  return sellOrders.value.filter(order =>
     String(order.id).includes(term) ||
     (order.serialnumber && order.serialnumber.includes(term)) ||
     getCustomerNameById(order.customerId).toLowerCase().includes(term)
@@ -251,7 +230,7 @@ const filteredSellOrders = computed(() => {
 const filteredSellOrdersDtl = computed(() => {
   if (!searchTermDetails.value) return sellOrdersDtl.value
   const term = searchTermDetails.value.toLowerCase()
-  return sellOrdersDtl.value.filter(detail => 
+  return sellOrdersDtl.value.filter(detail =>
     String(detail.orderId).includes(term) ||
     (detail.itemName && detail.itemName.toLowerCase().includes(term))
   )
@@ -260,7 +239,7 @@ const filteredSellOrdersDtl = computed(() => {
 const filteredTransactions = computed(() => {
   if (!searchTermTransactions.value) return transactions.value
   const term = searchTermTransactions.value.toLowerCase()
-  return transactions.value.filter(trans => 
+  return transactions.value.filter(trans =>
     (trans.name && trans.name.toLowerCase().includes(term)) ||
     (trans.TransType && trans.TransType.toLowerCase().includes(term))
   )
@@ -273,6 +252,7 @@ const filteredTransactions = computed(() => {
   font-weight: 700;
   color: #4b5563;
 }
+
 :deep(.n-tabs-tab) {
   font-weight: 600;
 }

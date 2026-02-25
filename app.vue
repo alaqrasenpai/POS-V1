@@ -193,9 +193,56 @@ body {
   padding: 24px;
 }
 
+/* تحسين المسافات العالمية */
+.page-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.page-title-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  gap: 16px;
+}
+
+.page-header-text {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.page-title {
+  margin: 0 !important;
+  font-weight: 800 !important;
+  color: #1f2937;
+  font-size: 1.8rem !important;
+}
+
+.page-subtitle {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.main-content-card {
+  border-radius: 16px !important;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06) !important;
+}
+
 @media (max-width: 768px) {
   .page-padding {
-    padding: 12px;
+    padding: 16px;
+  }
+
+  .page-container {
+    gap: 16px;
+  }
+
+  .page-title-section {
+    flex-direction: column;
+    align-items: flex-start;
   }
 }
 </style>

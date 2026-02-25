@@ -1,26 +1,24 @@
 <template>
-  <div class="activity-log-page">
-    <div class="page-header">
-      <div class="header-left">
-        <n-h1 style="margin-bottom: 4px;">سجل أنشطة النظام</n-h1>
-        <n-text depth="3">مراقبة جميع العمليات والحركات التي تمت على النظام</n-text>
+  <div class="page-container">
+    <div class="page-title-section">
+      <div class="page-header-text">
+        <n-h1 class="page-title">سجل أنشطة النظام</n-h1>
+        <n-text class="page-subtitle">مراقبة جميع العمليات والحركات التي تمت على النظام</n-text>
       </div>
       <n-button quaternary type="error" @click="handleClearLogs" v-if="hasPermission('all')">
         <template #icon>
-          <n-icon><TrashIcon /></n-icon>
+          <n-icon>
+            <TrashIcon />
+          </n-icon>
         </template>
         مسح السجل
       </n-button>
     </div>
 
-    <n-card :bordered="false" class="main-card">
-      <n-data-table
-        :columns="columns"
-        :data="logs"
-        :pagination="pagination"
-        :bordered="false"
-        scroll-x="900"
-      />
+    <n-card :bordered="false" class="main-content-card">
+      <div style="padding: 12px 0;">
+        <n-data-table :columns="columns" :data="logs" :pagination="pagination" :bordered="false" scroll-x="900" />
+      </div>
     </n-card>
   </div>
 </template>
@@ -102,16 +100,6 @@ const columns = [
 </script>
 
 <style scoped>
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
-}
-.main-card {
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-}
 :deep(.n-data-table .n-data-table-th) {
   background-color: #f9fafb;
 }

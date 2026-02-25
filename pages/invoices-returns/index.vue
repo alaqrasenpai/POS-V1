@@ -1,69 +1,50 @@
 <template>
-  <div class="invoices-returns-page">
-    <n-card title="الفواتير والمرتجعات" style="margin-bottom: 20px;">
-      <n-tabs type="line" animated>
+  <div class="page-container">
+    <div class="page-title-section">
+      <div class="page-header-text">
+        <n-h1 class="page-title">الفواتير والمرتجعات</n-h1>
+        <n-text class="page-subtitle">إدارة ومراجعة فواتير المبيعات وحالات الإرجاع</n-text>
+      </div>
+    </div>
+
+    <n-card class="main-content-card" :bordered="false">
+      <n-tabs type="line" animated size="large" justify-content="start" style="padding: 12px 0;">
         <!-- تبويب الفواتير -->
         <n-tab-pane name="invoices" tab="الفواتير">
-          <n-card>
-            <template #header>
-              <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                <n-h3 style="margin: 0;">قائمة الفواتير</n-h3>
-                <n-flex>
-                  <n-input 
-                    v-model:value="searchTermInvoices" 
-                    placeholder="البحث في الفواتير..." 
-                    clearable
-                    style="width: 300px;"
-                  >
-                    <template #prefix>
-                      <n-icon><SearchOutline /></n-icon>
-                    </template>
-                  </n-input>
-                </n-flex>
-              </div>
-            </template>
-            <n-data-table 
-              :columns="invoicesColumns" 
-              :data="filteredInvoices" 
-              :pagination="invoicesPagination"
-              :bordered="true"
-              :single-line="false"
-              :scroll-x="1200"
-              :loading="loadingInvoices"
-            />
-          </n-card>
+          <div style="padding: 24px 0">
+            <n-flex justify="space-between" align="center" style="margin-bottom: 24px">
+              <n-h3 style="margin: 0;">قائمة الفواتير</n-h3>
+              <n-input v-model:value="searchTermInvoices" placeholder="البحث في الفواتير..." clearable
+                :style="{ width: isMobile ? '100%' : '320px' }">
+                <template #prefix>
+                  <n-icon>
+                    <SearchOutline />
+                  </n-icon>
+                </template>
+              </n-input>
+            </n-flex>
+            <n-data-table :columns="invoicesColumns" :data="filteredInvoices" :pagination="invoicesPagination"
+              :bordered="false" :scroll-x="1200" :loading="loadingInvoices" />
+          </div>
         </n-tab-pane>
 
         <!-- تبويب المرتجعات -->
         <n-tab-pane name="returns" tab="المرتجعات">
-          <n-card>
-            <template #header>
-              <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                <n-h3 style="margin: 0;">قائمة المرتجعات</n-h3>
-                <n-flex>
-                  <n-input 
-                    v-model:value="searchTermReturns" 
-                    placeholder="البحث في المرتجعات..." 
-                    clearable
-                    style="width: 300px;"
-                  >
-                    <template #prefix>
-                      <n-icon><SearchOutline /></n-icon>
-                    </template>
-                  </n-input>
-                </n-flex>
-              </div>
-            </template>
-            <n-data-table 
-              :columns="returnsColumns" 
-              :data="filteredReturns" 
-              :pagination="returnsPagination"
-              :bordered="true"
-              :single-line="false"
-              :scroll-x="1000"
-              :loading="loadingReturns"
-            />
-          </n-card>
+          <div style="padding: 24px 0">
+            <n-flex justify="space-between" align="center" style="margin-bottom: 24px">
+              <n-h3 style="margin: 0;">قائمة المرتجعات</n-h3>
+              <n-input v-model:value="searchTermReturns" placeholder="البحث في المرتجعات..." clearable
+                :style="{ width: isMobile ? '100%' : '320px' }">
+                <template #prefix>
+                  <n-icon>
+                    <SearchOutline />
+                  </n-icon>
+                </template>
+              </n-input>
+            </n-flex>
+            <n-data-table :columns="returnsColumns" :data="filteredReturns" :pagination="returnsPagination"
+              :bordered="false" :scroll-x="1000" :loading="loadingReturns" />
+          </div>
         </n-tab-pane>
       </n-tabs>
     </n-card>
@@ -245,10 +226,10 @@ onMounted(async () => {
   try {
     loadingInvoices.value = true
     loadingReturns.value = true
-    
+
     // تحميل الفواتير (من طلبات البيع الموجودة)
     invoices.value = getAlldSellOrders()
-    
+
     // تحميل المرتجعات (بيانات مثال)
     returns.value = [
       {
@@ -279,7 +260,7 @@ onMounted(async () => {
         status: 'rejected'
       }
     ]
-    
+
   } catch (error) {
     console.error('خطأ في تحميل البيانات:', error)
   } finally {
@@ -301,9 +282,9 @@ const returnsPagination = computed(() => ({
 // تصفية الفواتير
 const filteredInvoices = computed(() => {
   if (!searchTermInvoices.value) return invoices.value
-  
+
   const term = searchTermInvoices.value.toLowerCase()
-  return invoices.value.filter(invoice => 
+  return invoices.value.filter(invoice =>
     String(invoice.id).includes(term) ||
     (invoice.serialnumber && invoice.serialnumber.includes(term)) ||
     (invoice.selldate && new Date(invoice.selldate).toLocaleDateString().includes(term)) ||
@@ -316,9 +297,9 @@ const filteredInvoices = computed(() => {
 // تصفية المرتجعات
 const filteredReturns = computed(() => {
   if (!searchTermReturns.value) return returns.value
-  
+
   const term = searchTermReturns.value.toLowerCase()
-  return returns.value.filter(returnItem => 
+  return returns.value.filter(returnItem =>
     String(returnItem.returnId).includes(term) ||
     String(returnItem.invoiceId).includes(term) ||
     (returnItem.returnDate && returnItem.returnDate.includes(term)) ||
@@ -342,36 +323,8 @@ const handleViewReturn = (returnItem) => {
 </script>
 
 <style scoped>
-.invoices-returns-page {
-  padding: 0;
-}
-
-:deep(.n-card) {
-  border-radius: 12px;
-}
-
 :deep(.n-data-table .n-data-table-th) {
   background-color: #f8f9fa;
   font-weight: bold;
-}
-
-:deep(.n-tabs .n-tabs-nav-scroll-content) {
-  background-color: white;
-  padding: 0 12px;
-  border-radius: 8px 8px 0 0;
-}
-
-@media (max-width: 768px) {
-  :deep(.n-card-header) {
-    padding: 12px !important;
-  }
-  
-  :deep(.n-card-content) {
-    padding: 12px !important;
-  }
-  
-  .search-input {
-    width: 100% !important;
-  }
 }
 </style>

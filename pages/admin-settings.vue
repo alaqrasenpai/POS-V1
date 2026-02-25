@@ -8,39 +8,45 @@
     </div>
 
     <n-card :bordered="false" class="main-content-card">
-      <n-tabs type="line" animated size="large" justify-content="start">
+      <n-tabs type="line" animated size="large" justify-content="start" style="padding: 12px 0;">
         <n-tab-pane name="general" tab="الإعدادات العامة">
           <template #tab>
-            <n-space align="center" :size="4">
-              <n-icon><SettingsIcon /></n-icon>
+            <n-space align="center" :size="8">
+              <n-icon>
+                <SettingsIcon />
+              </n-icon>
               <span>الإعدادات العامة</span>
             </n-space>
           </template>
-          <div style="padding: 16px 0">
+          <div style="padding: 24px 0">
             <GeneralSettings />
           </div>
         </n-tab-pane>
 
         <n-tab-pane name="users" tab="إدارة المستخدمين">
           <template #tab>
-            <n-space align="center" :size="4">
-              <n-icon><UsersIcon /></n-icon>
+            <n-space align="center" :size="8">
+              <n-icon>
+                <UsersIcon />
+              </n-icon>
               <span>المستخدمين</span>
             </n-space>
           </template>
-          <div style="padding: 16px 0">
+          <div style="padding: 24px 0">
             <UserManagement />
           </div>
         </n-tab-pane>
 
         <n-tab-pane name="activity" tab="سجل الأنشطة">
           <template #tab>
-            <n-space align="center" :size="4">
-              <n-icon><LogIcon /></n-icon>
+            <n-space align="center" :size="8">
+              <n-icon>
+                <LogIcon />
+              </n-icon>
               <span>سجل الأنشطة</span>
             </n-space>
           </template>
-          <div style="padding: 16px 0">
+          <div style="padding: 24px 0">
             <ActivityLogManagement />
           </div>
         </n-tab-pane>
@@ -50,10 +56,10 @@
 </template>
 
 <script setup>
-import { 
-  SettingsOutline as SettingsIcon, 
-  PeopleOutline as UsersIcon, 
-  ListOutline as LogIcon 
+import {
+  SettingsOutline as SettingsIcon,
+  PeopleOutline as UsersIcon,
+  ListOutline as LogIcon
 } from '@vicons/ionicons5'
 import { useAuth } from '@/composables/useAuth'
 import { useMessage } from 'naive-ui'

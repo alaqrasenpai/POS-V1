@@ -5,30 +5,32 @@
         <n-h1 class="page-title">إدارة الموردين</n-h1>
         <n-text class="page-subtitle">إدارة جهات الاتصال، المشتريات، وفواتير التوريد</n-text>
       </div>
-      <n-flex v-if="!isMobile">
+      <n-flex v-if="!isMobile" :size="16">
         <SuppliersAddSupplier />
       </n-flex>
     </div>
 
     <n-card class="main-content-card" :bordered="false">
-      <n-flex justify="space-between" align="center">
-        <n-input 
-          v-model:value="searchTerm" 
-          placeholder="البحث باسم المورد أو الشركة" 
-          clearable
-          :style="{ width: isMobile ? '100%' : '300px' }"
-        >
+      <n-flex justify="space-between" align="center" :size="16">
+        <n-input v-model:value="searchTerm" placeholder="البحث باسم المورد أو الشركة" clearable
+          :style="{ width: isMobile ? '100%' : '320px' }">
           <template #prefix>
-            <n-icon><SearchOutline /></n-icon>
+            <n-icon>
+              <SearchOutline />
+            </n-icon>
           </template>
         </n-input>
-        <SuppliersAddSupplier v-if="isMobile" style="margin-top: 12px; width: 100%;" />
+        <SuppliersAddSupplier v-if="isMobile" style="margin-top: 16px; width: 100%;" />
       </n-flex>
     </n-card>
 
-    <n-card class="main-content-card" :bordered="false">
-      <SuppliersSupplierstable :listOfItems="filteredSuppliers" />
-    </n-card>
+    <div style="margin-top: 16px;">
+      <n-card class="main-content-card" :bordered="false">
+        <div style="padding: 8px 0;">
+          <SuppliersSupplierstable :listOfItems="filteredSuppliers" />
+        </div>
+      </n-card>
+    </div>
   </div>
 </template>
 
@@ -51,5 +53,4 @@ const filteredSuppliers = computed(() => {
 })
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
