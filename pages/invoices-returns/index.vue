@@ -58,10 +58,12 @@ import { NButton, NTag } from 'naive-ui'
 import { SearchOutline } from '@vicons/ionicons5'
 import { useSellOrder } from '@/composables/useSellOrder'
 import { useCustomers } from '@/composables/useCustomers'
+import { useSettings } from '@/composables/useSettings'
 
 // استخدام composables
 const { getAlldSellOrders } = useSellOrder()
 const { getCustomerById } = useCustomers()
+const { settings } = useSettings()
 
 // حالات التحميل
 const loadingInvoices = ref(false)
@@ -127,7 +129,7 @@ const invoicesColumns = [
     width: 120,
     sorter: 'default',
     render(row) {
-      return `${row.totalDisc || 0}₪`
+      return `${row.totalDisc || 0} ${settings.value.currency}`
     }
   },
   {
@@ -137,7 +139,7 @@ const invoicesColumns = [
     sorter: 'default',
     fixed: 'right',
     render(row) {
-      return `${row.totalPrice || 0}₪`
+      return `${row.totalPrice || 0} ${settings.value.currency}`
     }
   },
   {
@@ -195,7 +197,7 @@ const returnsColumns = [
     width: 120,
     sorter: 'default',
     render(row) {
-      return `${row.returnAmount || 0}₪`
+      return `${row.returnAmount || 0} ${settings.value.currency}`
     }
   },
   {

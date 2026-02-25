@@ -6,15 +6,19 @@
                 <!-- زر تصدير البيانات -->
                 <n-button @click="exportData">
                     <template #icon>
-                        <n-icon><DownloadOutline /></n-icon>
+                        <n-icon>
+                            <DownloadOutline />
+                        </n-icon>
                     </template>
                     تصدير البيانات
                 </n-button>
-                
+
                 <!-- زر طباعة الجدول -->
                 <n-button @click="printTable">
                     <template #icon>
-                        <n-icon><PrintOutline /></n-icon>
+                        <n-icon>
+                            <PrintOutline />
+                        </n-icon>
                     </template>
                     طباعة
                 </n-button>
@@ -22,15 +26,8 @@
         </n-flex>
 
         <!-- جدول المنتجات مع خاصية الفرز -->
-        <n-data-table 
-            :columns="columns" 
-            :data="listOfItems" 
-            :pagination="pagination"
-            :bordered="true"
-            :single-line="false"
-            :scroll-x="1200"
-            ref="tableRef"
-        />
+        <n-data-table :columns="columns" :data="listOfItems" :pagination="pagination" :bordered="true"
+            :single-line="false" :scroll-x="1200" ref="tableRef" />
     </div>
 </template>
 
@@ -40,6 +37,10 @@ import { NButton, NTag, useMessage } from 'naive-ui'
 import type { DataTableColumns, DataTableInst } from 'naive-ui'
 import EditItem from '../item/editItem.vue'
 import { DownloadOutline, PrintOutline } from '@vicons/ionicons5'
+import { useSettings } from '@/composables/useSettings'
+
+const { getCurrency } = useSettings()
+const currency = getCurrency()
 
 // تعريف Props
 const props = defineProps({
@@ -76,12 +77,12 @@ const exportData = () => {
             item.quantity,
             getStatus(item.quantity, item.deleted).text
         ])
-        
+
         let csvContent = headers.join(',') + '\n'
         rows.forEach(row => {
             csvContent += row.join(',') + '\n'
         })
-        
+
         // إنشاء ملف وتحميله
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
         const url = URL.createObjectURL(blob)
@@ -92,7 +93,7 @@ const exportData = () => {
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
-        
+
         message.success('تم تصدير البيانات بنجاح')
     } catch (error) {
         message.error('حدث خطأ أثناء تصدير البيانات')
@@ -129,7 +130,7 @@ const columns: DataTableColumns<any> = [
         key: 'price',
         sorter: (row1, row2) => row1.price - row2.price,
         render(row) {
-            return `${row.price}₪`
+            return `${row.price} ${currency}`
         },
         width: 120
     },
@@ -188,12 +189,12 @@ const pagination = computed(() => ({
     body * {
         visibility: hidden;
     }
-    
-    .n-data-table, 
+
+    .n-data-table,
     .n-data-table * {
         visibility: visible;
     }
-    
+
     .n-data-table {
         position: absolute;
         left: 0;

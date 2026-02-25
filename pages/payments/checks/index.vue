@@ -7,7 +7,7 @@
       </div>
       <n-space>
         <n-tag type="warning" size="large" round>
-          بانتظار التحصيل: {{ pendingTotal }} د.أ
+          بانتظار التحصيل: {{ pendingTotal }} {{ currency }}
         </n-tag>
       </n-space>
     </div>
@@ -23,8 +23,11 @@ import { computed, h } from 'vue'
 useHead({ title: 'إدارة الشيكات' })
 import { NTag, NButton, NSpace, NText, useMessage } from 'naive-ui'
 import { usePayments } from '@/composables/usePayments'
+import { useSettings } from '@/composables/useSettings'
 
 const { getChecks, updateCheckStatus } = usePayments()
+const { getCurrency } = useSettings()
+const currency = getCurrency()
 const message = useMessage()
 const checks = computed(() => getChecks())
 
@@ -39,7 +42,7 @@ const pagination = { pageSize: 10 }
 const columns = [
   { title: 'رقم الشيك', key: 'checkNumber' },
   { title: 'اسم المشتري', key: 'customerName' },
-  { title: 'المبلغ', key: 'amount', render(row) { return `${row.amount} د.أ` } },
+  { title: 'المبلغ', key: 'amount', render(row) { return `${row.amount} ${currency}` } },
   { title: 'تاريخ الاستحقاق', key: 'dueDate' },
   {
     title: 'الحالة',

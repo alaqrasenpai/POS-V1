@@ -6,7 +6,7 @@
         <n-text depth="3">متابعة مبيعات التقسيط والمبالغ المتبقية</n-text>
       </div>
       <n-tag type="info" size="large" round>
-        إجمالي المبالغ المستحقة: {{ totalRemaining }} د.أ
+        إجمالي المبالغ المستحقة: {{ totalRemaining }} {{ currency }}
       </n-tag>
     </div>
 
@@ -31,8 +31,11 @@ import { computed, ref, h } from 'vue'
 useHead({ title: 'إدارة الأقساط' })
 import { NTag, NButton, NSpace, NProgress, useMessage } from 'naive-ui'
 import { usePayments } from '@/composables/usePayments'
+import { useSettings } from '@/composables/useSettings'
 
 const { getInstallments, addInstallmentPayment } = usePayments()
+const { getCurrency } = useSettings()
+const currency = getCurrency()
 const message = useMessage()
 const installments = computed(() => getInstallments())
 
@@ -52,7 +55,7 @@ const handlePayment = (row) => {
 
 const confirmPayment = () => {
   addInstallmentPayment(selectedInstallment.value.id, paymentAmount.value)
-  message.success(`تم تسجيل دفعة بقيمة ${paymentAmount.value} د.أ`)
+  message.success(`تم تسجيل دفعة بقيمة ${paymentAmount.value} ${currency}`)
   showPaymentModal.value = false
 }
 
@@ -60,9 +63,9 @@ const pagination = { pageSize: 10 }
 
 const columns = [
   { title: 'اسم المشتري', key: 'customerName' },
-  { title: 'إجمالي المبلغ', key: 'totalAmount', render(row) { return `${row.totalAmount} د.أ` } },
-  { title: 'المدفوع', key: 'paidAmount', render(row) { return `${row.paidAmount} د.أ` } },
-  { title: 'المتبقي', key: 'remainingAmount', render(row) { return `${row.remainingAmount} د.أ` } },
+  { title: 'إجمالي المبلغ', key: 'totalAmount', render(row) { return `${row.totalAmount} ${currency}` } },
+  { title: 'المدفوع', key: 'paidAmount', render(row) { return `${row.paidAmount} ${currency}` } },
+  { title: 'المتبقي', key: 'remainingAmount', render(row) { return `${row.remainingAmount} ${currency}` } },
   {
     title: 'التقدم',
     key: 'progress',
