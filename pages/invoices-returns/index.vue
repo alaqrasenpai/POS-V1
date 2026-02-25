@@ -343,7 +343,11 @@ const handleViewReturn = (returnItem) => {
 
 <style scoped>
 .invoices-returns-page {
-  padding: 20px;
+  padding: 0;
+}
+
+:deep(.n-card) {
+  border-radius: 12px;
 }
 
 :deep(.n-data-table .n-data-table-th) {
@@ -351,13 +355,23 @@ const handleViewReturn = (returnItem) => {
   font-weight: bold;
 }
 
-:deep(.n-data-table .n-data-table-td) {
-  vertical-align: middle;
-}
-
 :deep(.n-tabs .n-tabs-nav-scroll-content) {
   background-color: white;
-  padding: 0 20px;
+  padding: 0 12px;
   border-radius: 8px 8px 0 0;
+}
+
+@media (max-width: 768px) {
+  :deep(.n-card-header) {
+    padding: 12px !important;
+  }
+  
+  :deep(.n-card-content) {
+    padding: 12px !important;
+  }
+  
+  .search-input {
+    width: 100% !important;
+  }
 }
 </style>

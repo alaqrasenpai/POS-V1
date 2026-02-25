@@ -1,63 +1,62 @@
 <template>
-    <div>
-        <form @submit.prevent="handleSubmit">
-            <!-- Form Fields -->
-            <div>
-                <n-form-item label="Name :">
-                    <n-input placeholder="Name" v-model:value="newItem.name" id="name" required />
-                </n-form-item>
-            </div>
-            <div>
-                <n-form-item label="Price :">
-                    <n-input placeholder="Price" v-model:value="newItem.price" id="price" type="number" required />
-                </n-form-item>
-            </div>
-            <div>
-                <n-form-item label="Buy Price :">
-                    <n-input placeholder="Buy Price" v-model:value="newItem.buyprice" id="buyprice" type="number" required />
-                </n-form-item>
-            </div>
-            <div>
-                <n-form-item label="Color :">
-                    <n-input placeholder="Color" v-model:value="newItem.color" id="color" />
-                </n-form-item>
-            </div>
-            <div>
-                <n-form-item label="Category :">
-                    <n-input placeholder="Category" v-model:value="newItem.category" id="category" />
-                </n-form-item>
-            </div>
-            <div>
-                <n-form-item label="Quantity :">
-                    <n-input placeholder="Quantity" v-model:value="newItem.quantity" id="quantity" type="number" />
-                </n-form-item>
-            </div>
-            <div>
-                <n-checkbox v-model:value="newItem.isFav" id="isFav" size="large" label="Is Favorite" />
-            </div>
-            <div>
-                <n-checkbox v-model:value="newItem.deleted" size="large" label="Is Deleted" id="deleted" type="checkbox" />
-            </div>
-            <div>
-                <n-form-item label="Barcode :">
-                    <n-input placeholder="Barcode" v-model:value="newItem.barcode" id="barcode" />
-                </n-form-item>
-            </div>
+    <div style="padding-top: 10px;">
+        <n-form :model="newItem" label-placement="top">
+            <n-grid :cols="2" :x-gap="16">
+                <n-form-item-gi label="اسم المنتج">
+                    <n-input placeholder="أدخل اسم المنتج" v-model:value="newItem.name" />
+                </n-form-item-gi>
+                <n-form-item-gi label="الباركود">
+                    <n-input placeholder="رقم الباركود" v-model:value="newItem.barcode" />
+                </n-form-item-gi>
 
-            <!-- Submit Button -->
-            <n-button type="primary" @click="handleSubmit">
-                {{ props.isAdd ? 'Add Item' : 'Edit Item' }}
-            </n-button>
-        </form>
+                <n-form-item-gi label="سعر البيع">
+                    <n-input-number placeholder="سعر البيع" v-model:value="newItem.price" :min="0"
+                        style="width: 100%" />
+                </n-form-item-gi>
+                <n-form-item-gi label="سعر الشراء">
+                    <n-input-number placeholder="سعر التكلفة" v-model:value="newItem.buyprice" :min="0"
+                        style="width: 100%" />
+                </n-form-item-gi>
+
+                <n-form-item-gi label="التصنيف">
+                    <n-select v-model:value="newItem.category" :options="categoryOptions" placeholder="اختر التصنيف"
+                        filterable clearable placement="bottom-start" />
+                </n-form-item-gi>
+                <n-form-item-gi label="الكمية">
+                    <n-input-number placeholder="الكمية المتوفرة" v-model:value="newItem.quantity" :min="0"
+                        style="width: 100%" />
+                </n-form-item-gi>
+
+                <n-form-item-gi label="اللون (اختياري)">
+                    <n-input placeholder="لون المنتج" v-model:value="newItem.color" />
+                </n-form-item-gi>
+
+                <n-form-item-gi>
+                    <n-space vertical>
+                        <n-checkbox v-model:checked="newItem.isFav">إضافة للمفضلة</n-checkbox>
+                        <n-checkbox v-model:checked="newItem.deleted" v-if="!props.isAdd">تحويل المنتج
+                            لمحذوف</n-checkbox>
+                    </n-space>
+                </n-form-item-gi>
+            </n-grid>
+
+            <n-flex justify="end" style="margin-top: 24px;">
+                <n-button quaternary @click="props.close()">إلغاء</n-button>
+                <n-button type="primary" size="large" @click="handleSubmit" style="min-width: 120px;">
+                    {{ props.isAdd ? 'إضافة المنتج' : 'حفظ التغييرات' }}
+                </n-button>
+            </n-flex>
+        </n-form>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useMessage } from 'naive-ui'
 
-// Mocked functions from the inventory system
 const { getItemById, addItem, editItem } = useInventory()
+const { getCategories } = useCategory()
+const message = useMessage()
 
 const props = defineProps({
     itemId: {
@@ -70,8 +69,15 @@ const props = defineProps({
     },
     isAdd: {
         type: Boolean,
-        required: false
+        default: true
     }
+})
+
+const categoryOptions = computed(() => {
+    return getCategories().map(cat => ({
+        label: cat.name,
+        value: cat.name
+    }))
 })
 
 let newItem = ref({
@@ -79,54 +85,38 @@ let newItem = ref({
     name: "",
     price: null,
     color: "",
-    category: "",
+    category: null,
     buyprice: null,
     quantity: 0,
-    isFav: 0,
+    isFav: false,
     barcode: "",
     deleted: false
 })
 
-// If editing, load the existing item data
 if (!props.isAdd) {
-    newItem.value = getItemById(props.itemId)
-}
-
-// Add item function
-const addNewItem = () => {
-    addItem(newItem.value)
-    props.close() // Close the modal
-    resetForm()
-}
-
-// Edit item function
-const editMyItem = () => {
-    editItem(props.itemId, newItem.value)
-    props.close() // Close the modal
-}
-
-// Reset form function
-const resetForm = () => {
-    newItem.value = {
-        id: null,
-        name: "",
-        price: null,
-        color: "",
-        category: "",
-        buyprice: null,
-        quantity: 0,
-        isFav: 0,
-        barcode: "",
-        deleted: false
+    const item = getItemById(props.itemId)
+    if (item) {
+        newItem.value = { ...item }
     }
 }
 
-// Handle form submission
 const handleSubmit = () => {
-    if (props.isAdd) {
-        addNewItem()
-    } else {
-        editMyItem()
+    if (!newItem.value.name) {
+        message.error('يرجى إدخال اسم المنتج')
+        return
     }
+    if (newItem.value.price === null) {
+        message.error('يرجى إدخال سعر البيع')
+        return
+    }
+
+    if (props.isAdd) {
+        addItem(newItem.value)
+        message.success('تم إضافة المنتج بنجاح')
+    } else {
+        editItem(props.itemId, newItem.value)
+        message.success('تم تحديث بيانات المنتج')
+    }
+    props.close()
 }
 </script>

@@ -1,13 +1,17 @@
 <template>
-    <n-button @click="isOpen = true">
-        اضافة عميل
+    <n-button type="primary" @click="isOpen = true">
+        إضافة عميل جديد
     </n-button>
     <n-modal v-model:show="isOpen">
-        <n-card style="width: 600px" title="Add Customer" :bordered="false" size="huge" role="dialog" aria-modal="true">
-            <template #header-extra>
-                Adding Customer!
-            </template>
-            <!-- CustomerForm component to handle Add functionality -->
+        <n-card 
+            style="width: 600px" 
+            title="إضافة عميل جديد" 
+            :bordered="false" 
+            size="huge" 
+            role="dialog" 
+            aria-modal="true" 
+            class="main-content-card"
+        >
             <CustomersCustomerform :close="closeDialog" :isAdd="true" />
         </n-card>
     </n-modal>

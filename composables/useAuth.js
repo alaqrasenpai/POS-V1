@@ -1,151 +1,132 @@
 // composables/useAuth.js
 import { reactive, computed } from 'vue'
-import { useRouter } from 'vue-router'
+import { useStores } from '@/composables/useStores'
 
 const state = reactive({
   user: null,
   isAuthenticated: false,
-  token: null
+  isSuperAdmin: false
 })
 
 export const useAuth = () => {
   const router = useRouter()
+  const authCookie = useCookie('pos_user_data')
+  const loggedInCookie = useCookie('pos_demo_logged_in')
 
-  // المستخدمون الافتراضيون (للتجربة - يجب استبدالهم بقاعدة بيانات حقيقية)
-  const mockUsers = [
-    {
-      id: 1,
-      username: 'admin',
-      password: 'admin123',
-      name: 'مدير النظام',
-      role: 'admin',
-      permissions: ['all']
-    },
-    {
-      id: 2,
-      username: 'cashier',
-      password: 'cashier123',
-      name: 'كاشير',
-      role: 'cashier',
-      permissions: ['view_products', 'sell_orders', 'view_customers']
-    },
-    {
-      id: 3,
-      username: 'manager',
-      password: 'manager123',
-      name: 'مدير المبيعات',
-      role: 'manager',
-      permissions: ['view_products', 'sell_orders', 'view_customers', 'view_reports']
+  const { getUsers } = useUsers()
+  const { getStores } = useStores()
+
+  // تسجيل دخول للمدير العام (Super Admin)
+  const superLogin = (username, password) => {
+    const allUsers = getUsers()
+    const user = allUsers.find(u => u.username === username && u.password === password && u.role === 'super_admin');
+
+    if (user) {
+      const userCopy = JSON.parse(JSON.stringify(user))
+      state.user = userCopy
+      state.isAuthenticated = true
+      state.isSuperAdmin = true
+
+      authCookie.value = JSON.stringify(userCopy)
+      loggedInCookie.value = 'true'
+
+      return { success: true, user: userCopy }
     }
-  ]
+    return { success: false, message: 'بيانات دخول المدير العام غير صحيحة' }
+  }
 
-  // تسجيل الدخول
-  const login = (username, password) => {
-    try {
-      // التحقق من صحة البيانات المدخلة
-      if (!username || !password) {
-        return { success: false, message: 'يرجى ملء جميع الحقول' }
+  // تسجيل دخول لأصحاب المتاجر والموظفين
+  const login = (phone, username, password) => {
+    if (!phone || !username || !password) {
+      return { success: false, message: 'يرجى ملء جميع الحقول المطلوبة' }
+    }
+
+    // 1. العثور على المتجر من خلال رقم الجوال المسجل
+    const allStores = getStores()
+    const store = allStores.find(s => s.registeredPhone === phone)
+
+    if (!store) {
+      return { success: false, message: 'لا يوجد متجر مسجل بهذا الرقم' }
+    }
+
+    if (!store.active) {
+      return { success: false, message: 'هذا المتجر موقوف حالياً، يرجى مراجعة إدارة المنصة' }
+    }
+
+    // 2. العثور على المستخدم داخل هذا المتجر حصراً
+    const allUsers = getUsers()
+    const user = allUsers.find(u =>
+      u.username === username &&
+      u.password === password &&
+      u.storeId === store.id
+    )
+
+    if (user) {
+      if (!user.active) {
+        return { success: false, message: 'حسابك معطل حالياً، اتصل بمدير المتجر' }
       }
 
-      // البحث عن المستخدم
-      const user = mockUsers.find(u => 
-        u.username === username && u.password === password
-      )
-      
-      if (user) {
-        // نسخ المستخدم لتجنب مشاكل المرجعية
-        const userCopy = JSON.parse(JSON.stringify(user))
-        
-        state.user = userCopy
-        state.isAuthenticated = true
-        state.token = btoa(JSON.stringify(userCopy)) // تشفير بسيط للبيانات (للاختبار فقط)
-        
-        // تخزين في localStorage
-        if (typeof localStorage !== 'undefined') {
-          localStorage.setItem('auth_token', state.token)
-          localStorage.setItem('user', JSON.stringify(userCopy))
-        }
-        
-        // إعادة توجيه تلقائي بعد تسجيل الدخول الناجح
-        setTimeout(() => {
-          router.push('/')
-        }, 100)
-        
-        return { success: true, user: userCopy }
-      } else {
-        return { success: false, message: 'اسم المستخدم أو كلمة المرور غير صحيحة' }
-      }
-    } catch (error) {
-      console.error('خطأ في تسجيل الدخول:', error)
-      return { success: false, message: 'حدث خطأ غير متوقع، يرجى المحاولة لاحقاً' }
+      const userCopy = JSON.parse(JSON.stringify(user))
+      state.user = userCopy
+      state.isAuthenticated = true
+      state.isSuperAdmin = false
+
+      authCookie.value = JSON.stringify(userCopy)
+      loggedInCookie.value = 'true'
+
+      return { success: true, user: userCopy }
+    } else {
+      return { success: false, message: 'اسم المستخدم أو كلمة المرور غير صحيحة' }
     }
   }
 
-  // تسجيل الخروج
   const logout = () => {
-    try {
-      state.user = null
-      state.isAuthenticated = false
-      state.token = null
-      
-      // مسح من localStorage
-      if (typeof localStorage !== 'undefined') {
-        localStorage.removeItem('auth_token')
-        localStorage.removeItem('user')
+    state.user = null
+    state.isAuthenticated = false
+    state.isSuperAdmin = false
+    authCookie.value = null
+    loggedInCookie.value = null
+    router.push('/login')
+  }
+
+  const checkAuth = () => {
+    if (authCookie.value && loggedInCookie.value === 'true') {
+      try {
+        const userData = typeof authCookie.value === 'string' ? JSON.parse(authCookie.value) : authCookie.value
+        const allUsers = getUsers()
+        const liveUser = allUsers.find(u => u.id === userData.id)
+
+        if (liveUser && liveUser.active) {
+          state.user = JSON.parse(JSON.stringify(liveUser))
+          state.isAuthenticated = true
+          state.isSuperAdmin = liveUser.role === 'super_admin'
+        } else {
+          logout()
+        }
+      } catch (e) {
+        logout()
       }
-      
-      router.push('/login')
-    } catch (error) {
-      console.error('خطأ في تسجيل الخروج:', error)
     }
   }
 
-  // التحقق من الصلاحية
   const hasPermission = (permission) => {
     if (!state.user) return false
-    if (state.user.role === 'admin') return true // المدير له جميع الصلاحيات
+    if (state.user.role === 'super_admin') return true
+    if (permission === 'super_admin') return false
+
+    if (state.user.permissions && (state.user.permissions.includes('all') || state.user.role === 'admin')) return true
     return state.user.permissions && state.user.permissions.includes(permission)
   }
 
-  // التحقق من الدور
-  const hasRole = (role) => {
-    if (!state.user) return false
-    return state.user.role === role
-  }
-
-  // تحميل حالة المستخدم من localStorage
-  const loadUserFromStorage = () => {
-    try {
-      if (typeof localStorage !== 'undefined') {
-        const token = localStorage.getItem('auth_token')
-        const user = localStorage.getItem('user')
-        
-        if (token && user) {
-          state.token = token
-          state.user = JSON.parse(user)
-          state.isAuthenticated = true
-        }
-      }
-    } catch (error) {
-      console.error('خطأ في تحميل بيانات المستخدم:', error)
-      // مسح البيانات التالفة
-      if (typeof localStorage !== 'undefined') {
-        localStorage.removeItem('auth_token')
-        localStorage.removeItem('user')
-      }
-    }
-  }
-
-  // الحصول على معلومات المستخدم الحالي
   const currentUser = computed(() => state.user)
   const isAuthenticated = computed(() => state.isAuthenticated)
 
   return {
     login,
+    superLogin,
     logout,
     hasPermission,
-    hasRole,
-    loadUserFromStorage,
+    checkAuth,
     currentUser,
     isAuthenticated
   }

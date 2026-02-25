@@ -1,15 +1,37 @@
 // middleware/auth.global.js
-export default defineNuxtRouteMiddleware((to, from) => {
-  // السماح بصفحة تسجيل الدخول
-  if (to.path === '/login') {
-    return;
+import { useAuth } from '@/composables/useAuth'
+
+export default defineNuxtRouteMiddleware((to) => {
+  const auth = useAuth()
+
+  // التحقق من حالة تسجيل الدخول عبر الكوكي
+  const isLoggedIn = useCookie('pos_demo_logged_in')
+  const publicPages = ['/login', '/super-login']
+
+  // 1. إذا لم يكن المستخدم مسجلاً دخوله ويحاول الوصول لصفحة محمية
+  if (!isLoggedIn.value && !publicPages.includes(to.path)) {
+    return navigateTo('/login')
   }
 
-  // التحقق من حالة تسجيل الدخول
-  const isLoggedIn = localStorage.getItem('pos_demo_logged_in')
-  
-  // إذا لم يكن مسجل دخول، توجيه لصفحة تسجيل الدخول
-  if (!isLoggedIn) {
-    return navigateTo('/login')
+  // 2. إذا كان المستخدم مسجلاً دخوله ويحاول الوصول لصفحة تسجيل الدخول
+  if (isLoggedIn.value && publicPages.includes(to.path)) {
+    // منع المستخدم العادي من الوصول لصفحة الـ super-login والعكس لو أردت
+    auth.checkAuth()
+    const user = auth.currentUser.value
+
+    if (user?.role === 'super_admin') {
+      return navigateTo('/super-admin')
+    }
+    return navigateTo('/')
+  }
+
+  // 3. التحقق من صلاحيات الـ Super Admin
+  if (isLoggedIn.value && to.path.startsWith('/super-admin')) {
+    auth.checkAuth()
+    const user = auth.currentUser.value
+
+    if (!user || user.role !== 'super_admin') {
+      return navigateTo('/super-login')
+    }
   }
 })

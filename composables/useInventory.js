@@ -1,105 +1,89 @@
+import { reactive, computed } from 'vue';
+import { useAuth } from '@/composables/useAuth';
+
 const state = reactive({
     items: [
-        {
-            id: 1,
-            name: "عنصر واحد",
-            price: 500,
-            color: "Black",
-            category: "Accessories",
-            buyprice: 300,
-            quantity: 0,
-            isFav: true,
-            barcode: "5a66a32",
-            deleted: false,
-        },
-        {
-            id: 2,
-            name: "شبس",
-            price: 300,
-            color: "Black",
-            category: "Accessories",
-            buyprice: 300,
-            quantity: 5,
-            isFav: false,
-            barcode: "566a3s2",
-            deleted: false,
+        // منتجات المتجر الأول (تجزئة)
+        { id: 1, name: "كابل شحن آيفون", price: 25, color: "White", category: "Electronics", buyprice: 15, quantity: 20, isFav: true, barcode: "1001", storeId: 1, deleted: false },
+        { id: 2, name: "سماعة بلوتوث", price: 150, color: "Black", category: "Electronics", buyprice: 90, quantity: 5, isFav: false, barcode: "1002", storeId: 1, deleted: false },
+        { id: 3, name: "باور بانك 20ألف", price: 80, color: "Black", category: "Accessories", buyprice: 50, quantity: 12, isFav: true, barcode: "1003", storeId: 1, deleted: false },
 
-        }, {
-            id: 3,
-            name: "بزر",
-            price: 500,
-            color: "Black",
-            category: "Accessories",
-            buyprice: 300,
-            quantity: 4,
-            isFav: true,
-            barcode: "566a3d2",
-            deleted: false,
-
-        },
+        // منتجات المتجر الثاني (صيدلية الشفاء)
+        { id: 4, name: "بندول اكسترا", price: 3.5, color: "Red", category: "Medicine", buyprice: 2.1, quantity: 50, isFav: true, barcode: "2001", storeId: 2, deleted: false },
+        { id: 5, name: "فيتامين سي 1000", price: 12, color: "Orange", category: "Supplements", buyprice: 8, quantity: 30, isFav: false, barcode: "2002", storeId: 2, deleted: false },
+        { id: 6, name: "معقم يدين 500مل", price: 5, color: "Clear", category: "Hygiene", buyprice: 3, quantity: 15, isFav: true, barcode: "2003", storeId: 2, deleted: false },
     ]
 });
+
 export const useInventory = () => {
+    const { currentUser } = useAuth();
+
+    // الحصول على رمز المتجر للمستخدم الحالي
+    const currentStoreId = computed(() => currentUser.value?.storeId);
 
     const getItemById = (id) => {
-        return state.items.find(item => item.id === id);
+        return state.items.find(item => item.id === id && item.storeId === currentStoreId.value);
     };
+
     const getItems = () => {
-        console.log("hello")
-        return state.items
+        if (!currentStoreId.value) return [];
+        return state.items.filter(item => item.storeId === currentStoreId.value && !item.deleted);
     };
+
     const getFavItems = () => {
-        return state.items.filter(item => item.isFav === true);
+        if (!currentStoreId.value) return [];
+        return state.items.filter(item => item.isFav && item.storeId === currentStoreId.value && !item.deleted);
     };
+
     const updateItemQuantity = (id, quantity) => {
-        const item = state.items.find(item => item.id === id);
+        const item = state.items.find(item => item.id === id && item.storeId === currentStoreId.value);
         if (item) {
-            item.quantity -= quantity; // تحديث الكمية في المستودع
+            item.quantity -= quantity;
         }
     };
 
     const getItemsFiltered = (itemName) => {
-        console.log("test test")
-        console.log(state.items)
-
-        if (!itemName) {
-            return state.items;
-        }
+        const storeItems = getItems();
+        if (!itemName) return storeItems;
 
         const lowerCaseSearchTerm = itemName.toLowerCase();
 
-        return state.items.filter(item => {
+        return storeItems.filter(item => {
             return (
                 item.name.toLowerCase().includes(lowerCaseSearchTerm) ||
-                item.color.toLowerCase().includes(lowerCaseSearchTerm) ||
                 item.category.toLowerCase().includes(lowerCaseSearchTerm) ||
-                item.price.toString().includes(lowerCaseSearchTerm) ||
-                item.barcode.toString().includes(lowerCaseSearchTerm) ||
-                item.quantity.toString().includes(lowerCaseSearchTerm)
+                item.barcode.toString().includes(lowerCaseSearchTerm)
             );
         });
     };
-    const addItem = (newItem) => {
-        // Assign a new unique ID to the new item
-        const newId = state.items.length ? Math.max(...state.items.map(item => item.id)) + 1 : 1;
-        const itemToAdd = { ...newItem, id: newId };
 
-        // Add the new item to the items array
+    const addItem = (newItem) => {
+        const newId = state.items.length ? Math.max(...state.items.map(item => item.id)) + 1 : 1;
+        const itemToAdd = {
+            ...newItem,
+            id: newId,
+            storeId: currentStoreId.value, // ربط المنتج بالمتجر الحالي تلقائياً
+            deleted: false
+        };
+
         state.items.push(itemToAdd);
-        console.log(state.items)
         return itemToAdd;
     };
+
     const editItem = (id, updatedItem) => {
-        const index = state.items.findIndex(item => item.id === id);
+        const index = state.items.findIndex(item => item.id === id && item.storeId === currentStoreId.value);
         if (index !== -1) {
-            // Merge the updated item properties with the existing item
             state.items[index] = { ...state.items[index], ...updatedItem };
-            console.log(`Item with ID ${id} updated successfully.`);
-        } else {
-            console.log(`Item with ID ${id} not found.`);
         }
     };
 
-
-    return { getItems, getItemsFiltered, addItem, getFavItems, getItemById, editItem ,updateItemQuantity};
+    return {
+        getItems,
+        getItemsFiltered,
+        addItem,
+        getFavItems,
+        getItemById,
+        editItem,
+        updateItemQuantity
+    };
 };

@@ -9,20 +9,21 @@
             </div>
             <div>
                 <n-form-item label="Items :">
-                    <n-select placeholder="Please Select Item" :options="itemsList" @update:value="handleUpdateValue" />
-
+                    <n-select placeholder="Please Select Item" :options="itemsList" @update:value="handleUpdateValue"
+                        placement="bottom-start" />
                 </n-form-item>
             </div>
 
             <div>
                 <n-form-item label="Suppliers :">
                     <n-select placeholder="Please Select Supplier" :options="suppliersList"
-                        @update:value="handleUpdateValue" />
+                        @update:value="handleUpdateValue" placement="bottom-start" />
                 </n-form-item>
             </div>
             <div>
                 <n-form-item label="Transaction Type :">
-                    <n-select placeholder="Please Select Type" :options="options" @update:value="handleUpdateValue" />
+                    <n-select placeholder="Please Select Type" :options="options" @update:value="handleUpdateValue"
+                        placement="bottom-start" />
                 </n-form-item>
             </div>
             <div>

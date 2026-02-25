@@ -1,81 +1,75 @@
 <template>
-    <section class="">
-        <div>
-            <div>
-                <h1>شاشة المنتجات</h1>
-            </div>
-            <div>
-                <div>
-                    <n-layout content-style="padding: 24px;" :native-scrollbar="false">
-                        <n-flex vertical justify="space-between">
-                            <!-- أشرطة الفلاتر -->
-                            <n-flex justify="space-between" align="flex-end" wrap>
-                                <!-- البحث النصي -->
-                                <n-input 
-                                    round 
-                                    style="width: 20vh;" 
-                                    v-model:value="searchTerm" 
-                                    type="text"
-                                    placeholder="البحث باسم المنتج" 
-                                />
-                                
-                                <!-- فلتر التصنيف -->
-                                <n-select
-                                    v-model:value="selectedCategory"
-                                    :options="categoryOptions"
-                                    placeholder="اختر التصنيف"
-                                    clearable
-                                    style="width: 150px;"
-                                    @update:value="handleCategoryFilter"
-                                />
-                                
-                                <!-- فلتر الحالة -->
-                                <n-select
-                                    v-model:value="selectedStatus"
-                                    :options="statusOptions"
-                                    placeholder="اختر الحالة"
-                                    clearable
-                                    style="width: 150px;"
-                                    @update:value="handleStatusFilter"
-                                />
-                                
-                                <!-- فلتر السعر -->
-                                <n-input-group style="width: 200px;">
-                                    <n-input-number
-                                        v-model:value="minPrice"
-                                        placeholder="الحد الأدنى"
-                                        style="width: 50%;"
-                                        @update:value="handlePriceFilter"
-                                    />
-                                    <n-input-number
-                                        v-model:value="maxPrice"
-                                        placeholder="الحد الأقصى"
-                                        style="width: 50%;"
-                                        @update:value="handlePriceFilter"
-                                    />
-                                </n-input-group>
-                                
-                                <!-- أزرار الإجراءات -->
-                                <div>
-                                    <ItemAddItem />
-                                    <InventoryAddTransToInventory />
-                                </div>
-                            </n-flex>
-                            
-                            <!-- جدول المنتجات -->
-                            <InventoryInventorytable :listOfItems="filteredItems" />
-                        </n-flex>
-                    </n-layout>
-                </div>
-            </div>
-        </div>
-    </section>
+  <div class="page-container">
+    <div class="page-title-section">
+      <div class="page-header-text">
+        <n-h1 class="page-title">إدارة المخزون</n-h1>
+        <n-text class="page-subtitle">تتبع الكميات، الأسعار، وحركات المنتجات</n-text>
+      </div>
+      <n-flex v-if="!isMobile">
+        <ItemAddItem />
+        <InventoryAddTransToInventory />
+      </n-flex>
+    </div>
+
+    <!-- الفلاتر -->
+    <n-card class="main-content-card" :bordered="false">
+      <n-grid :cols="isMobile ? 1 : isTablet ? 2 : 4" :x-gap="12" :y-gap="12">
+        <n-gi>
+          <n-input 
+            v-model:value="searchTerm" 
+            placeholder="البحث باسم المنتج" 
+            clearable
+          >
+            <template #prefix>
+              <n-icon><SearchOutline /></n-icon>
+            </template>
+          </n-input>
+        </n-gi>
+        <n-gi>
+          <n-select
+            v-model:value="selectedCategory"
+            :options="categoryOptions"
+            placeholder="التصنيف"
+            clearable
+          />
+        </n-gi>
+        <n-gi>
+          <n-select
+            v-model:value="selectedStatus"
+            :options="statusOptions"
+            placeholder="الحالة"
+            clearable
+          />
+        </n-gi>
+        <n-gi>
+          <n-input-group>
+            <n-input-number v-model:value="minPrice" placeholder="أدنى سعر" style="width: 50%" />
+            <n-input-number v-model:value="maxPrice" placeholder="أعلى سعر" style="width: 50%" />
+          </n-input-group>
+        </n-gi>
+      </n-grid>
+
+      <!-- أزرار الإجراءات للموبايل -->
+      <n-flex v-if="isMobile" style="margin-top: 16px" vertical>
+        <ItemAddItem />
+        <InventoryAddTransToInventory />
+      </n-flex>
+    </n-card>
+    
+    <!-- جدول المنتجات -->
+    <n-card class="main-content-card" :bordered="false">
+      <InventoryInventorytable :listOfItems="filteredItems" />
+    </n-card>
+  </div>
 </template>
 
 <script setup>
 import { ref, computed } from 'vue'
+import { SearchOutline } from '@vicons/ionicons5'
 import { useInventory } from '@/composables/useInventory'
+import { useScreen } from '@/composables/useScreen'
 
+const { isMobile, isTablet } = useScreen()
 const searchTerm = ref('')
 const selectedCategory = ref(null)
 const selectedStatus = ref(null)
@@ -85,12 +79,13 @@ const maxPrice = ref(null)
 const { getItems, getItemsFiltered } = useInventory()
 const items = getItems()
 
+const { getCategories } = useCategory()
+
 // إعداد خيارات التصنيفات
 const categoryOptions = computed(() => {
-    const categories = [...new Set(items.map(item => item.category))]
-    return categories.map(category => ({
-        label: category || 'غير محدد',
-        value: category
+    return getCategories().map(cat => ({
+        label: cat.name,
+        value: cat.name
     }))
 })
 
@@ -156,3 +151,24 @@ const handlePriceFilter = () => {
     // سيتم تحديث الفلتر تلقائياً من خلال computed property
 }
 </script>
+
+<style scoped>
+.inventory-page {
+  padding: 0;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.filter-card {
+  margin-bottom: 24px;
+}
+
+:deep(.n-card) {
+  border-radius: 12px;
+}
+</style>

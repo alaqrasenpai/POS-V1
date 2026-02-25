@@ -13,29 +13,32 @@ export const useCart = () => { // تعريف الدالة المستخدمة ل�
     };
 
     const addItem = (newItem) => {
-        const itemInInventory = getItemById(newItem.id); // الحصول على العنصر من المخزون
+        const itemInInventory = getItemById(newItem.id);
 
-        if (itemInInventory && itemInInventory.quantity >= newItem.quantity) {
-            const existingItem = state.cartItems.find(item => item.id === newItem.id);
-
-            if (existingItem) {
-                // إذا كان العنصر موجودًا في السلة، تأكد من أن الكلية لا تتجاوز الكمية المتاحة
-                if (existingItem.quantity + 1 <= itemInInventory.quantity) {
-                    existingItem.quantity += 1; // تحديث الكمية في السلة
-                } else {
-                    alert(`الكمية المطلوبة (${existingItem.quantity + newItem.quantity}) تتجاوز الكمية المتاحة في المخزون (${itemInInventory.quantity})!`);
-                }
-            } else {
-                // إذا كان العنصر غير موجود في السلة، أضفه بشرط ألا تتجاوز الكمية المتاحة
-                if (newItem.quantity <= itemInInventory.quantity) {
-                    state.cartItems.push({ ...newItem, quantity: 1 });
-                } else {
-                    alert(`الكمية المطلوبة (${newItem.quantity}) تتجاوز الكمية المتاحة في المخزون (${itemInInventory.quantity})!`);
-                }
-            }
-        } else {
-            alert("الكمية غير متاحة في المخزون!");
+        if (!itemInInventory || itemInInventory.quantity <= 0) {
+            return { success: false, error: 'out_of_stock' };
         }
+
+        const existingItem = state.cartItems.find(item => item.id === newItem.id);
+        const currentInCart = existingItem ? existingItem.quantity : 0;
+        const requestedQuantity = 1; // Default behavior is adding 1
+
+        if (currentInCart + requestedQuantity > itemInInventory.quantity) {
+            return {
+                success: false,
+                error: 'limit_exceeded',
+                available: itemInInventory.quantity,
+                inCart: currentInCart
+            };
+        }
+
+        if (existingItem) {
+            existingItem.quantity += requestedQuantity;
+        } else {
+            state.cartItems.push({ ...newItem, quantity: requestedQuantity });
+        }
+
+        return { success: true };
     };
 
     const clearCart = () => {

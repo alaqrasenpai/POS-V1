@@ -1,58 +1,176 @@
-<!-- app.vue -->
 <template>
-  <n-message-provider>
-    <div v-if="!isLoggedIn">
-      <!-- عرض صفحة تسجيل الدخول إذا لم يكن المستخدم مسجلاً -->
-      <NuxtPage />
-    </div>
-    <n-space v-else vertical size="large">
-      <n-layout has-sider>
-        <sidebar />
-        <n-layout-content content-style="padding: 24px;">
-          <NuxtLayout>
-            <NuxtPage />
-          </NuxtLayout>
-        </n-layout-content>
-      </n-layout>
-    </n-space>
-  </n-message-provider>
+  <n-config-provider :locale="arDZ" :date-locale="dateArDZ" :theme-overrides="themeOverrides">
+    <n-message-provider>
+      <n-dialog-provider>
+        <!-- إذا كانت الصفحة هي صفحة تسجيل الدخول (عادية أو سوبر)، نعرضها بدون الهيدر والمينيو -->
+        <div v-if="isLoginPage">
+          <NuxtPage />
+        </div>
+
+        <!-- باقي صفحات النظام التي تتطلب الهيدر والقائمة الجانبية -->
+        <div v-else class="app-container">
+          <div class="app-header">
+            <div class="header-right">
+              <n-button quaternary v-if="isMobile" @click="showMobileMenu = true">
+                <template #icon><n-icon>
+                    <MenuOutline />
+                  </n-icon></template>
+              </n-button>
+              <n-text strong class="system-title">{{ settings.shopName }}</n-text>
+            </div>
+            <div class="header-left">
+              <div class="user-info" v-if="!isMobile && currentUser">
+                <n-text strong>{{ currentUser.name }}</n-text>
+                <n-text depth="3" style="font-size: 0.8rem;"> ({{ currentUser.role }})</n-text>
+              </div>
+            </div>
+          </div>
+
+          <n-layout has-sider class="main-layout" style="height: calc(100vh - 56px);">
+            <Sidebar v-if="!isMobile" />
+
+            <n-drawer v-model:show="showMobileMenu" :width="240" placement="right">
+              <SidebarContent @select="showMobileMenu = false" />
+            </n-drawer>
+
+            <n-layout-content :content-style="contentStyle" :native-scrollbar="false">
+              <div class="page-padding">
+                <NuxtPage />
+              </div>
+            </n-layout-content>
+          </n-layout>
+        </div>
+      </n-dialog-provider>
+    </n-message-provider>
+  </n-config-provider>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { MenuOutline } from '@vicons/ionicons5'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
+import { arDZ, dateArDZ } from 'naive-ui'
 
-const isLoggedIn = ref(false)
 const route = useRoute()
+// الصفحات التي تظهر بدون الإطار العام (layout)
+const isLoginPage = computed(() => ['/login', '/super-login'].includes(route.path))
+
+const showMobileMenu = ref(false)
+const windowWidth = ref(0)
+const isMounted = ref(false)
+
+const { settings } = useSettings()
+const { checkAuth, currentUser } = useAuth()
+
+const isMobile = computed(() => isMounted.value && windowWidth.value < 768)
+
+const updateWidth = () => {
+  if (typeof window !== 'undefined') {
+    windowWidth.value = window.innerWidth
+  }
+}
 
 onMounted(() => {
-  // التحقق من حالة تسجيل الدخول عند تحميل التطبيق
-  const loggedIn = localStorage.getItem('pos_demo_logged_in')
-  isLoggedIn.value = !!loggedIn
-  
-  // إذا لم يكن المستخدم مسجلاً دخوله ولم يكن في صفحة تسجيل الدخول، نوجهه لصفحة تسجيل الدخول
-  if (!loggedIn && route.path !== '/login') {
-    useRouter().push('/login')
+  // تفعيل الـ RTL على مستوى الـ HTML
+  if (typeof document !== 'undefined') {
+    document.documentElement.setAttribute('dir', 'rtl')
+    document.documentElement.setAttribute('lang', 'ar')
   }
-  // إذا كان المستخدم مسجلاً دخوله وحاول الوصول لصفحة تسجيل الدخول، نوجهه للصفحة الرئيسية
-  else if (loggedIn && route.path === '/login') {
-    useRouter().push('/')
-  }
+  isMounted.value = true
+
+  // تحديث حالة المصادقة من الـ cookie
+  checkAuth()
+
+  updateWidth()
+  window.addEventListener('resize', updateWidth)
 })
 
-// مراقبة تغيير المسار
-const router = useRouter()
-router.afterEach((to) => {
-  // التحقق من حالة تسجيل الدخول
-  const loggedIn = localStorage.getItem('pos_demo_logged_in')
-  isLoggedIn.value = !!loggedIn
-  
-  if (!loggedIn && to.path !== '/login') {
-    // إذا لم يكن مسجلاً دخول، نوجهه لصفحة تسجيل الدخول
-    router.push('/login')
-  } else if (loggedIn && to.path === '/login') {
-    // إذا كان مسجلاً دخول وحاول الوصول لصفحة تسجيل الدخول، نوجهه للرئيسية
-    router.push('/')
+const themeOverrides = {
+  common: {
+    primaryColor: '#18a058',
+    primaryColorHover: '#36ad6a',
+    primaryColorPressed: '#0c7a43',
+    primaryColorSuppl: '#36ad6a',
+    borderRadius: '12px',
+    fontFamily: "'Tajawal', sans-serif"
+  },
+  Card: {
+    borderRadius: '16px',
+    boxShadow: '0 4px 16px rgba(0,0,0,0.04)'
+  }
+}
+
+const contentStyle = computed(() => ({
+  minHeight: 'calc(100vh - 56px)',
+  backgroundColor: '#f9fafb'
+}))
+
+onUnmounted(() => {
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('resize', updateWidth)
   }
 })
 </script>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap');
+
+body {
+  margin: 0;
+  font-family: 'Tajawal', sans-serif;
+  background-color: #f9fafb;
+}
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-header {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: white;
+  border-bottom: 1px solid #efeff5;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  z-index: 1000;
+  position: sticky;
+  top: 0;
+}
+
+.system-title {
+  font-size: 1.1rem;
+  color: #18a058;
+}
+
+.header-right,
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.main-layout {
+  flex: 1;
+}
+
+.page-padding {
+  padding: 24px;
+}
+
+@media (max-width: 768px) {
+  .page-padding {
+    padding: 12px;
+  }
+}
+</style>

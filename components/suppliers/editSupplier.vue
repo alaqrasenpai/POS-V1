@@ -1,21 +1,25 @@
 <template>
-    <n-button @click="isOpen = true">
-        تعديل الموزع
+    <n-button quaternary circle type="info" @click="isOpen = true">
+        <template #icon><n-icon><EditIcon /></n-icon></template>
     </n-button>
-    <n-modal v-model:show="isOpen" role="dialog" aria-modal="true">
-        <n-card style="width: 600px" title="Edit Supplier" :bordered="false" size="huge">
-            <template #header-extra>
-                <n-button ghost type="primary" icon="i-heroicons-x-mark-20-solid" @click="closeDialog">
-                    Close
-                </n-button>
-            </template>
-            <SuppliersSupplierform :supplierId="supplierId" :close="closeDialog" :isAdd="false" />
+    <n-modal v-model:show="isOpen">
+        <n-card 
+            style="width: 600px" 
+            title="تعديل بيانات المورد" 
+            :bordered="false" 
+            size="huge" 
+            role="dialog" 
+            aria-modal="true"
+            class="main-content-card"
+        >
+            <SuppliersSupplierform :supplierId="props.supplierId" :close="closeDialog" :isAdd="false" />
         </n-card>
     </n-modal>
 </template>
 
-<script lang="ts" setup>
+<script setup>
 import { ref } from 'vue'
+import { CreateOutline as EditIcon } from '@vicons/ionicons5'
 
 const isOpen = ref(false)
 
@@ -27,7 +31,6 @@ const props = defineProps({
 })
 
 const closeDialog = () => {
-    console.log("closed")
     isOpen.value = false
 }
 </script>

@@ -1,129 +1,145 @@
 <template>
   <div class="sell-order-page">
-    <n-layout style="height: 100vh">
-      <!-- رأس الصفحة -->
-      <n-layout-header style="height: 64px; padding: 16px 24px" bordered>
-        <n-page-header>
-          <n-h2 style="margin: 0;">شاشة البيع</n-h2>
-        </n-page-header>
-      </n-layout-header>
-
-      <!-- المحتوى الرئيسي -->
-      <n-layout position="absolute" style="top: 64px; bottom: 0" has-sider>
-        <!-- لوحة السلة (الجانب الأيمن) -->
-        <n-layout-sider 
-          width="350" 
-          content-style="padding: 16px;" 
-          :native-scrollbar="false" 
-          bordered
-          show-trigger="bar"
-        >
+    <!-- للجوال: استخدام التبويبات للتنقل بين المنتجات والسلة -->
+    <n-tabs v-if="isMobile" type="line" animated justify-content="space-evenly" class="mobile-tabs">
+      <n-tab-pane name="products" tab="الأصناف">
+        <div class="products-section mobile">
+          <n-input 
+            v-model:value="searchTerm" 
+            placeholder="البحث باسم المنتج..." 
+            clearable
+            class="mobile-search"
+          >
+            <template #prefix>
+              <n-icon><SearchOutline /></n-icon>
+            </template>
+          </n-input>
+          
+          <n-flex align="center" style="margin-bottom: 12px; padding: 0 8px;">
+            <n-select
+              v-model:value="selectedCategory"
+              :options="categoryOptions"
+              placeholder="التصنيف"
+              clearable
+              size="small"
+              style="flex: 1"
+            />
+            <n-button quaternary size="small" @click="showFavorites = !showFavorites" :type="showFavorites ? 'primary' : 'default'">
+                <template #icon><n-icon><StarIcon /></n-icon></template>
+            </n-button>
+          </n-flex>
+          
+          <ItemItems :listOfItems="filteredAndSortedItems" />
+        </div>
+      </n-tab-pane>
+      <n-tab-pane name="cart" tab="السلة">
+        <div class="cart-section mobile">
           <cart />
-        </n-layout-sider>
+        </div>
+      </n-tab-pane>
+    </n-tabs>
 
-        <!-- منطقة المنتجات (الجانب الأيسر) -->
-        <n-layout content-style="padding: 16px;" :native-scrollbar="false">
-          <!-- شريط الأدوات والبحث -->
-          <n-card style="margin-bottom: 16px;">
-            <n-flex justify="space-between" align="center">
-              <!-- البحث -->
-              <n-input 
-                v-model:value="searchTerm" 
-                placeholder="البحث باسم المنتج" 
-                clearable
-                style="width: 300px;"
-              >
-                <template #prefix>
-                  <n-icon><SearchOutline /></n-icon>
-                </template>
-              </n-input>
+    <!-- لسطح المكتب -->
+    <n-layout v-else has-sider style="height: calc(100vh - 84px); background: transparent;">
+      <n-layout-sider 
+        width="400" 
+        content-style="padding: 0; background: white;" 
+        :native-scrollbar="false" 
+        bordered
+      >
+        <cart />
+      </n-layout-sider>
 
-              <!-- أزرار الإجراءات -->
-              <n-flex>
-                <ItemAddItem />
-                <n-button @click="refreshItems">
-                  <template #icon>
-                    <n-icon><RefreshOutline /></n-icon>
-                  </template>
-                  تحديث
-                </n-button>
-              </n-flex>
-            </n-flex>
-          </n-card>
+      <n-layout-content content-style="padding: 24px; background: #f9fafb;" :native-scrollbar="false">
+        <div class="page-title-section">
+          <div class="page-header-text">
+            <n-h1 class="page-title">شاشة البيع</n-h1>
+            <n-text class="page-subtitle">اختر المنتجات لإتمام عملية البيع</n-text>
+          </div>
+          <n-flex align="center">
+            <n-input 
+              v-model:value="searchTerm" 
+              placeholder="البحث باسم المنتج أو الباركود..." 
+              clearable
+              style="width: 300px;"
+            >
+              <template #prefix>
+                <n-icon><SearchOutline /></n-icon>
+              </template>
+            </n-input>
+            <ItemAddItem />
+          </n-flex>
+        </div>
 
-          <!-- فلاتر إضافية -->
-          <n-card style="margin-bottom: 16px;">
-            <n-flex align="center" size="small">
-              <n-text strong>الفلاتر:</n-text>
-              
-              <!-- فلتر حسب التصنيف -->
+        <!-- الفلاتر -->
+        <n-card class="main-content-card" :bordered="false" style="margin-bottom: 20px;">
+          <n-flex align="center" justify="space-between">
+            <n-flex align="center">
+              <n-text depth="3" strong>تصفية النتائج:</n-text>
               <n-select
                 v-model:value="selectedCategory"
                 :options="categoryOptions"
-                placeholder="التصنيف"
+                placeholder="كل التصنيفات"
                 clearable
-                style="width: 150px;"
-                size="small"
+                style="width: 200px;"
               />
-              
-              <!-- عرض المنتجات المفضلة فقط -->
               <n-checkbox v-model:checked="showFavorites">
-                المنتجات المفضلة فقط
+                المفضلة فقط
               </n-checkbox>
             </n-flex>
-          </n-card>
+            <n-text depth="3">إجمالي النتائج: {{ filteredAndSortedItems.length }}</n-text>
+          </n-flex>
+        </n-card>
 
-          <!-- جدول المنتجات -->
-          <n-card title="المنتجات">
-            <ItemItems :listOfItems="filteredAndSortedItems" />
-          </n-card>
-        </n-layout>
-      </n-layout>
+        <ItemItems :listOfItems="filteredAndSortedItems" />
+      </n-layout-content>
     </n-layout>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { SearchOutline, RefreshOutline } from '@vicons/ionicons5'
+import { ref, computed, watch } from 'vue'
+import { SearchOutline, Star as StarIcon } from '@vicons/ionicons5'
 import { useInventory } from '@/composables/useInventory'
+import { useScreen } from '@/composables/useScreen'
+import { useCategory } from '@/composables/useCategory'
 
+const { isMobile } = useScreen()
 const searchTerm = ref('')
 const selectedCategory = ref(null)
 const showFavorites = ref(false)
 
 const { getItems, getItemsFiltered } = useInventory()
+const { getCategories } = useCategory()
 const items = getItems()
 
-// خيارات التصنيفات
+// خيارات التصنيفات من السورس الموحد
 const categoryOptions = computed(() => {
-  const categories = [...new Set(items.map(item => item.category).filter(Boolean))]
-  return categories.map(category => ({
-    label: category,
-    value: category
+  return getCategories().map(cat => ({
+    label: cat.name,
+    value: cat.name
   }))
 })
 
-// الفلترة والترتيب
 const filteredAndSortedItems = computed(() => {
   let result = [...items]
   
-  // تطبيق البحث
   if (searchTerm.value) {
+    // عند البحث: تظهر جميع المنتجات المتطابقة حتى لو كانت الكمية صفر
     result = getItemsFiltered(searchTerm.value)
+  } else {
+    // الحالة الافتراضية: تظهر فقط المنتجات المتوفرة في المخزن
+    result = result.filter(item => item.quantity > 0)
   }
   
-  // تطبيق فلتر التصنيف
   if (selectedCategory.value) {
     result = result.filter(item => item.category === selectedCategory.value)
   }
   
-  // تطبيق فلتر المنتجات المفضلة
   if (showFavorites.value) {
     result = result.filter(item => item.isFav === true)
   }
   
-  // ترتيب المنتجات: المفضلة أولاً، ثم حسب الاسم
   result.sort((a, b) => {
     if (a.isFav && !b.isFav) return -1
     if (!a.isFav && b.isFav) return 1
@@ -132,33 +148,30 @@ const filteredAndSortedItems = computed(() => {
   
   return result
 })
-
-// تحديث المنتجات
-const refreshItems = () => {
-  // يمكن إضافة منطق لتحديث البيانات من الخادم هنا
-  console.log('تحديث المنتجات')
-}
-
-// مراقبة التغييرات في الفلاتر
-watch([searchTerm, selectedCategory, showFavorites], () => {
-  // يمكن إضافة منطق إضافي عند تغيير الفلاتر
-})
 </script>
 
 <style scoped>
-.sell-order-page {
-  height: 100vh;
+/* Page styles handled globally */
+
+.mobile-tabs {
+  background: white;
+  height: 100%;
 }
 
-:deep(.n-layout-header) {
-  background-color: white;
+.mobile-search {
+  margin-bottom: 8px;
+  padding: 0 8px;
+}
+
+.products-section.mobile,
+.cart-section.mobile {
+  padding: 12px 4px;
+  overflow-y: auto;
+  height: calc(100vh - 145px);
 }
 
 :deep(.n-layout-sider) {
-  background-color: #fafafa;
-}
-
-:deep(.n-card) {
-  border-radius: 8px;
+  background-color: white;
+  z-index: 10;
 }
 </style>

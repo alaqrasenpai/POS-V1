@@ -1,38 +1,37 @@
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
+import { useAuth } from '@/composables/useAuth';
+
 const state = reactive({
     sellOrders: []
 });
 
 export const useSellOrder = () => {
+    const { currentUser } = useAuth();
+    const currentStoreId = computed(() => currentUser.value?.storeId);
 
     const getSellOrderById = (id) => {
-        return state.sellOrders.find(item => item.id === id);
+        return state.sellOrders.find(order => order.id === id && order.storeId === currentStoreId.value);
     };
 
     const getAlldSellOrders = () => {
-        return state.sellOrders;
+        if (!currentStoreId.value) return [];
+        return state.sellOrders.filter(order => order.storeId === currentStoreId.value);
     };
 
     const addSellOrder = (newItem) => {
-        // Get the current list of sell orders
-        const sellOrders = state.sellOrders;
+        if (!currentStoreId.value) return null;
 
-        // Determine the new id
-        let newId = 1; // Default to 1 if there are no sell orders
-        if (sellOrders.length > 0) {
-            // Find the max id in the existing orders
-            const maxId = Math.max(...sellOrders.map(order => order.id));
-            newId = maxId + 1;
-        }
+        const newId = state.sellOrders.length ? Math.max(...state.sellOrders.map(order => order.id)) + 1 : 1;
 
-        // Set the new item's id
-        newItem.id = newId;
-        console.log(newItem)
-        // Add the new item to the list
-        sellOrders.push(newItem);
-        return newId
+        const orderToAdd = {
+            ...newItem,
+            id: newId,
+            storeId: currentStoreId.value // ربط الفاتورة بالمتجر الحالي
+        };
+
+        state.sellOrders.push(orderToAdd);
+        return newId;
     };
-
 
     return { addSellOrder, getAlldSellOrders, getSellOrderById };
 };

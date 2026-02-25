@@ -1,44 +1,55 @@
 <template>
-    <section class="">
+  <div class="page-container">
+    <div class="page-title-section">
+      <div class="page-header-text">
+        <n-h1 class="page-title">إدارة الموردين</n-h1>
+        <n-text class="page-subtitle">إدارة جهات الاتصال، المشتريات، وفواتير التوريد</n-text>
+      </div>
+      <n-flex v-if="!isMobile">
+        <SuppliersAddSupplier />
+      </n-flex>
+    </div>
 
-        <div>
-            <div>
-                <h1>شاشة الموزعون</h1>
-            </div>
-            <div>
+    <n-card class="main-content-card" :bordered="false">
+      <n-flex justify="space-between" align="center">
+        <n-input 
+          v-model:value="searchTerm" 
+          placeholder="البحث باسم المورد أو الشركة" 
+          clearable
+          :style="{ width: isMobile ? '100%' : '300px' }"
+        >
+          <template #prefix>
+            <n-icon><SearchOutline /></n-icon>
+          </template>
+        </n-input>
+        <SuppliersAddSupplier v-if="isMobile" style="margin-top: 12px; width: 100%;" />
+      </n-flex>
+    </n-card>
 
-                <div>
-                    <n-layout content-style="padding: 24px;" :native-scrollbar="false">
-                        <n-flex vertical justify="space-between">
-                            <n-flex justify="space-between" size="large">
-                                <n-input round style="width: 20vh;" v-model:value="searchTerm" type="text"
-                                    placeholder="البحث عن موزع" />
-                                <SuppliersAddSupplier />
-
-                            </n-flex>
-
-                            <SuppliersSupplierstable :listOfItems="filteredSuppliers" />
-                        </n-flex>
-                    </n-layout>
-
-                </div>
-            </div>
-        </div>
-
-    </section>
+    <n-card class="main-content-card" :bordered="false">
+      <SuppliersSupplierstable :listOfItems="filteredSuppliers" />
+    </n-card>
+  </div>
 </template>
 
 <script setup>
+import { ref, computed } from 'vue'
+import { SearchOutline } from '@vicons/ionicons5'
+import { useSuppliers } from '@/composables/useSuppliers'
+import { useScreen } from '@/composables/useScreen'
 
-const searchTerm = ref('');
-// const { getItems, getItemsFiltered, getFavItems, getItemById } = useInventory();
-const { getSuppliers, getSuppliersFiltered, addSupplier, geSupplierById } = useSuppliers();
-const suppliers = getSuppliers();
+const { isMobile } = useScreen()
+const searchTerm = ref('')
+const { getSuppliers, getSuppliersFiltered } = useSuppliers()
+const suppliers = getSuppliers()
 
 const filteredSuppliers = computed(() => {
-    if (!searchTerm.value) {
-        return suppliers;
-    }
-    return getSuppliersFiltered(searchTerm.value)
-});
+  if (!searchTerm.value) {
+    return suppliers
+  }
+  return getSuppliersFiltered(searchTerm.value)
+})
 </script>
+
+<style scoped>
+</style>

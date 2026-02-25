@@ -10,25 +10,29 @@
 
             <div>
                 <n-form-item label="Items :">
-                    <n-select placeholder="Please Select Item" v-model:value="newItem.itemId" :options="itemsList" />
+                    <n-select placeholder="Please Select Item" v-model:value="newItem.itemId" :options="itemsList"
+                        placement="bottom-start" />
                 </n-form-item>
             </div>
 
             <div>
                 <n-form-item label="Suppliers :">
-                    <n-select placeholder="Please Select Supplier" v-model:value="newItem.supplier" :options="suppliersList" />
+                    <n-select placeholder="Please Select Supplier" v-model:value="newItem.supplier"
+                        :options="suppliersList" placement="bottom-start" />
                 </n-form-item>
             </div>
 
             <div>
                 <n-form-item label="Transaction Type :">
-                    <n-select placeholder="Please Select Type" v-model:value="newItem.TransType" :options="options" />
+                    <n-select placeholder="Please Select Type" v-model:value="newItem.TransType" :options="options"
+                        placement="bottom-start" />
                 </n-form-item>
             </div>
 
             <div>
                 <n-form-item label="Quantity :">
-                    <n-input placeholder="Quantity" v-model:value="newItem.quantity" id="quantity" type="number" required />
+                    <n-input placeholder="Quantity" v-model:value="newItem.quantity" id="quantity" type="number"
+                        required />
                 </n-form-item>
             </div>
 

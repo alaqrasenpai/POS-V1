@@ -1,28 +1,34 @@
 <template>
-    <div>
-        <form @submit.prevent="handleSubmit">
-            <!-- Form Field for Category Name -->
-            <n-form-item label="Category Name:">
-                <n-input placeholder="Enter category name" v-model:value="newCategory.name" id="name" required />
-            </n-form-item>
+  <div class="category-form" style="padding-top: 10px;">
+    <n-form :model="newCategory" label-placement="top">
+      <n-form-item label="اسم التصنيف">
+        <n-input 
+          v-model:value="newCategory.name" 
+          placeholder="مثال: مشروبات باردة، أجهزة منزلية..." 
+          size="large"
+        />
+      </n-form-item>
 
-            <!-- Add and Edit Buttons -->
-            <n-button v-if="isAdd" type="primary" @click="handleAdd">
-                Add Category
-            </n-button>
-            <n-button v-else type="primary" @click="handleEdit">
-                Edit Category
-            </n-button>
-        </form>
-    </div>
+      <n-flex justify="end" style="margin-top: 24px;">
+        <n-button quaternary @click="props.close()">إلغاء</n-button>
+        <n-button 
+          type="primary" 
+          size="large" 
+          @click="handleSubmit"
+          style="min-width: 120px;"
+        >
+          {{ isAdd ? 'إضافة التصنيف' : 'حفظ التغييرات' }}
+        </n-button>
+      </n-flex>
+    </n-form>
+  </div>
 </template>
 
 <script setup>
-// Import necessary modules
-import { ref } from 'vue'
-// import { useCategory } from '@/composables' // Adjust import path as needed
+import { ref, onMounted } from 'vue'
+import { useMessage } from 'naive-ui'
+import { useCategory } from '@/composables/useCategory'
 
-// Define props with defineProps
 const props = defineProps({
     categoryId: {
         type: Number,
@@ -34,42 +40,40 @@ const props = defineProps({
     },
     isAdd: {
         type: Boolean,
-        required: true
+        default: true
     }
 })
 
-// Set up category data and functions
 const { addCategory, editCategory, getCategoryById } = useCategory()
+const message = useMessage()
 
-// Initialize newCategory with reactive state
-let newCategory = ref({
+const newCategory = ref({
     id: null,
     name: ""
 })
 
-// Load existing category data only if editing and categoryId is provided
-if (!props.isAdd && props.categoryId) {
-    newCategory.value = getCategoryById(props.categoryId)
-}
-
-// Add new category function
-const handleAdd = () => {
-    addCategory(newCategory.value)
-    props.close() // Close the modal after adding
-    resetForm()
-}
-
-// Edit existing category function
-const handleEdit = () => {
-    editCategory(props.categoryId, newCategory.value)
-    props.close() // Close the modal after editing
-}
-
-// Reset form function
-const resetForm = () => {
-    newCategory.value = {
-        id: null,
-        name: ""
+onMounted(() => {
+  if (!props.isAdd && props.categoryId) {
+    const existing = getCategoryById(props.categoryId)
+    if (existing) {
+      newCategory.value = { ...existing }
     }
+  }
+})
+
+const handleSubmit = () => {
+    if (!newCategory.value.name) {
+      message.error('يرجى إدخال اسم التصنيف')
+      return
+    }
+
+    if (props.isAdd) {
+        addCategory({ name: newCategory.value.name })
+        message.success('تم إضافة التصنيف بنجاح')
+    } else {
+        editCategory(props.categoryId, { name: newCategory.value.name })
+        message.success('تم تحديث البيانات بنجاح')
+    }
+    props.close()
 }
 </script>

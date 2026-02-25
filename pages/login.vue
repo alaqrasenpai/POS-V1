@@ -2,39 +2,58 @@
   <div class="login-background">
     <div class="login-card">
       <div class="login-header">
-        <h1>نظام إدارة المبيعات</h1>
-        <p>تسجيل دخول تجريبي</p>
+        <div class="app-icon">
+          <n-icon size="40" color="#764ba2">
+            <StoreIcon />
+          </n-icon>
+        </div>
+        <h1>دخول المتجر</h1>
+        <p>يرجى إدخال بيانات متجرك وحسابك</p>
       </div>
-      
+
       <div class="login-form">
         <div class="form-group">
-          <label for="username">اسم المستخدم</label>
-          <input
-            id="username"
-            v-model="username"
-            type="text"
-            placeholder="admin"
-            disabled
-          />
+          <label for="phone">رقم جوال المتجر المسجل</label>
+          <n-input id="phone" v-model:value="phone" type="text" placeholder="01xxxxxxxxx" size="large">
+            <template #prefix>
+              <n-icon>
+                <PhoneIcon />
+              </n-icon>
+            </template>
+          </n-input>
         </div>
-        
+
+        <div class="form-group">
+          <label for="username">اسم المستخدم</label>
+          <n-input id="username" v-model:value="username" type="text" placeholder="اسم المستخدم" size="large">
+            <template #prefix>
+              <n-icon>
+                <UserIcon />
+              </n-icon>
+            </template>
+          </n-input>
+        </div>
+
         <div class="form-group">
           <label for="password">كلمة المرور</label>
-          <input
-            id="password"
-            v-model="password"
-            type="password"
-            placeholder="admin123"
-            disabled
-          />
+          <n-input id="password" v-model:value="password" type="password" show-password-on="mousedown"
+            placeholder="كلمة المرور" size="large">
+            <template #prefix>
+              <n-icon>
+                <LockIcon />
+              </n-icon>
+            </template>
+          </n-input>
         </div>
-        
-        <button @click="handleLogin" class="login-button">
-          تسجيل الدخول
-        </button>
-        
-        <div class="info-message">
-          تسجيل دخول تجريبي - سيتم التوجيه مباشرة
+
+        <n-button @click="handleLogin" type="primary" block size="large" :loading="loading" class="login-button">
+          دخول إلى المتجر
+        </n-button>
+
+        <div class="links-footer">
+          <n-button text @click="router.push('/super-login')">
+            دخول إدارة المنصة (Super Admin)
+          </n-button>
         </div>
       </div>
     </div>
@@ -44,15 +63,41 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+// تمت إزالة الاستيراد اليدوي للـ composable
+import { useMessage } from 'naive-ui'
+import {
+  StorefrontOutline as StoreIcon,
+  CallOutline as PhoneIcon,
+  PersonOutline as UserIcon,
+  LockClosedOutline as LockIcon
+} from '@vicons/ionicons5'
 
 const router = useRouter()
+const { login } = useAuth()
+const message = useMessage()
+
+// قيم افتراضية للتجربة
+const phone = ref('0123456789')
 const username = ref('admin')
 const password = ref('admin123')
+const loading = ref(false)
 
 const handleLogin = () => {
-  // تسجيل الدخول التجريبي - لا نحتاج للتحقق
-  localStorage.setItem('pos_demo_logged_in', 'true')
-  router.push('/')
+  if (!phone.value || !username.value || !password.value) {
+    message.warning("يرجى إكمال جميع الحقول");
+    return;
+  }
+
+  loading.value = true
+  const result = login(phone.value, username.value, password.value)
+
+  if (result.success) {
+    message.success(`مرحباً بك في ${result.user.name}`)
+    router.push('/')
+  } else {
+    message.error(result.message)
+  }
+  loading.value = false
 }
 </script>
 
@@ -62,31 +107,40 @@ const handleLogin = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #f8fafc;
+  background-image:
+    radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
+    radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
+    radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
   direction: rtl;
-  font-family: 'Tajawal', sans-serif;
 }
 
 .login-card {
   background: white;
-  border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-  padding: 2rem;
+  border-radius: 24px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  padding: 3rem 2rem;
   width: 100%;
-  max-width: 400px;
-  text-align: center;
+  max-width: 440px;
+}
+
+.app-icon {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
 }
 
 .login-header h1 {
-  margin: 0 0 0.5rem 0;
-  color: #333;
-  font-size: 1.5rem;
+  margin: 0 0 10px 0;
+  color: #1e293b;
+  font-size: 1.8rem;
+  font-weight: 800;
 }
 
 .login-header p {
-  margin: 0 0 2rem 0;
-  color: #666;
-  font-size: 0.9rem;
+  margin: 0 0 30px 0;
+  color: #64748b;
+  font-size: 1rem;
 }
 
 .login-form {
@@ -94,49 +148,31 @@ const handleLogin = () => {
 }
 
 .form-group {
-  margin-bottom: 1.5rem;
+  margin-bottom: 20px;
 }
 
 .form-group label {
   display: block;
-  margin-bottom: 0.5rem;
-  color: #333;
-  font-weight: 500;
-}
-
-.form-group input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 1rem;
-  box-sizing: border-box;
-  background-color: #f5f5f5;
+  margin-bottom: 8px;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.9rem;
 }
 
 .login-button {
-  width: 100%;
-  padding: 0.75rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
+  height: 50px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
   border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: transform 0.2s;
+  margin-top: 10px;
 }
 
-.login-button:hover {
-  transform: translateY(-2px);
-}
-
-.info-message {
-  margin-top: 1rem;
-  padding: 0.75rem;
-  background-color: #e3f2fd;
-  color: #1976d2;
-  border-radius: 6px;
-  font-size: 0.875rem;
+.links-footer {
+  margin-top: 24px;
+  text-align: center;
+  border-top: 1px solid #f1f5f9;
+  padding-top: 20px;
 }
 </style>

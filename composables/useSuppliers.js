@@ -1,76 +1,58 @@
+import { reactive, computed } from 'vue';
+import { useAuth } from '@/composables/useAuth';
+
 const state = reactive({
     suppliers: [
-        {
-            id: 1,
-            name: "مركز واحد",
-            address: "العنوان",
-            phonenumber: "0597060381",
+        // موردين المتجر الأول
+        { id: 1, name: "شركة الأمل للإلكترونيات", address: "المنطقة الحرة", phonenumber: "010000001", storeId: 1 },
+        { id: 2, name: "مصنع الأفق للبلاستيك", address: "المدينة الصناعية", phonenumber: "010000002", storeId: 1 },
 
-        },
-        {
-            id: 2,
-            name: "مركز اثنين",
-            address: "العنوان",
-            phonenumber: "0597060381",
-
-        }, {
-            id: 3,
-            name: "مركز ثلاث",
-            address: "العنوان",
-            phonenumber: "0597060381",
-
-        },
+        // موردين المتجر الثاني (الصيدلية)
+        { id: 3, name: "مستودع أدوية الحكمة", address: "وسط البلد", phonenumber: "020000001", storeId: 2 },
+        { id: 4, name: "شركة النيل للمستحضرات", address: "القاهرة الجديدة", phonenumber: "020000002", storeId: 2 },
     ]
 });
+
 export const useSuppliers = () => {
+    const { currentUser } = useAuth();
+    const currentStoreId = computed(() => currentUser.value?.storeId);
+
+    const getSuppliers = () => {
+        if (!currentStoreId.value) return [];
+        return state.suppliers.filter(s => s.storeId === currentStoreId.value);
+    };
 
     const getSupplierById = (id) => {
-        return state.suppliers.find(supplier => supplier.id === id);
-    };
-    const getSuppliers = () => {
-        console.log("hello")
-        return state.suppliers
+        return state.suppliers.find(s => s.id === id && s.storeId === currentStoreId.value);
     };
 
     const getSuppliersFiltered = (supplierName) => {
-        console.log("test test")
-        console.log(state.suppliers)
-
-        if (!supplierName) {
-            return state.suppliers;
-        }
+        const storeSuppliers = getSuppliers();
+        if (!supplierName) return storeSuppliers;
 
         const lowerCaseSearchTerm = supplierName.toLowerCase();
-
-        return state.suppliers.filter(supplier => {
+        return storeSuppliers.filter(s => {
             return (
-                supplier.name.toLowerCase().includes(lowerCaseSearchTerm) ||
-                supplier.address.toLowerCase().includes(lowerCaseSearchTerm) ||
-                supplier.phonenumber.toLowerCase().includes(lowerCaseSearchTerm)
+                s.name.toLowerCase().includes(lowerCaseSearchTerm) ||
+                s.address.toLowerCase().includes(lowerCaseSearchTerm) ||
+                s.phonenumber.includes(lowerCaseSearchTerm)
             );
         });
     };
-    const addSupplier = (newsupplier) => {
-        // Assign a new unique ID to the new item
-        const newId = state.suppliers.length ? Math.max(...state.suppliers.map(supplier => supplier.id)) + 1 : 1;
-        const supplierToAdd = { ...newsupplier, id: newId };
 
-        // Add the new item to the items array
+    const addSupplier = (newsupplier) => {
+        const newId = state.suppliers.length ? Math.max(...state.suppliers.map(s => s.id)) + 1 : 1;
+        const supplierToAdd = { ...newsupplier, id: newId, storeId: currentStoreId.value };
         state.suppliers.push(supplierToAdd);
-        console.log(state.suppliers)
         return supplierToAdd;
     };
+
     const editSupplier = (id, updatedSupplier) => {
-        const index = state.suppliers.findIndex(supplier => supplier.id === id);
+        const index = state.suppliers.findIndex(s => s.id === id && s.storeId === currentStoreId.value);
         if (index !== -1) {
-            // Merge the updated item properties with the existing item
             state.suppliers[index] = { ...state.suppliers[index], ...updatedSupplier };
-            console.log(`supplier with ID ${id} updated successfully.`);
-        } else {
-            console.log(`Item with ID ${id} not found.`);
         }
     };
-
 
     return { getSuppliers, getSuppliersFiltered, addSupplier, getSupplierById, editSupplier };
 };

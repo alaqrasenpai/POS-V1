@@ -1,28 +1,28 @@
 <template>
-    <n-button @click="isOpen = true">
-        تعديل العميل
+    <n-button quaternary circle type="info" @click="isOpen = true">
+        <template #icon><n-icon><EditIcon /></n-icon></template>
     </n-button>
-    <n-modal v-model:show="isOpen" role="dialog" aria-modal="true">
-        <n-card style="width: 600px" title="Edit Customer" :bordered="false" size="huge">
-            <template #header-extra>
-                <n-button ghost type="primary" icon="i-heroicons-x-mark-20-solid" @click="closeDialog">
-                    Close
-                </n-button>
-            </template>
-            <!-- CustomerForm component to handle Add/Edit functionality -->
-            <CustomerForm :customerId="props.customerId" :close="closeDialog" :isAdd="false" />
+    <n-modal v-model:show="isOpen">
+        <n-card 
+            style="width: 600px" 
+            title="تعديل بيانات العميل" 
+            :bordered="false" 
+            size="huge" 
+            role="dialog" 
+            aria-modal="true"
+            class="main-content-card"
+        >
+            <CustomersCustomerform :customerId="props.customerId" :close="closeDialog" :isAdd="false" />
         </n-card>
     </n-modal>
 </template>
 
-<script lang="ts" setup>
+<script setup>
 import { ref } from 'vue'
-import CustomerForm from '../customers/CustomerForm.vue' // Ensure correct import path
+import { CreateOutline as EditIcon } from '@vicons/ionicons5'
 
-// State to manage the modal visibility
 const isOpen = ref(false)
 
-// Define props to receive the customer ID
 const props = defineProps({
     customerId: {
         type: Number,
@@ -30,7 +30,6 @@ const props = defineProps({
     }
 })
 
-// Close the modal
 const closeDialog = () => {
     isOpen.value = false
 }

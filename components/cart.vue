@@ -1,66 +1,168 @@
 <template>
-    <div>
-        <div>
-            <h1>السلة <n-icon>
-                    <CartIcon />
-                </n-icon></h1>
-            <div>
-                <!-- <n-button>أداة</n-button>
-                <n-button>قائمة</n-button> -->
+    <div class="cart-wrapper">
+        <!-- Section 1: Top Header -->
+        <div class="cart-header">
+            <n-flex align="center" justify="space-between">
+                <n-flex align="center" :size="8">
+                    <n-icon size="24" color="#18a058"><CartIcon /></n-icon>
+                    <n-h3 style="margin: 0; font-weight: 800;">سلة البيع</n-h3>
+                </n-flex>
                 <CustomersAddcustomer />
-            </div>
-        </div>
-        <div>
-            <!-- <modal /> -->
-        </div>
-        <div>
-            <!-- Dropdown لاختيار العميل -->
-            <n-select
-                v-model:value="selectedCustomerId"
-                :options="customerOptions"
-                placeholder="اختر عميل"
-                clearable
-                filterable
-            />
-            <ul>
-                <li v-for="item in cartItems" :key="item.id">
-                    <n-flex justify="space-around">
-                        <span>{{ item.name }}</span>
-                        <n-input-number
-                            style="width: 11vh; padding: 5px; border-radius: 4px; border: 1px solid #ccc; font-size: 14px;"
-                            v-model:value="item.quantity"
-                            :min="1"
-                            :max="getMaxQuantity(item.id)"
-                            @update:value="(newValue) => handleQuantityChange(item, newValue)"
-                        />
-                        <span>{{ item.price }}</span>
-                    </n-flex>
-                </li>
-            </ul>
-            <n-input v-model:value="discount" type="text" placeholder="الخصم" color="primary" style="color: whitesmoke;" />
-            <UDivider />
-            <div>إجمالي المبيعات: {{ totalPrice }}</div>
-            <div>الخصم: {{ discount }}</div>
-            <div>المجموع: {{ totalPriceWithDis }}</div>
-            <n-flex justify="space-between">
-                <n-button @click="handleSaveCart">
-                    <template #icon>
-                        <n-icon>
-                            <CashIcon />
-                        </n-icon>
-                    </template>
-                    بيع
-                </n-button>
-                <n-button @click="handleClearCart" strong secondary type="error">
-                    <template #icon>
-                        <n-icon>
-                            <TrashIcon />
-                        </n-icon>
-                    </template>
-                    إفراغ السلة
-                </n-button>
             </n-flex>
         </div>
+
+        <div class="cart-main-content">
+            <!-- Section 2: Transaction Config (Customer & Payment) -->
+            <div class="transaction-config">
+                <div class="config-grid">
+                    <div class="config-field">
+                        <label>العميل</label>
+                        <n-select 
+                            v-model:value="selectedCustomerId" 
+                            :options="customerOptions" 
+                            placeholder="بحث عن عميل..." 
+                            clearable
+                            filterable 
+                            size="medium"
+                        />
+                    </div>
+                    <div class="config-field">
+                        <label>وسيلة الدفع</label>
+                        <n-select 
+                            v-model:value="paymentMethod" 
+                            :options="paymentMethodOptions"
+                            size="medium"
+                        >
+                            <template #prefix>
+                                <n-icon><component :is="activePaymentIcon" /></n-icon>
+                            </template>
+                        </n-select>
+                    </div>
+                </div>
+
+                <!-- Hidden details for Check/Installment -->
+                <transition name="slide-fade">
+                    <div v-if="paymentMethod === 'check'" class="special-config-panel">
+                        <n-grid :cols="2" :x-gap="8">
+                            <n-gi>
+                                <n-text depth="3" class="mini-label">رقم الشيك</n-text>
+                                <n-input v-model:value="paymentDetails.checkNumber" size="small" placeholder="0000" />
+                            </n-gi>
+                            <n-gi>
+                                <n-text depth="3" class="mini-label">الاستحقاق</n-text>
+                                <n-date-picker v-model:value="paymentDetails.checkDate" type="date" size="small" style="width: 100%" />
+                            </n-gi>
+                        </n-grid>
+                    </div>
+                    <div v-else-if="paymentMethod === 'installment'" class="special-config-panel installment">
+                        <n-grid :cols="2" :x-gap="8">
+                            <n-gi>
+                                <n-text depth="3" class="mini-label">الدفعة الأولى</n-text>
+                                <n-input-number v-model:value="paymentDetails.downPayment" :min="0" size="small" :show-button="false" />
+                            </n-gi>
+                            <n-gi>
+                                <n-text depth="3" class="mini-label">الأقساط</n-text>
+                                <n-input-number v-model:value="paymentDetails.installmentsCount" :min="1" size="small" />
+                            </n-gi>
+                        </n-grid>
+                        <div class="installment-calc">
+                            القسط: <strong>{{ monthlyInstallment }} {{ settings.currency }}</strong> شهرياً
+                        </div>
+                    </div>
+                </transition>
+            </div>
+
+            <!-- Section 3: Items List (The scrollable part) -->
+            <div class="items-container">
+                <div class="items-header">
+                    <n-text depth="3">قائمة الأصناف ({{ cartItems.length }})</n-text>
+                    <n-button text type="error" size="tiny" v-if="cartItems.length > 0" @click="handleClearCart">مسح الكل</n-button>
+                </div>
+                
+                <div class="items-scroll-area">
+                    <transition-group name="list">
+                        <div v-for="item in cartItems" :key="item.id" class="item-card">
+                            <div class="item-card-top">
+                                <span class="item-name" :title="item.name">{{ item.name }}</span>
+                                <n-button quaternary circle type="error" size="tiny" @click="removeItem(item.id)">
+                                    <template #icon><n-icon><TrashIcon /></n-icon></template>
+                                </n-button>
+                            </div>
+                            <div class="item-card-bottom">
+                                <div class="unit-price">{{ item.price }} {{ settings.currency }}</div>
+                                <div class="quantity-controls">
+                                    <n-button strong secondary circle size="tiny" @click="updateQty(item, -1)">-</n-button>
+                                    <span class="qty-display">{{ item.quantity }}</span>
+                                    <n-button strong secondary circle size="tiny" @click="updateQty(item, 1)">+</n-button>
+                                </div>
+                                <div class="item-subtotal">
+                                    {{ (item.price * item.quantity).toFixed(2) }}
+                                    <span class="curr">{{ settings.currency }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </transition-group>
+                    <n-empty v-if="cartItems.length === 0" description="لم يتم إضافة أصناف بعد" style="margin-top: 40px" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Final Footer -->
+        <div class="cart-footer">
+            <div class="summary-card">
+                <div class="summary-row">
+                    <span>المجموع:</span>
+                    <span>{{ totalPrice }} {{ settings.currency }}</span>
+                </div>
+                <div class="summary-row discount-row">
+                    <span>الخصم:</span>
+                    <n-input-number v-model:value="discount" :min="0" size="tiny" class="discount-input" :show-button="false" placeholder="0.00" />
+                </div>
+                <n-divider class="footer-divider" />
+                <div class="summary-row total-row">
+                    <span class="total-label">الإجمالي النهائي</span>
+                    <span class="total-value">{{ totalPriceWithDis }} {{ settings.currency }}</span>
+                </div>
+            </div>
+
+            <n-button type="primary" block size="large" class="pay-btn" :disabled="cartItems.length === 0" @click="handleSaveCart">
+                <template #icon><n-icon><CashIcon /></n-icon></template>
+                تثبيت وعرض الفاتورة
+            </n-button>
+        </div>
+
+        <!-- Receipt Modal -->
+        <n-modal v-model:show="showReceipt" :mask-closable="false">
+             <n-card
+                style="width: 420px; border-radius: 20px;"
+                title="معاينة إيصال البيع"
+                bordered
+                size="huge"
+                role="dialog"
+                aria-modal="true"
+                class="main-content-card"
+             >
+                <template #header-extra>
+                   <n-button quaternary circle @click="showReceipt = false">
+                      <template #icon><n-icon><CloseIcon /></n-icon></template>
+                   </n-button>
+                </template>
+
+                <div id="print-area">
+                   <Receipt :order="lastOrder" :details="lastOrderDetails" />
+                </div>
+
+                <template #footer>
+                   <n-flex justify="end" :size="12">
+                      <n-button quaternary @click="showReceipt = false" size="large">إغلاق</n-button>
+                      <n-button type="primary" @click="printReceipt" size="large" style="padding: 0 30px">
+                         <template #icon><n-icon><PrintIcon /></n-icon></template>
+                         طباعة الآن
+                      </n-button>
+                   </n-flex>
+                </template>
+             </n-card>
+        </n-modal>
     </div>
 </template>
 
@@ -68,39 +170,72 @@
 import {
     TrashBinOutline as TrashIcon,
     CashOutline as CashIcon,
-    CartOutline as CartIcon
+    CartOutline as CartIcon,
+    WalletOutline as WalletIcon,
+    CardOutline as VisaIcon,
+    CalendarOutline as CheckIcon,
+    TimeOutline as InstallmentIcon,
+    PrintOutline as PrintIcon,
+    CloseOutline as CloseIcon
 } from '@vicons/ionicons5';
-import { computed, ref, watch } from 'vue';
-// import { useCustomers } from '@/path-to-your-customers-file'; // تأكد من استيراد useCustomers بشكل صحيح
-// import { useCart } from '@/path-to-your-cart-file'; // استيراد useCart
-// import { useSellOrder, useSellOrderDtl } from '@/path-to-your-sell-order-file'; // استيراد الدوال اللازمة
-// import { useInventory, useInventoryTrans } from '@/path-to-your-inventory-file'; // استيراد الدوال اللازمة
+import { computed, ref, watch, h } from 'vue';
+import { useMessage, NIcon, useDialog } from 'naive-ui';
+import { useSettings } from '@/composables/useSettings';
 
-const { getCartItems, clearCart } = useCart();
+const { getCartItems, clearCart, removeItem } = useCart();
 const { addSellOrder } = useSellOrder();
 const { addSellOrdeDtl } = useSellOrderDtl();
-const { getItemById, updateItemQuantity } = useInventory(); // استيراد الدوال اللازمة لإدارة المخزون
-const { getCustomers } = useCustomers(); // استيراد getCustomers من useCustomers
-const { addItemTrans } = useInventoryTrans(); // استيراد addItemTrans من useInventoryTrans
+const { getItemById, updateItemQuantity } = useInventory();
+const { getCustomers } = useCustomers();
+const { addItemTrans } = useInventoryTrans();
+const { addCheck, addInstallment } = usePayments();
+const { addLog } = useActivityLog();
+const { settings } = useSettings();
+const message = useMessage();
+const dialog = useDialog();
 
 const cartItems = computed(() => getCartItems());
-let totalPrice = ref(0);
-let totalPriceWithDis = ref(0);
-let discount = ref(0);
-let sellOrder = ref({
-    id: null,
-    serialnumber: "",
-    selldate: null,
-    totaltax: null,
-    totalPrice: null,
-    totalDisc: null,
-    deleted: false,
+const totalPrice = ref(0);
+const totalPriceWithDis = ref(0);
+const discount = ref(0);
+const paymentMethod = ref('cash');
+
+// Receipt States
+const showReceipt = ref(false);
+const lastOrder = ref({});
+const lastOrderDetails = ref([]);
+
+const printReceipt = () => {
+    window.print();
+};
+
+const renderIcon = (icon) => h(NIcon, null, { default: () => h(icon) })
+
+const paymentMethodOptions = [
+    { label: 'دفع نقدي', value: 'cash', icon: WalletIcon },
+    { label: 'بطاقة بنكية', value: 'visa', icon: VisaIcon },
+    { label: 'شيك بنكي', value: 'check', icon: CheckIcon },
+    { label: 'تقسيط مالي', value: 'installment', icon: InstallmentIcon },
+].map(opt => ({
+    label: opt.label,
+    value: opt.value,
+    icon: renderIcon(opt.icon)
+}));
+
+const activePaymentIcon = computed(() => {
+    const icons = { cash: WalletIcon, visa: VisaIcon, check: CheckIcon, installment: InstallmentIcon };
+    return icons[paymentMethod.value] || WalletIcon;
 });
 
-// حالة العميل المختار
+const paymentDetails = ref({
+    checkNumber: '',
+    checkDate: null,
+    downPayment: 0,
+    installmentsCount: 1
+});
+
 let selectedCustomerId = ref(null);
 
-// تحويل قائمة العملاء إلى خيارات للقائمة المنسدلة
 const customerOptions = computed(() => {
     return getCustomers().map(customer => ({
         label: customer.name,
@@ -108,104 +243,282 @@ const customerOptions = computed(() => {
     }));
 });
 
-// الحصول على الحد الأقصى للكمية المتاحة في المخزون
-const getMaxQuantity = (itemId) => {
-    const itemInInventory = getItemById(itemId);
-    return itemInInventory ? itemInInventory.quantity : 0;
-};
+const remainingAmount = computed(() => {
+    const remaining = totalPriceWithDis.value - (paymentDetails.value.downPayment || 0);
+    return Math.max(0, remaining).toFixed(2);
+});
 
-// التحقق من الكمية عند التعديل
-const handleQuantityChange = (item, newValue) => {
-    const itemInInventory = getItemById(item.id);
-    if (itemInInventory && newValue > itemInInventory.quantity) {
-        alert(`الكمية المطلوبة (${newValue}) تتجاوز الكمية المتاحة في المخزون (${itemInInventory.quantity})!`);
-        item.quantity = itemInInventory.quantity; // إعادة الكمية إلى الحد الأقصى المتاح
-    } else {
-        item.quantity = newValue;
+const monthlyInstallment = computed(() => {
+    const count = paymentDetails.value.installmentsCount || 1;
+    return (parseFloat(remainingAmount.value) / count).toFixed(2);
+});
+
+const updateQty = (item, delta) => {
+    const newQty = item.quantity + delta;
+    const inv = getItemById(item.id);
+    if (newQty < 1) return;
+    if (inv && newQty > inv.quantity) {
+        dialog.warning({
+            title: 'تنبيه نفاذ الكمية',
+            content: `عذراً، الكمية المتوفرة في المخزن من الهذا الصنف هي (${inv.quantity}) فقط. لا يمكنك إضافة المزيد.`,
+            positiveText: 'حسناً',
+            closable: false
+        });
+        return;
     }
+    item.quantity = newQty;
     calculateTotalPrice();
 };
 
-// إتمام البيع وتعديل المخزون
 const handleSaveCart = () => {
-    if (totalPrice.value != 0) {
-        const currentDate = new Date();
-        const year = currentDate.getFullYear();
-        const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-        const day = String(currentDate.getDate()).padStart(2, '0');
-        const formattedDate = `${year}${month}${day}`;
-
-        sellOrder.value.serialnumber = formattedDate;
-        sellOrder.value.selldate = new Date();
-        sellOrder.value.totalPrice = totalPrice.value;
-        sellOrder.value.totalDisc = discount.value;
-
-        // إضافة العميل المختار إلى الطلب
-        if (selectedCustomerId.value) {
-            sellOrder.value.customerId = selectedCustomerId.value;
-        }
-
-        let sellOrderId = addSellOrder(sellOrder.value);
-
-        for (let i = 0; i < cartItems.value.length; i++) {
-            let sellOrderDtl = {
-                id: null,
-                orderId: sellOrderId,
-                itemId: cartItems.value[i].id,
-                totaltax: null,
-                totalPrice: cartItems.value[i].price,
-                itemQuan: cartItems.value[i].quantity,
-                itemDisc: null,
-                itemName: cartItems.value[i].name,
-                deleted: false,
-            };
-            addSellOrdeDtl(sellOrderDtl);
-
-            // تعديل الكمية في المخزون
-            const itemInInventory = getItemById(cartItems.value[i].id);
-            if (itemInInventory) {
-                const newQuantity = itemInInventory.quantity - cartItems.value[i].quantity;
-                updateItemQuantity(cartItems.value[i].id, newQuantity); // تحديث الكمية في المخزون
-            }
-
-            // إضافة سجل sell في الـ transactions
-            const newTransaction = {
-                name: cartItems.value[i].name,
-                TransType: "sell",
-                supplier: "N/A", // يمكنك تغيير هذا إذا كان لديك معلومات المورد
-                itemId: cartItems.value[i].id,
-                date: new Date().toISOString(), // تاريخ اليوم
-            };
-            addItemTrans(newTransaction); // إضافة السجل إلى الـ transactions
-        }
-
-        discount.value = null;
-        clearCart();
-    } else {
-        alert("السلة فارغة!");
+    if (cartItems.value.length === 0) return;
+    if ((paymentMethod.value === 'check' || paymentMethod.value === 'installment') && !selectedCustomerId.value) {
+        message.error("يجب اختيار عميل لهذه العملية");
+        return;
     }
+
+    const currentDate = new Date();
+    const formattedDate = currentDate.toISOString().slice(0, 10).replace(/-/g, '');
+
+    const orderData = {
+        serialnumber: formattedDate + '-' + Math.floor(Math.random() * 1000),
+        selldate: new Date(),
+        totalPrice: totalPriceWithDis.value,
+        totalDisc: discount.value,
+        paymentMethod: paymentMethod.value,
+        customerId: selectedCustomerId.value,
+        deleted: false
+    };
+
+    let sellOrderId = addSellOrder(orderData);
+
+    lastOrder.value = { ...orderData, id: sellOrderId };
+    lastOrderDetails.value = [];
+
+    const customerName = getCustomers().find(c => c.id === selectedCustomerId.value)?.name || 'عميل مجهول';
+    
+    if (paymentMethod.value === 'check') {
+        addCheck({ orderId: sellOrderId, customerName, checkNumber: paymentDetails.value.checkNumber, amount: totalPriceWithDis.value, dueDate: paymentDetails.value.checkDate ? new Date(paymentDetails.value.checkDate).toLocaleDateString() : 'غير محدد' });
+    } else if (paymentMethod.value === 'installment') {
+        addInstallment({ orderId: sellOrderId, customerName, totalAmount: totalPriceWithDis.value, paidAmount: paymentDetails.value.downPayment, remainingAmount: parseFloat(remainingAmount.value), installmentsCount: paymentDetails.value.installmentsCount, payments: [] });
+    }
+
+    for (let item of cartItems.value) {
+        let dtl = { orderId: sellOrderId, itemId: item.id, totalPrice: item.price, itemQuan: item.quantity, itemName: item.name, deleted: false };
+        addSellOrdeDtl(dtl);
+        lastOrderDetails.value.push(dtl);
+        const inv = getItemById(item.id);
+        if (inv) updateItemQuantity(item.id, inv.quantity - item.quantity);
+        addItemTrans({ name: item.name, TransType: "sell", itemId: item.id, date: new Date().toISOString() });
+    }
+
+    message.success("تم تسجيل الطلب بنجاح");
+    showReceipt.value = true;
+    handleClearCart();
 };
 
-// إفراغ السلة
 const handleClearCart = () => {
-    discount.value = null;
+    discount.value = 0;
     clearCart();
+    paymentMethod.value = 'cash';
+    paymentDetails.value = { checkNumber: '', checkDate: null, downPayment: 0, installmentsCount: 1 };
+    selectedCustomerId.value = null;
 };
 
-// حساب الإجمالي
 const calculateTotalPrice = () => {
     totalPrice.value = cartItems.value.reduce((sum, item) => (sum + item.price * item.quantity), 0);
-    totalPriceWithDis.value = totalPrice.value - discount.value;
+    totalPriceWithDis.value = Math.max(0, totalPrice.value - (discount.value || 0));
 };
 
-// مراقبة التغييرات في السلة والخصم
 watch(cartItems, calculateTotalPrice, { immediate: true, deep: true });
-watch(discount, (newValue) => {
-    if (totalPrice.value - newValue < 0 && totalPrice.value != 0) {
-        alert("قيمة الخصم غير صالحة!");
-        discount.value = null;
-    } else {
-        calculateTotalPrice();
-    }
-}, { immediate: true, deep: true });
+watch(discount, calculateTotalPrice);
 </script>
+
+<style scoped>
+.cart-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background: #fcfdfe;
+    overflow: hidden;
+}
+
+.cart-header {
+    background: white;
+    padding: 20px;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.cart-main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.transaction-config {
+    padding: 16px;
+    background: white;
+    border-bottom: 1px dashed #e2e8f0;
+}
+
+.config-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.config-field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 4px;
+    text-transform: uppercase;
+}
+
+.special-config-panel {
+    margin-top: 12px;
+    padding: 12px;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px solid #edf2f7;
+}
+
+.mini-label { font-size: 10px; margin-bottom: 2px; display: block; }
+.installment-calc { margin-top: 8px; font-size: 11px; text-align: center; color: #18a058; }
+
+.items-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    min-height: 0;
+}
+
+.items-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.items-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    padding-left: 4px; /* Flip scrollbar padding for RTL */
+}
+
+/* Redesigned Item Card */
+.item-card {
+    background: white;
+    border: 1px solid #f1f5f9;
+    border-radius: 14px;
+    padding: 12px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+    transition: transform 0.2s, border-color 0.2s;
+}
+
+.item-card:hover {
+    border-color: #18a05899;
+    transform: translateX(2px); /* Shift right in RTL */
+}
+
+.item-card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.item-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: #1e293b;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.item-card-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #f8fafc;
+    padding: 6px 12px;
+    border-radius: 10px;
+}
+
+.unit-price { font-size: 11px; color: #94a3b8; }
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: white;
+    padding: 2px 8px;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+.qty-display { font-weight: 800; font-size: 13px; min-width: 20px; text-align: center; }
+
+.item-subtotal {
+    font-weight: 800;
+    font-size: 15px;
+    color: #18a058;
+}
+
+.item-subtotal .curr { font-size: 10px; margin-right: 2px; }
+
+/* Footer */
+.cart-footer {
+    padding: 20px;
+    background: white;
+    border-top: 1px solid #f1f5f9;
+}
+
+.summary-card {
+    background: #f8fafc;
+    border-radius: 16px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.summary-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    margin-bottom: 8px;
+    color: #64748b;
+}
+
+.discount-row { align-items: center; }
+.discount-input { width: 80px; }
+
+.total-row {
+    margin-top: 8px;
+    color: #1e293b;
+}
+
+.total-label { font-weight: 700; font-size: 15px; }
+.total-value { font-weight: 900; font-size: 22px; color: #18a058; }
+
+.pay-btn {
+    height: 52px;
+    font-size: 17px;
+    font-weight: 800;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(24, 160, 88, 0.2);
+}
+
+/* Animations */
+.list-enter-active, .list-leave-active { transition: all 0.3s ease; }
+.list-enter-from, .list-leave-to { opacity: 0; transform: scale(0.9); }
+
+.slide-fade-enter-active { transition: all 0.3s ease-out; }
+.slide-fade-leave-active { transition: all 0.2s cubic-bezier(1, 0.5, 0.8, 1); }
+.slide-fade-enter-from, .slide-fade-leave-to { transform: translateY(-10px); opacity: 0; }
+</style>

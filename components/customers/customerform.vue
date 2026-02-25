@@ -1,43 +1,39 @@
 <template>
-    <div>
-        <form @submit.prevent="handleSubmit">
-            <!-- Form Fields -->
-            <div>
-                <n-form-item label="Name :">
-                    <n-input placeholder="Name" v-model:value="newCustomer.name" id="name" required />
-                </n-form-item>
-            </div>
-            <div>
-                <n-form-item label="Email :">
-                    <n-input placeholder="Email" v-model:value="newCustomer.email" id="email" required />
-                </n-form-item>
-            </div>
-            <div>
-                <n-form-item label="Phone Number :">
-                    <n-input placeholder="Phone Number" v-model:value="newCustomer.phoneNumber" id="phoneNumber" required />
-                </n-form-item>
-            </div>
-            <div>
-                <n-form-item label="Address :">
-                    <n-input placeholder="Address" v-model:value="newCustomer.address" id="address" />
-                </n-form-item>
-            </div>
+    <div style="padding-top: 10px;">
+        <n-form :model="newCustomer" label-placement="top">
+            <n-grid :cols="2" :x-gap="16">
+                <n-form-item-gi label="اسم العميل">
+                    <n-input placeholder="الاسم الكامل" v-model:value="newCustomer.name" />
+                </n-form-item-gi>
+                <n-form-item-gi label="رقم الهاتف">
+                    <n-input placeholder="رقم الجوال" v-model:value="newCustomer.phoneNumber" />
+                </n-form-item-gi>
+                
+                <n-form-item-gi label="البريد الإلكتروني">
+                    <n-input placeholder="example@mail.com" v-model:value="newCustomer.email" />
+                </n-form-item-gi>
+                <n-form-item-gi label="العنوان">
+                    <n-input placeholder="المدينة / المنطقة" v-model:value="newCustomer.address" />
+                </n-form-item-gi>
+            </n-grid>
 
-
-            <!-- Submit Button -->
-            <n-button type="primary" @click="handleSubmit">
-                {{ props.isAdd ? 'Add Customer' : 'Edit Customer' }}
-            </n-button>
-        </form>
+            <n-flex justify="end" style="margin-top: 24px;">
+                <n-button quaternary @click="props.close()">إلغاء</n-button>
+                <n-button type="primary" size="large" @click="handleSubmit" style="min-width: 120px;">
+                    {{ props.isAdd ? 'إضافة عميل جديد' : 'حفظ التعديلات' }}
+                </n-button>
+            </n-flex>
+        </n-form>
     </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useMessage } from 'naive-ui'
+import { useCustomers } from '@/composables/useCustomers'
 
-// Mocked functions for customer management
 const { getCustomerById, addCustomer, editCustomer } = useCustomers()
+const message = useMessage()
 
 const props = defineProps({
     customerId: {
@@ -50,7 +46,7 @@ const props = defineProps({
     },
     isAdd: {
         type: Boolean,
-        required: false
+        default: true
     }
 })
 
@@ -59,46 +55,33 @@ let newCustomer = ref({
     name: "",
     email: "",
     phoneNumber: "",
-    address: "",
-
+    address: ""
 })
 
-// If editing, load the existing customer data
 if (!props.isAdd) {
-    newCustomer.value = getCustomerById(props.customerId)
-}
-
-// Add customer function
-const addNewCustomer = () => {
-    addCustomer(newCustomer.value)
-    props.close() // Close the modal
-    resetForm()
-}
-
-// Edit customer function
-const editMyCustomer = () => {
-    editCustomer(props.customerId, newCustomer.value)
-    props.close() // Close the modal
-}
-
-// Reset form function
-const resetForm = () => {
-    newCustomer.value = {
-        id: null,
-        name: "",
-        email: "",
-        phoneNumber: "",
-        address: "",
-
+    const customer = getCustomerById(props.customerId)
+    if (customer) {
+        newCustomer.value = { ...customer }
     }
 }
 
-// Handle form submission
 const handleSubmit = () => {
-    if (props.isAdd) {
-        addNewCustomer()
-    } else {
-        editMyCustomer()
+    if (!newCustomer.value.name) {
+        message.error('يرجى إدخال اسم العميل')
+        return
     }
+    if (!newCustomer.value.phoneNumber) {
+        message.error('يرجى إدخال رقم الهاتف')
+        return
+    }
+
+    if (props.isAdd) {
+        addCustomer(newCustomer.value)
+        message.success('تم إضافة العميل بنجاح')
+    } else {
+        editCustomer(props.customerId, newCustomer.value)
+        message.success('تم تحديث بيانات العميل')
+    }
+    props.close()
 }
 </script>

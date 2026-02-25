@@ -1,38 +1,39 @@
 <template>
-    <div>
-        <form @submit.prevent="handleSubmit">
-            <!-- Form Fields -->
-            <div>
-                <n-form-item label="Name :">
-                    <n-input placeholder="Name" v-model:value="newSupplier.name" id="name" required />
-                </n-form-item>
-            </div>
-            <div>
-                <n-form-item label="Address :">
-                    <n-input placeholder="Address" v-model:value="newSupplier.address" id="address" required />
-                </n-form-item>
-            </div>
-            <div>
-                <n-form-item label="Phone Number :">
-                    <n-input placeholder="Phone Number" v-model:value="newSupplier.phonenumber" id="phonenumber" type="number"
-                        required />
-                </n-form-item>
-            </div>
+    <div style="padding-top: 10px;">
+        <n-form :model="newSupplier" label-placement="top">
+            <n-grid :cols="2" :x-gap="16">
+                <n-form-item-gi label="اسم المورد / الشركة">
+                    <n-input placeholder="مثال: شركة القدس للتجارة" v-model:value="newSupplier.name" />
+                </n-form-item-gi>
+                <n-form-item-gi label="رقم الهاتف">
+                    <n-input placeholder="رقم التواصل" v-model:value="newSupplier.phonenumber" />
+                </n-form-item-gi>
+                
+                <n-form-item-gi label="العنوان">
+                    <n-input placeholder="المدينة، الشارع" v-model:value="newSupplier.address" />
+                </n-form-item-gi>
+                <n-form-item-gi label="ملاحظات">
+                    <n-input placeholder="أي معلومات إضافية" v-model:value="newSupplier.notes" />
+                </n-form-item-gi>
+            </n-grid>
 
-            <!-- Submit Button -->
-            <n-button type="primary" @click="handleSubmit">
-                {{ props.isAdd ? 'Add Supplier' : 'Edit Supplier' }}
-            </n-button>
-        </form>
+            <n-flex justify="end" style="margin-top: 24px;">
+                <n-button quaternary @click="props.close()">إلغاء</n-button>
+                <n-button type="primary" size="large" @click="handleSubmit" style="min-width: 120px;">
+                    {{ props.isAdd ? 'إضافة المورد' : 'حفظ التغييرات' }}
+                </n-button>
+            </n-flex>
+        </n-form>
     </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useMessage } from 'naive-ui'
+import { useSuppliers } from '@/composables/useSuppliers'
 
-// Mocked functions from the inventory system
 const { getSupplierById, addSupplier, editSupplier } = useSuppliers()
+const message = useMessage()
 
 const props = defineProps({
     supplierId: {
@@ -45,53 +46,38 @@ const props = defineProps({
     },
     isAdd: {
         type: Boolean,
-        required: false
+        default: true
     }
 })
 
 let newSupplier = ref({
     id: null,
     name: "",
-    phonenumber: null,
+    phonenumber: "",
     address: "",
-
+    notes: ""
 })
 
-// If editing, load the existing item data
 if (!props.isAdd) {
-    newSupplier.value = getSupplierById(props.supplierId)
-}
-
-// Add item function
-const addNewSupplier = () => {
-    addSupplier(newSupplier.value)
-    props.close() // Close the modal
-    resetForm()
-}
-
-// Edit item function
-const editMySupplier = () => {
-    editSupplier(props.supplierId, newSupplier.value)
-    props.close() // Close the modal
-}
-
-// Reset form function
-const resetForm = () => {
-    newSupplier.value = {
-        id: null,
-        name: "",
-        phonenumber: null,
-        address: "",
-
+    const supplier = getSupplierById(props.supplierId)
+    if (supplier) {
+        newSupplier.value = { ...supplier }
     }
 }
 
-// Handle form submission
 const handleSubmit = () => {
-    if (props.isAdd) {
-        addNewSupplier()
-    } else {
-        editMySupplier()
+    if (!newSupplier.value.name) {
+        message.error('يرجى إدخال اسم المورد')
+        return
     }
+
+    if (props.isAdd) {
+        addSupplier(newSupplier.value)
+        message.success('تم إضافة المورد بنجاح')
+    } else {
+        editSupplier(props.supplierId, newSupplier.value)
+        message.success('تم تحديث بيانات المورد')
+    }
+    props.close()
 }
 </script>

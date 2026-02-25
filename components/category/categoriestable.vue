@@ -1,13 +1,21 @@
 <template>
-    <n-data-table :columns="columns" :data="listOfCategories" :pagination="false" :bordered="false" />
+  <div class="category-table-wrapper">
+    <n-data-table 
+      :columns="columns" 
+      :data="listOfCategories" 
+      :pagination="pagination" 
+      :bordered="false"
+      class="custom-table"
+      scroll-x="400"
+    />
+  </div>
 </template>
 
-<script lang="ts" setup>
-import { defineProps, h } from 'vue'
-import EditCategory from '../category/editCategory.vue' // Ensure correct import path and case sensitivity
-import type { DataTableColumns } from 'naive-ui'
+<script setup>
+import { h } from 'vue'
+import { NTag, NSpace } from 'naive-ui'
+import CategoryEditCategory from './editCategory.vue'
 
-// Define props to receive the list of categories
 const props = defineProps({
     listOfCategories: {
         type: Array,
@@ -15,22 +23,60 @@ const props = defineProps({
     }
 })
 
-// Define the columns configuration for the n-data-table
-const columns: DataTableColumns<any> = [
+const pagination = {
+  pageSize: 10
+}
+
+const columns = [
     {
-        title: 'Id',
-        key: 'id', // Match the property in listOfCategories for Id
+        title: 'المعرف',
+        key: 'id',
+        width: 80,
+        align: 'center'
     },
     {
-        title: 'Category Name',
-        key: 'name', // Match the property in listOfCategories for Category Name
-    },
-    {
-        title: 'Edit',
-        key: 'edit',
+        title: 'اسم التصنيف',
+        key: 'name',
         render(row) {
-            return h(EditCategory, { categoryId: row.id }) // Render EditItem component with itemId
+            return h(
+                NTag,
+                {
+                    type: 'success',
+                    bordered: false,
+                    style: { fontWeight: 'bold' }
+                },
+                { default: () => row.name }
+            )
+        }
+    },
+    {
+        title: 'الإجراءات',
+        key: 'actions',
+        width: 120,
+        align: 'center',
+        render(row) {
+            return h(
+              NSpace,
+              { justify: 'center' },
+              { default: () => h(CategoryEditCategory, { categoryId: row.id }) }
+            )
         }
     }
 ]
 </script>
+
+<style scoped>
+.category-table-wrapper {
+  background: white;
+}
+
+:deep(.n-data-table-th) {
+  background-color: #f9fafb !important;
+  font-weight: bold !important;
+  color: #374151 !important;
+}
+
+:deep(.n-data-table-td) {
+  padding: 12px 16px !important;
+}
+</style>

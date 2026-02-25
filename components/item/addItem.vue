@@ -1,32 +1,28 @@
-
 <template>
-    <n-button @click="isOpen = true">
-        اضافة منتج
+    <n-button type="primary" @click="isOpen = true">
+        إضافة منتج جديد
     </n-button>
     <n-modal v-model:show="isOpen">
-        <n-card style="width: 600px" title="Modal" :bordered="false" size="huge" role="dialog" aria-modal="true">
-            <template #header-extra>
-                Adding Items !
-            </template>
+        <n-card 
+            style="width: 700px" 
+            title="إضافة منتج جديد للمخزون" 
+            :bordered="false" 
+            size="huge" 
+            role="dialog" 
+            aria-modal="true"
+            class="main-content-card"
+        >
             <ItemItemform :close="closeDialog" :isAdd="true" />
-
         </n-card>
     </n-modal>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref } from 'vue'
+<script setup>
+import { ref } from 'vue'
 
-export default defineComponent({
-    setup() {
-        return {
-            isOpen: ref(false)
-        }
-    }
-})
+const isOpen = ref(false)
+
 const closeDialog = () => {
-    console.log("closed")
-    isOpen.value = false;
+    isOpen.value = false
 }
-
 </script>

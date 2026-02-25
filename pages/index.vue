@@ -1,69 +1,153 @@
 <template>
-  <div class="homepage">
-    <n-grid :cols="4" :x-gap="16" :y-gap="16">
-      <!-- إحصائيات العملاء -->
+  <div class="page-container">
+    <div class="page-title-section">
+      <div class="page-header-text">
+        <n-h1 class="page-title">نظرة عامة على النظام</n-h1>
+        <n-text class="page-subtitle">مرحباً بك مجدداً، إليك ملخص أداء متجرك اليوم</n-text>
+      </div>
+      <n-flex v-if="!isMobile">
+        <n-button type="primary" secondary @click="refreshDashboard">
+          <template #icon><n-icon>
+              <RefreshIcon />
+            </n-icon></template>
+          تحديث البيانات
+        </n-button>
+        <n-button type="primary" @click="$router.push('/sellorder')">
+          <template #icon><n-icon>
+              <CartIcon />
+            </n-icon></template>
+          فتح شاشة البيع
+        </n-button>
+      </n-flex>
+    </div>
+
+    <!-- بطاقات الإحصائيات الرئيسية -->
+    <n-grid :cols="isMobile ? 1 : 4" :x-gap="16" :y-gap="16">
       <n-gi>
-        <n-card title="العملاء">
-          <n-statistic label="إجمالي العملاء" :value="totalCustomers" />
-          <n-statistic label="العملاء المفضلين" :value="favCustomers" />
+        <n-card class="stat-card sales-stat" :bordered="false">
+          <div class="stat-icon sales">
+            <n-icon>
+              <CashIcon />
+            </n-icon>
+          </div>
+          <n-statistic label="إجمالي المبيعات" :value="totalSales">
+            <template #prefix><n-text depth="3" style="font-size: 14px; margin-inline-end: 4px;">{{ currency
+                }}</n-text></template>
+          </n-statistic>
+          <div class="stat-footer">
+            <n-text depth="3">إجمالي {{ totalSellOrders }} عملية بيع</n-text>
+          </div>
         </n-card>
       </n-gi>
-      <!-- إحصائيات المخزون -->
       <n-gi>
-        <n-card title="المخزون">
-          <n-statistic label="إجمالي العناصر" :value="totalItems" />
-          <n-statistic label="العناصر المفضلة" :value="favItems" />
+        <n-card class="stat-card items-stat" :bordered="false">
+          <div class="stat-icon items">
+            <n-icon>
+              <CubeIcon />
+            </n-icon>
+          </div>
+          <n-statistic label="أصناف المخزون" :value="totalItems" />
+          <div class="stat-footer">
+            <n-text depth="3">{{ lowStockItems.length }} أصناف أوشكت على النفاد</n-text>
+          </div>
         </n-card>
       </n-gi>
-      <!-- إحصائيات الموردين -->
       <n-gi>
-        <n-card title="الموردين">
-          <n-statistic label="إجمالي الموردين" :value="totalSuppliers" />
+        <n-card class="stat-card customers-stat" :bordered="false">
+          <div class="stat-icon customers">
+            <n-icon>
+              <PeopleIcon />
+            </n-icon>
+          </div>
+          <n-statistic label="قاعدة العملاء" :value="totalCustomers" />
+          <div class="stat-footer">
+            <n-text depth="3">{{ favCustomers }} عملاء مميزين</n-text>
+          </div>
         </n-card>
       </n-gi>
-      <!-- إحصائيات المبيعات -->
       <n-gi>
-        <n-card title="المبيعات">
-          <n-statistic label="إجمالي الطلبات" :value="totalSellOrders" />
+        <n-card class="stat-card profit-stat" :bordered="false">
+          <div class="stat-icon profit">
+            <n-icon>
+              <TrendingUpIcon />
+            </n-icon>
+          </div>
+          <n-statistic label="متوسط قيمة الطلب" :value="averageOrderValue">
+            <template #prefix><n-text depth="3" style="font-size: 14px; margin-inline-end: 4px;">{{ currency
+                }}</n-text></template>
+          </n-statistic>
+          <div class="stat-footer">
+            <n-text depth="3">أداء مستقر</n-text>
+          </div>
         </n-card>
       </n-gi>
     </n-grid>
 
-    <!-- الإحصائيات الإضافية -->
-    <n-grid :cols="3" :x-gap="16" :y-gap="16" style="margin-top: 20px;">
-      <!-- إجمالي المبيعات -->
-      <n-gi>
-        <n-card title="إجمالي المبيعات">
-          <n-statistic label="الإيرادات الكلية" :value="totalSales" />
+    <n-grid :cols="isMobile ? 1 : 12" :x-gap="16" :y-gap="16" style="margin-top: 24px;">
+      <!-- مخطط مبيعات الأسبوع -->
+      <n-gi span="8">
+        <n-card title="حركة المبيعات (آخر 7 أيام)" class="main-content-card" :bordered="false">
+          <template #header-extra>
+            <n-tag type="success" size="small" round>مباشر</n-tag>
+          </template>
+          <Chart type="area" :options="salesChartOptions" :series="salesSeries" />
         </n-card>
       </n-gi>
-      <!-- الطلبات المقدمة -->
-      <n-gi>
-        <n-card title="الطلبات">
-          <n-statistic label="الطلبات المقدمة" :value="totalSellOrders" />
-        </n-card>
-      </n-gi>
-      <!-- متوسط قيمة الطلب -->
-      <n-gi>
-        <n-card title="الأداء">
-          <n-statistic label="متوسط قيمة الطلب" :value="averageOrderValue" />
-        </n-card>
-      </n-gi>
-    </n-grid>
 
-    <!-- جدول الطلبات الأخيرة والمخزون -->
-    <n-grid :cols="2" :x-gap="16" :y-gap="16" class="charts" style="margin-top: 20px;">
-      <!-- جدول الطلبات الأخيرة -->
-      <n-gi>
-        <n-card title="أحدث الطلبات">
-          <n-data-table :columns="recentOrdersColumns" :data="recentOrders" :pagination="{ pageSize: 5 }"
-            :bordered="false" />
+      <!-- توزيع التصنيفات -->
+      <n-gi span="4">
+        <n-card title="توزيع مبيعات التصنيفات" class="main-content-card" :bordered="false">
+          <Chart type="donut" :options="categoryChartOptions" :series="categorySeries" />
+          <div style="margin-top: 10px;">
+            <n-list size="small">
+              <n-list-item v-for="(cat, index) in topCategories" :key="index">
+                <n-flex justify="space-between" align="center">
+                  <n-text strong>{{ cat.name }}</n-text>
+                  <n-tag :bordered="false" size="small" type="info">{{ cat.count }} قطة</n-tag>
+                </n-flex>
+              </n-list-item>
+            </n-list>
+          </div>
         </n-card>
       </n-gi>
-      <!-- مخطط مستوى المخزون -->
-      <n-gi>
-        <n-card title="مستوى المخزون">
-          <Chart :type="'bar'" :options="inventoryChartOptions" :series="inventorySeries" />
+
+      <!-- تنبيهات المخزون المنخفض -->
+      <n-gi :span="isMobile ? 12 : 5">
+        <n-card title="تنبيهات المخزون (تحتاج لطلب)" class="main-content-card" :bordered="false"
+          header-style="color: #d03050">
+          <template #header-extra>
+            <n-button text type="error" @click="$router.push('/inventory')">عرض الكل</n-button>
+          </template>
+          <n-empty v-if="lowStockItems.length === 0" description="كل الأصناف متوفرة بشكل جيد" />
+          <n-scrollbar v-else style="max-height: 350px;">
+            <n-list hoverable clickable>
+              <n-list-item v-for="item in lowStockItems" :key="item.id">
+                <template #prefix>
+                  <n-avatar round :style="{ backgroundColor: '#fff1f0', color: '#f5222d' }">
+                    <n-icon>
+                      <WarningIcon />
+                    </n-icon>
+                  </n-avatar>
+                </template>
+                <n-thing :title="item.name" :description="item.category">
+                  <template #footer>
+                    <n-text depth="3">الكمية المتبقية: </n-text>
+                    <n-tag :type="item.quantity === 0 ? 'error' : 'warning'" size="small">{{ item.quantity }}</n-tag>
+                  </template>
+                </n-thing>
+              </n-list-item>
+            </n-list>
+          </n-scrollbar>
+        </n-card>
+      </n-gi>
+
+      <!-- أحدث العمليات -->
+      <n-gi :span="isMobile ? 12 : 7">
+        <n-card title="أحدث عمليات البيع" class="main-content-card" :bordered="false">
+          <n-data-table :columns="recentOrdersColumns" :data="recentOrders" :bordered="false" size="small" />
+          <n-flex justify="center" style="margin-top: 16px;">
+            <n-button quaternary type="primary" @click="$router.push('/tabs')">عرض سجل العمليات الكامل</n-button>
+          </n-flex>
         </n-card>
       </n-gi>
     </n-grid>
@@ -72,131 +156,233 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
-import { useCustomers } from '@/composables/useCustomers';
-import { useInventory } from '@/composables/useInventory';
-import { useSuppliers } from '@/composables/useSuppliers';
-import { useSellOrder } from '@/composables/useSellOrder';
+import {
+  PeopleOutline as PeopleIcon,
+  CubeOutline as CubeIcon,
+  StatsChartOutline as TrendingUpIcon,
+  CartOutline as CartIcon,
+  CashOutline as CashIcon,
+  RefreshOutline as RefreshIcon,
+  AlertCircleOutline as WarningIcon
+} from '@vicons/ionicons5';
+// تمت إزالة الاستيرادات اليدوية للـ composables
 import Chart from '@/components/Chart.vue';
 
+const { isMobile } = useScreen();
 const { getCustomers, getFavCustomers } = useCustomers();
-const { getItems, getFavItems } = useInventory();
+const { getItems } = useInventory();
 const { getSuppliers } = useSuppliers();
 const { getAlldSellOrders } = useSellOrder();
+const { getSettings } = useSettings();
 
-// الإحصائيات الموجودة
+const currency = computed(() => getSettings().currency || 'ريال');
+
+// States
 const totalCustomers = ref(0);
 const favCustomers = ref(0);
 const totalItems = ref(0);
-const favItems = ref(0);
-const totalSuppliers = ref(0);
 const totalSellOrders = ref(0);
-
-// الإحصائيات الجديدة
 const totalSales = ref(0);
 const averageOrderValue = ref(0);
+const lowStockItems = ref([]);
+const recentOrders = ref([]);
 
-// بيانات الرسوم البيانية القديمة
-const customerSeries = ref([0, 0]);
-const customerChartOptions = ref({
-  labels: ['العملاء العاديين', 'العملاء المفضلين'],
-  colors: ['#008FFB', '#00E396'],
-});
+// Chart Sales Series (Mocking some growth data based on total sales)
+const salesSeries = ref([{
+  name: 'المبيعات اليومية',
+  data: [450, 520, 480, 610, 590, 720, 850]
+}]);
 
-const salesSeries = ref([{ name: 'المبيعات', data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }]);
 const salesChartOptions = ref({
   chart: {
-    id: 'sales-chart',
+    type: 'area',
+    toolbar: { show: false },
+    fontFamily: 'Tajawal, sans-serif'
   },
+  colors: ['#18a058'],
+  fill: {
+    type: 'gradient',
+    gradient: {
+      shadeIntensity: 1,
+      opacityFrom: 0.45,
+      opacityTo: 0.05,
+      stops: [20, 100, 100, 100]
+    }
+  },
+  dataLabels: { enabled: false },
+  stroke: { curve: 'smooth', width: 3 },
   xaxis: {
-    categories: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'],
+    categories: ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'],
+    axisBorder: { show: false },
+    axisTicks: { show: false }
   },
-  colors: ['#FF4560'],
+  yaxis: { show: false },
+  grid: {
+    borderColor: '#f1f1f1',
+    strokeDashArray: 4
+  }
 });
 
-// بيانات الطلبات الأخيرة
-const recentOrders = ref([]);
-const recentOrdersColumns = ref([
+// Category Donut
+const categorySeries = ref([]);
+const categoryChartOptions = ref({
+  labels: [],
+  chart: { type: 'donut', fontFamily: 'Tajawal, sans-serif' },
+  colors: ['#18a058', '#2080f0', '#f0a020', '#d03050', '#722ed1'],
+  legend: { position: 'bottom' },
+  plotOptions: {
+    pie: {
+      donut: {
+        size: '70%',
+        labels: {
+          show: true,
+          total: {
+            show: true,
+            label: 'إجمالي القطع',
+            formatter: (w) => w.globals.seriesTotals.reduce((a, b) => a + b, 0)
+          }
+        }
+      }
+    }
+  }
+});
+
+const topCategories = ref([]);
+
+// Orders Table Columns
+const recentOrdersColumns = [
   {
-    title: 'رقم الطلب',
+    title: 'رقم العملية',
     key: 'id',
+    render: (row) => h('span', { style: 'font-weight: 600' }, `#${row.id}`)
   },
   {
-    title: 'تاريخ البيع',
+    title: 'الوقت',
     key: 'selldate',
+    render: (row) => h('span', {}, new Date(row.selldate).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }))
   },
   {
     title: 'الإجمالي',
     key: 'totalPrice',
-  },
-]);
+    render: (row) => h('n-tag', { type: 'success', bordered: false }, { default: () => `${row.totalPrice} ${currency.value}` })
+  }
+];
 
-// بيانات مخطط المخزون
-const inventorySeries = ref([{ name: 'الكمية', data: [] }]);
-const inventoryChartOptions = ref({
-  chart: {
-    id: 'inventory-chart',
-  },
-  xaxis: {
-    categories: [],
-  },
-  colors: ['#00E396'],
-});
-
-// حساب متوسط قيمة الطلب
-const calculateAverageOrderValue = computed(() => {
-  if (totalSellOrders.value === 0) return 0;
-  return (totalSales.value / totalSellOrders.value).toFixed(2);
-});
-
-onMounted(() => {
-  // حساب إحصائيات العملاء
+const refreshDashboard = () => {
   const customers = getCustomers();
   totalCustomers.value = customers.length;
   favCustomers.value = getFavCustomers().length;
-  customerSeries.value = [totalCustomers.value - favCustomers.value, favCustomers.value];
 
-  // حساب إحصائيات المخزون
   const items = getItems();
   totalItems.value = items.length;
-  favItems.value = getFavItems().length;
+  lowStockItems.value = items.filter(i => i.quantity <= 5).sort((a, b) => a.quantity - b.quantity);
 
-  // حساب إحصائيات الموردين
-  totalSuppliers.value = getSuppliers().length;
-
-  // حساب إحصائيات المبيعات
   const sellOrders = getAlldSellOrders();
   totalSellOrders.value = sellOrders.length;
+  totalSales.value = sellOrders.reduce((sum, o) => sum + (o.totalPrice || 0), 0);
+  averageOrderValue.value = totalSellOrders.value ? (totalSales.value / totalSellOrders.value).toFixed(1) : 0;
 
-  // حساب إجمالي المبيعات
-  totalSales.value = sellOrders.reduce((sum, order) => sum + (order.totalPrice || 0), 0);
+  recentOrders.value = [...sellOrders].sort((a, b) => new Date(b.selldate) - new Date(a.selldate)).slice(0, 5);
 
-  // حساب متوسط قيمة الطلب
-  averageOrderValue.value = calculateAverageOrderValue.value;
+  // Categories Distribution Logic
+  const catMap = {};
+  items.forEach(item => {
+    if (item.category) {
+      catMap[item.category] = (catMap[item.category] || 0) + item.quantity;
+    }
+  });
 
-  // أحدث الطلبات (آخر 5 طلبات)
-  recentOrders.value = [...sellOrders]
-    .sort((a, b) => new Date(b.selldate) - new Date(a.selldate))
-    .slice(0, 5);
+  const cats = Object.entries(catMap).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
+  topCategories.value = cats.slice(0, 5);
+  categoryChartOptions.value.labels = topCategories.value.map(c => c.name);
+  categorySeries.value = topCategories.value.map(c => c.count);
+};
 
-  // بيانات مخطط المخزون
-  const topItems = [...items]
-    .sort((a, b) => b.quantity - a.quantity)
-    .slice(0, 10); // أول 10 عناصر بأعلى كمية
-
-  inventorySeries.value[0].data = topItems.map(item => item.quantity);
-  inventoryChartOptions.value.xaxis.categories = topItems.map(item => item.name);
-
-  // بيانات المبيعات الشهرية (يمكن استبدالها ببيانات حقيقية)
-  salesSeries.value[0].data = [30, 40, 35, 50, 49, 60, 70, 91, 125, 100, 110, 120];
+onMounted(() => {
+  refreshDashboard();
 });
 </script>
 
 <style scoped>
-.homepage {
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
   padding: 20px;
+  border-radius: 16px;
+  background: white;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.charts {
-  margin-top: 20px;
+.stat-card:hover {
+  transform: translateY(-4px);
+}
+
+.stat-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.sales .stat-icon {
+  background: #f6ffed;
+  color: #52c41a;
+}
+
+.items .stat-icon {
+  background: #e6f7ff;
+  color: #1890ff;
+}
+
+.customers .stat-icon {
+  background: #fff7e6;
+  color: #fa8c16;
+}
+
+.profit .stat-icon {
+  background: #f9f0ff;
+  color: #722ed1;
+}
+
+/* Custom colors for stats */
+.sales-stat {
+  border-top: 4px solid #52c41a;
+}
+
+.items-stat {
+  border-top: 4px solid #1890ff;
+}
+
+.customers-stat {
+  border-top: 4px solid #fa8c16;
+}
+
+.profit-stat {
+  border-top: 4px solid #722ed1;
+}
+
+.stat-footer {
+  margin-top: auto;
+  border-top: 1px solid #f0f0f0;
+  padding-top: 8px;
+  font-size: 12px;
+}
+
+:deep(.n-statistic .n-statistic-value .n-statistic-value__content) {
+  font-size: 28px;
+  font-weight: 800;
+}
+
+:deep(.n-statistic .n-statistic-label) {
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
 }
 </style>

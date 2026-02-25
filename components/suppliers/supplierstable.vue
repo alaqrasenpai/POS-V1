@@ -1,15 +1,18 @@
 <template>
-    
-    <n-data-table :columns="columns" :data="listOfItems" :pagination="false" :bordered="false" />
+    <n-data-table 
+        :columns="columns" 
+        :data="listOfItems" 
+        :pagination="pagination" 
+        :bordered="false"
+        :single-line="false"
+        class="premium-table"
+    />
 </template>
 
-<script lang="ts" setup>
-import { defineProps, h } from 'vue'
-import EditItem from '../item/editItem.vue' // Ensure correct import path and case sensitivity
-import type { DataTableColumns } from 'naive-ui'
-import EditSupplier from './editSupplier.vue';
+<script setup>
+import { h, reactive } from 'vue'
+import EditSupplier from './editSupplier.vue'
 
-// Define props to receive the list of items
 const props = defineProps({
     listOfItems: {
         type: Array,
@@ -17,26 +20,43 @@ const props = defineProps({
     }
 })
 
-// Define the columns configuration for the n-data-table
-const columns: DataTableColumns<any> = [
+const pagination = reactive({
+    pageSize: 10
+})
+
+const columns = [
     {
-        title: 'Supplier Name',
-        key: 'name', 
-    },
-    {
-        title: 'Address',
-        key: 'address', 
-    },
-    {
-        title: 'Phone Number',
-        key: 'phonenumber', 
-    },
-    {
-        title: 'Edit',
-        key: 'edit',
+        title: 'اسم المورد / الشركة',
+        key: 'name',
+        sorter: 'default',
         render(row) {
-            return h(EditSupplier, { supplierId: row.id }) // Render EditItem component with itemId
+            return h('span', { style: 'font-weight: 600;' }, row.name)
+        }
+    },
+    {
+        title: 'العنوان',
+        key: 'address',
+    },
+    {
+        title: 'رقم الهاتف',
+        key: 'phonenumber',
+    },
+    {
+        title: 'الإجراءات',
+        key: 'actions',
+        width: 100,
+        align: 'center',
+        render(row) {
+            return h(EditSupplier, { supplierId: row.id })
         }
     }
 ]
 </script>
+
+<style scoped>
+:deep(.n-data-table-th) {
+    background-color: #f9fafb !important;
+    font-weight: 700 !important;
+    color: #4b5563 !important;
+}
+</style>
