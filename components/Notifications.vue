@@ -68,11 +68,11 @@ const handleNotifClick = (notif) => {
 <style scoped>
 .notifications-header {
   padding: 12px 16px;
-  border-bottom: 1px solid #efeff5;
+  border-bottom: 1px solid var(--n-border-color);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #f9f9f9;
+  background: var(--n-action-color);
 }
 
 .empty-notifications {

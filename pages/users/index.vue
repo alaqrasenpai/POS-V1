@@ -298,6 +298,6 @@ const resetForm = () => {
 }
 
 :deep(.n-data-table .n-data-table-th) {
-  background-color: #f9fafb;
+  background-color: var(--n-th-color);
 }
 </style>

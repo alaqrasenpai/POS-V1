@@ -83,7 +83,15 @@
                     <transition-group name="list">
                         <div v-for="item in cartItems" :key="item.id" class="item-card">
                             <div class="item-card-top">
-                                <span class="item-name" :title="item.name">{{ item.name }}</span>
+                                <n-flex :size="8" align="center" style="flex: 1; overflow: hidden; margin-left: 8px;">
+                                    <div v-if="getItemById(item.id)?.images?.length" class="cart-item-image">
+                                        <img :src="getItemById(item.id).images[0]" />
+                                    </div>
+                                    <div v-else class="cart-item-image icon-fallback">
+                                        <n-icon size="16"><CubeIcon /></n-icon>
+                                    </div>
+                                    <span class="item-name" :title="item.name">{{ item.name }}</span>
+                                </n-flex>
                                 <n-button quaternary circle type="error" size="tiny" @click="removeItem(item.id)">
                                     <template #icon><n-icon><TrashIcon /></n-icon></template>
                                 </n-button>
@@ -143,7 +151,7 @@
                 class="main-content-card"
              >
                 <template #header-extra>
-                   <n-button quaternary circle @click="showReceipt = false">
+                   <n-button quaternary circle @click="showReceipt = false" class="hide-on-print">
                       <template #icon><n-icon><CloseIcon /></n-icon></template>
                    </n-button>
                 </template>
@@ -153,7 +161,7 @@
                 </div>
 
                 <template #footer>
-                   <n-flex justify="end" :size="12">
+                   <n-flex justify="end" :size="12" class="hide-on-print">
                       <n-button quaternary @click="showReceipt = false" size="large">إغلاق</n-button>
                       <n-button type="primary" @click="printReceipt" size="large" style="padding: 0 30px">
                          <template #icon><n-icon><PrintIcon /></n-icon></template>
@@ -176,11 +184,13 @@ import {
     CalendarOutline as CheckIcon,
     TimeOutline as InstallmentIcon,
     PrintOutline as PrintIcon,
-    CloseOutline as CloseIcon
+    CloseOutline as CloseIcon,
+    CubeOutline as CubeIcon
 } from '@vicons/ionicons5';
 import { computed, ref, watch, h } from 'vue';
 import { useMessage, NIcon, useDialog } from 'naive-ui';
 import { useSettings } from '@/composables/useSettings';
+import { useShifts } from '@/composables/useShifts';
 
 const { getCartItems, clearCart, removeItem } = useCart();
 const { addSellOrder } = useSellOrder();
@@ -191,6 +201,7 @@ const { addItemTrans } = useInventoryTrans();
 const { addCheck, addInstallment } = usePayments();
 const { addLog } = useActivityLog();
 const { settings } = useSettings();
+const { isShiftOpen, registerSaleCash } = useShifts();
 const message = useMessage();
 const dialog = useDialog();
 
@@ -272,6 +283,16 @@ const updateQty = (item, delta) => {
 
 const handleSaveCart = () => {
     if (cartItems.value.length === 0) return;
+
+    if (!isShiftOpen.value) {
+        dialog.error({
+            title: 'خطأ: لا توجد وردية مفتوحة',
+            content: 'يرجى فتح وردية جديدة من صفحة "إدارة الورديات" واستلام الدرج لتتمكن من إتمام عملية البيع.',
+            positiveText: 'حسناً',
+        });
+        return;
+    }
+
     if ((paymentMethod.value === 'check' || paymentMethod.value === 'installment') && !selectedCustomerId.value) {
         message.error("يجب اختيار عميل لهذه العملية");
         return;
@@ -304,12 +325,25 @@ const handleSaveCart = () => {
     }
 
     for (let item of cartItems.value) {
-        let dtl = { orderId: sellOrderId, itemId: item.id, totalPrice: item.price, itemQuan: item.quantity, itemName: item.name, deleted: false };
+        const inv = getItemById(item.id);
+        let dtl = { 
+            orderId: sellOrderId, 
+            itemId: item.id, 
+            totalPrice: item.price, 
+            buyPrice: inv ? inv.buyprice : 0, // لحساب الأرباح في تقرير الورديات
+            itemQuan: item.quantity, 
+            itemName: item.name, 
+            deleted: false 
+        };
         addSellOrdeDtl(dtl);
         lastOrderDetails.value.push(dtl);
-        const inv = getItemById(item.id);
         if (inv) updateItemQuantity(item.id, inv.quantity - item.quantity);
         addItemTrans({ name: item.name, TransType: "sell", itemId: item.id, date: new Date().toISOString() });
+    }
+
+    // تسجيل نقدية المبيعات في الدرج إذا كان الدفع نقداً
+    if (paymentMethod.value === 'cash') {
+       registerSaleCash(totalPriceWithDis.value);
     }
 
     message.success("تم تسجيل الطلب بنجاح");
@@ -339,14 +373,14 @@ watch(discount, calculateTotalPrice);
     display: flex;
     flex-direction: column;
     height: 100%;
-    background: #fcfdfe;
+    background: transparent;
     overflow: hidden;
 }
 
 .cart-header {
-    background: white;
+    background: var(--n-card-color);
     padding: 20px;
-    border-bottom: 1px solid #f1f5f9;
+    border-bottom: 1px solid var(--n-border-color);
 }
 
 .cart-main-content {
@@ -358,8 +392,8 @@ watch(discount, calculateTotalPrice);
 
 .transaction-config {
     padding: 16px;
-    background: white;
-    border-bottom: 1px dashed #e2e8f0;
+    background: var(--n-card-color);
+    border-bottom: 1px dashed var(--n-border-color);
 }
 
 .config-grid {
@@ -380,9 +414,9 @@ watch(discount, calculateTotalPrice);
 .special-config-panel {
     margin-top: 12px;
     padding: 12px;
-    background: #f8fafc;
+    background: var(--n-action-color);
     border-radius: 12px;
-    border: 1px solid #edf2f7;
+    border: 1px solid var(--n-border-color);
 }
 
 .mini-label { font-size: 10px; margin-bottom: 2px; display: block; }
@@ -411,8 +445,8 @@ watch(discount, calculateTotalPrice);
 
 /* Redesigned Item Card */
 .item-card {
-    background: white;
-    border: 1px solid #f1f5f9;
+    background: var(--n-card-color);
+    border: 1px solid var(--n-border-color);
     border-radius: 14px;
     padding: 12px;
     margin-bottom: 10px;
@@ -435,18 +469,40 @@ watch(discount, calculateTotalPrice);
 .item-name {
     font-weight: 700;
     font-size: 14px;
-    color: #1e293b;
+    color: var(--n-text-color);
     flex: 1;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
+.cart-item-image {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.cart-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.cart-item-image.icon-fallback {
+    background: var(--n-action-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--n-text-color-3);
+}
+
 .item-card-bottom {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #f8fafc;
+    background: var(--n-action-color);
     padding: 6px 12px;
     border-radius: 10px;
 }
@@ -457,10 +513,10 @@ watch(discount, calculateTotalPrice);
     display: flex;
     align-items: center;
     gap: 8px;
-    background: white;
+    background: var(--n-card-color);
     padding: 2px 8px;
     border-radius: 20px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--n-border-color);
 }
 
 .qty-display { font-weight: 800; font-size: 13px; min-width: 20px; text-align: center; }
@@ -476,12 +532,12 @@ watch(discount, calculateTotalPrice);
 /* Footer */
 .cart-footer {
     padding: 20px;
-    background: white;
-    border-top: 1px solid #f1f5f9;
+    background: var(--n-card-color);
+    border-top: 1px solid var(--n-border-color);
 }
 
 .summary-card {
-    background: #f8fafc;
+    background: var(--n-action-color);
     border-radius: 16px;
     padding: 16px;
     margin-bottom: 16px;
@@ -500,7 +556,7 @@ watch(discount, calculateTotalPrice);
 
 .total-row {
     margin-top: 8px;
-    color: #1e293b;
+    color: var(--n-text-color);
 }
 
 .total-label { font-weight: 700; font-size: 15px; }
@@ -521,4 +577,15 @@ watch(discount, calculateTotalPrice);
 .slide-fade-enter-active { transition: all 0.3s ease-out; }
 .slide-fade-leave-active { transition: all 0.2s cubic-bezier(1, 0.5, 0.8, 1); }
 .slide-fade-enter-from, .slide-fade-leave-to { transform: translateY(-10px); opacity: 0; }
+</style>
+
+<style>
+@media print {
+  .hide-on-print,
+  .n-card-header,
+  .n-card__footer,
+  .n-card__action {
+    display: none !important;
+  }
+}
 </style>

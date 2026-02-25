@@ -67,13 +67,13 @@ const columns = [
 
 <style scoped>
 .category-table-wrapper {
-  background: white;
+  background: var(--n-card-color);
 }
 
 :deep(.n-data-table-th) {
-  background-color: #f9fafb !important;
+  background-color: var(--n-th-color) !important;
   font-weight: bold !important;
-  color: #374151 !important;
+  color: var(--n-th-text-color) !important;
 }
 
 :deep(.n-data-table-td) {

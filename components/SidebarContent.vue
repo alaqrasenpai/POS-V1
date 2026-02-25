@@ -1,8 +1,5 @@
 <template>
   <div class="sidebar-content">
-    <div class="logo-container">
-      <n-text strong class="logo-text">{{ settings.shopName }}</n-text>
-    </div>
     <n-menu 
       :options="menuOptions" 
       @update:value="handleSelect"
@@ -31,16 +28,7 @@ const handleSelect = (key) => {
   flex-direction: column;
   height: 100%;
 }
-.logo-container {
-  padding: 24px 16px;
-  text-align: center;
-  border-bottom: 1px solid #eee;
-  margin-bottom: 12px;
-}
-.logo-text {
-  font-size: 1.2rem;
-  color: #18a058;
-}
+
 .sidebar-menu {
   flex: 1;
 }

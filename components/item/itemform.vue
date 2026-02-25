@@ -38,6 +38,18 @@
                             لمحذوف</n-checkbox>
                     </n-space>
                 </n-form-item-gi>
+                <n-form-item-gi :span="2" label="صور المنتج">
+                    <n-upload
+                        multiple
+                        action="https://www.mocky.io/v2/5e4bafc63100007100d8b70f"
+                        v-model:file-list="fileList"
+                        @update:file-list="handleFileListChange"
+                        :custom-request="customRequest"
+                        accept="image/*"
+                    >
+                        <n-button>رفع صورة</n-button>
+                    </n-upload>
+                </n-form-item-gi>
             </n-grid>
 
             <n-flex justify="end" style="margin-top: 24px;">
@@ -52,7 +64,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-import { useMessage } from 'naive-ui'
+import { useMessage, NUpload, NButton, NGrid, NFormItemGi, NInput, NInputNumber, NSelect, NSpace, NCheckbox, NText, NForm, NFlex } from 'naive-ui'
 
 const { getItemById, addItem, editItem } = useInventory()
 const { getCategories } = useCategory()
@@ -90,14 +102,59 @@ let newItem = ref({
     quantity: 0,
     isFav: false,
     barcode: "",
-    deleted: false
+    deleted: false,
+    images: []
 })
+
+const fileList = ref([])
 
 if (!props.isAdd) {
     const item = getItemById(props.itemId)
     if (item) {
         newItem.value = { ...item }
+        if (!newItem.value.images) {
+             newItem.value.images = []
+        }
+        // تحميل الصور المحفوظة في العرض
+        fileList.value = newItem.value.images.map((img, index) => ({
+             id: String(index),
+             name: `صورة ${index + 1}`,
+             status: 'finished',
+             url: img
+        }))
     }
+}
+
+const customRequest = async ({ file, data, headers, withCredentials, action, onFinish, onError, onProgress }) => {
+    try {
+        const base64Url = await new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file.file);
+        });
+        
+        // إضافة الصورة للمنتج
+        if (!newItem.value.images) newItem.value.images = [];
+        newItem.value.images.push(base64Url);
+        
+        // تحديث الملف بمسار الصورة (الـ base64 لتتمكن من العرض)
+        file.url = base64Url;
+        
+        onFinish();
+    } catch (err) {
+        console.error('فشل معالجة الصورة:', err);
+        onError();
+    }
+}
+
+// تحديث وحذف الصور عند الضغط على زر الحذف في نافذة الرفع
+const handleFileListChange = (fl) => {
+    // تحديث الصور المرفوعة (المكتملة فقط)
+    fileList.value = fl.filter(f => f.status === 'finished');
+    
+    // مزامنة ذلك مع مصفوفة المنتج
+    newItem.value.images = fileList.value.map(f => f.url).filter(Boolean);
 }
 
 const handleSubmit = () => {

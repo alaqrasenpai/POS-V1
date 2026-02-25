@@ -324,7 +324,7 @@ onMounted(() => {
   flex-direction: column;
   padding: 20px;
   border-radius: 16px;
-  background: white;
+  background: var(--n-card-color);
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -382,7 +382,7 @@ onMounted(() => {
 
 .stat-footer {
   margin-top: auto;
-  border-top: 1px solid #f0f0f0;
+  border-top: 1px solid var(--n-border-color);
   padding-top: 8px;
   font-size: 12px;
 }

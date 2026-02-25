@@ -32,7 +32,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, h, ref, computed } from 'vue'
+import { h, ref, computed } from 'vue'
 import { NButton, NTag, useMessage } from 'naive-ui'
 import type { DataTableColumns, DataTableInst } from 'naive-ui'
 import EditItem from '../item/editItem.vue'
@@ -42,20 +42,27 @@ import { useSettings } from '@/composables/useSettings'
 const { getCurrency } = useSettings()
 const currency = getCurrency()
 
+interface InventoryItem {
+    id: number;
+    name: string;
+    category: string;
+    price: number;
+    quantity: number;
+    deleted: boolean;
+    images?: string[];
+}
+
 // تعريف Props
-const props = defineProps({
-    listOfItems: {
-        type: Array,
-        required: true
-    }
-})
+const props = defineProps<{
+    listOfItems: InventoryItem[]
+}>()
 
 // المرجع إلى الجدول لاستخدام الوظائف
 const tableRef = ref<DataTableInst | null>(null)
 const message = useMessage()
 
 // دالة للحصول على حالة المنتج
-const getStatus = (quantity, deleted) => {
+const getStatus = (quantity: number, deleted: boolean) => {
     if (deleted) {
         return { text: 'محذوف', color: 'error' }
     } else if (quantity > 0) {
@@ -113,6 +120,17 @@ const printTable = () => {
 // تكوين أعمدة الجدول مع خاصية الفرز
 const columns: DataTableColumns<any> = [
     {
+        title: 'صورة المنتج',
+        key: 'image',
+        width: 80,
+        render(row) {
+            if (row.images && row.images.length > 0) {
+                return h('img', { src: row.images[0], style: 'width: 40px; height: 40px; border-radius: 6px; object-fit: cover;' })
+            }
+            return h('div', { style: 'width: 40px; height: 40px; border-radius: 6px; background: var(--n-action-color); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--n-text-color-3);' }, 'لا توجد')
+        }
+    },
+    {
         title: 'اسم المنتج',
         key: 'name',
         sorter: 'default',
@@ -151,7 +169,7 @@ const columns: DataTableColumns<any> = [
         render(row) {
             const status = getStatus(row.quantity, row.deleted)
             return h(NTag, {
-                type: status.color,
+                type: status.color as 'default' | 'error' | 'success' | 'warning' | 'primary' | 'info',
                 size: 'small'
             }, {
                 default: () => status.text

@@ -35,11 +35,11 @@
 
     <!-- لسطح المكتب -->
     <n-layout v-else has-sider style="height: calc(100vh - 84px); background: transparent;">
-      <n-layout-sider width="400" content-style="padding: 0; background: white;" :native-scrollbar="false" bordered>
+      <n-layout-sider width="400" content-style="padding: 0; background: var(--n-color);" :native-scrollbar="false" bordered>
         <cart />
       </n-layout-sider>
 
-      <n-layout-content content-style="padding: 24px; background: #f9fafb;" :native-scrollbar="false">
+      <n-layout-content content-style="padding: 24px; background: transparent;" :native-scrollbar="false">
         <div class="page-title-section">
           <div class="page-header-text">
             <n-h1 class="page-title">شاشة البيع</n-h1>
@@ -137,7 +137,7 @@ const filteredAndSortedItems = computed(() => {
 /* Page styles handled globally */
 
 .mobile-tabs {
-  background: white;
+  background: var(--n-color);
   height: 100%;
 }
 
@@ -154,7 +154,7 @@ const filteredAndSortedItems = computed(() => {
 }
 
 :deep(.n-layout-sider) {
-  background-color: white;
+  background-color: var(--n-color);
   z-index: 10;
 }
 </style>

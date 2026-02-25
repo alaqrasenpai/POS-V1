@@ -30,10 +30,10 @@
           <n-select v-model:value="selectedStatus" :options="statusOptions" placeholder="الحالة" clearable />
         </n-gi>
         <n-gi>
-          <n-input-group>
-            <n-input-number v-model:value="minPrice" placeholder="أدنى سعر" style="width: 50%" />
-            <n-input-number v-model:value="maxPrice" placeholder="أعلى سعر" style="width: 50%" />
-          </n-input-group>
+          <div style="display: flex; gap: 8px; width: 100%;">
+            <n-input-number v-model:value="minPrice" placeholder="أدنى سعر" style="flex: 1;" />
+            <n-input-number v-model:value="maxPrice" placeholder="أعلى سعر" style="flex: 1;" />
+          </div>
         </n-gi>
       </n-grid>
 

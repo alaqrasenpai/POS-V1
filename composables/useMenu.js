@@ -11,7 +11,8 @@ import {
     LogOutOutline,
     StatsChartOutline,
     SettingsOutline,
-    CalendarOutline
+    CalendarOutline,
+    TimeOutline
 } from "@vicons/ionicons5"
 import { useI18n } from '@/composables/useI18n'
 import { useAuth } from '@/composables/useAuth'
@@ -53,6 +54,13 @@ export const useMenu = () => {
             icon: renderIcon(ListOutline),
             to: "/inventory",
             permission: "manage_inventory"
+        },
+        {
+            label: "إدارة الورديات",
+            key: "shifts",
+            icon: renderIcon(TimeOutline),
+            to: "/shifts",
+            permission: "view_dashboard"
         },
         {
             label: t('common.categories'),

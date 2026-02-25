@@ -1,5 +1,5 @@
 <template>
-  <div class="login-background" :dir="isRTL ? 'rtl' : 'ltr'">
+  <div class="login-background">
     <div class="login-card">
       <div class="login-header">
         <div class="app-icon">

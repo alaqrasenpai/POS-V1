@@ -249,9 +249,9 @@ const filteredTransactions = computed(() => {
 
 <style scoped>
 :deep(.n-data-table .n-data-table-th) {
-  background-color: #f9fafb;
+  background-color: var(--n-th-color);
   font-weight: 700;
-  color: #4b5563;
+  color: var(--n-text-color-2);
 }
 
 :deep(.n-tabs-tab) {

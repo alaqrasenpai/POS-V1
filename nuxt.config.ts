@@ -23,8 +23,7 @@ export default defineNuxtConfig({
       title: 'نظام إدارة المبيعات',
       titleTemplate: '%s - نظام POS المتكامل',
       htmlAttrs: {
-        lang: 'ar',
-        dir: 'rtl'
+        lang: 'ar'
       },
       meta: [
         { charset: 'utf-8' },

@@ -236,23 +236,41 @@ defineExpose({ printReceipt });
   margin-top: 5px;
 }
 
-/* Print Overrides */
+</style>
+
+<style>
+/* Global Print Overrides to hide modal boundaries and buttons */
 @media print {
   @page {
     margin: 0;
-    size: 80mm auto; /* Adjust for thermal printers */
+    size: 80mm auto;
   }
+  
   body * {
     visibility: hidden;
   }
+  
   .receipt-wrapper, .receipt-wrapper * {
     visibility: visible;
   }
+  
   .receipt-wrapper {
-    position: absolute;
+    position: fixed;
     left: 0;
     top: 0;
     width: 80mm;
+    z-index: 9999;
+  }
+
+  /* Hide Naive UI Modal parts */
+  .n-modal, .n-card, .n-card-header, .n-card__footer, .n-modal-mask {
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+  }
+  
+  .n-card-header, .n-card__footer, .n-base-close {
+    display: none !important;
   }
 }
 </style>

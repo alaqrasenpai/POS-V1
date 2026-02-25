@@ -4,8 +4,9 @@
             <div class="item-badge" v-if="item.isFav">
                 <n-icon color="#f0a020"><StarIcon /></n-icon>
             </div>
-            <div class="item-icon-box">
-                <n-icon size="32" :color="getItemColor(item)"><CubeIcon /></n-icon>
+            <div class="item-icon-box" :style="item.images && item.images.length ? { padding: 0, overflow: 'hidden' } : {}">
+                <img v-if="item.images && item.images.length" :src="item.images[0]" style="width: 100%; height: 100%; object-fit: cover;" />
+                <n-icon v-else size="32" :color="getItemColor(item)"><CubeIcon /></n-icon>
             </div>
             <div class="item-details">
                 <span class="item-name">{{ item.name }}</span>
@@ -99,8 +100,8 @@ function handleAddtoCart(row: any) {
 }
 
 .item-card {
-    background: white;
-    border: 1px solid #efeff5;
+    background: var(--n-card-color, #ffffff);
+    border: 1px solid var(--n-border-color, #e0e0e6);
     border-radius: 12px;
     padding: 12px;
     display: flex;
@@ -128,7 +129,7 @@ function handleAddtoCart(row: any) {
 .item-icon-box {
     width: 48px;
     height: 48px;
-    background: #f9fafb;
+    background: var(--n-action-color);
     border-radius: 14px;
     display: flex;
     align-items: center;
@@ -151,7 +152,7 @@ function handleAddtoCart(row: any) {
 .item-name {
     font-size: 0.95rem;
     font-weight: 700;
-    color: #2c3e50;
+    color: var(--n-text-color);
     text-align: center;
     white-space: nowrap;
     overflow: hidden;
@@ -161,8 +162,8 @@ function handleAddtoCart(row: any) {
 
 .item-category {
     font-size: 0.7rem;
-    color: #94a3b8;
-    background: #f1f5f9;
+    color: var(--n-text-color-3);
+    background: var(--n-action-color);
     padding: 1px 6px;
     border-radius: 4px;
 }

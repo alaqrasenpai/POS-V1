@@ -55,8 +55,8 @@ const columns = [
 
 <style scoped>
 :deep(.n-data-table-th) {
-    background-color: #f9fafb !important;
+    background-color: var(--n-th-color) !important;
     font-weight: 700 !important;
-    color: #4b5563 !important;
+    color: var(--n-th-text-color) !important;
 }
 </style>

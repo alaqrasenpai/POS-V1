@@ -1,5 +1,6 @@
 import { reactive, computed } from 'vue';
 import { useAuth } from '@/composables/useAuth';
+import { useShifts } from '@/composables/useShifts';
 
 const state = reactive({
     sellOrders: []
@@ -21,12 +22,16 @@ export const useSellOrder = () => {
     const addSellOrder = (newItem) => {
         if (!currentStoreId.value) return null;
 
+        const { getActiveShift } = useShifts();
+        const activeShift = getActiveShift();
+
         const newId = state.sellOrders.length ? Math.max(...state.sellOrders.map(order => order.id)) + 1 : 1;
 
         const orderToAdd = {
             ...newItem,
             id: newId,
-            storeId: currentStoreId.value // ربط الفاتورة بالمتجر الحالي
+            storeId: currentStoreId.value, // ربط الفاتورة بالمتجر الحالي
+            shiftId: activeShift ? activeShift.id : null
         };
 
         state.sellOrders.push(orderToAdd);

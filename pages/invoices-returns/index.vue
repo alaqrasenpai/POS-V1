@@ -327,7 +327,7 @@ const handleViewReturn = (returnItem) => {
 
 <style scoped>
 :deep(.n-data-table .n-data-table-th) {
-  background-color: #f8f9fa;
+  background-color: var(--n-th-color);
   font-weight: bold;
 }
 </style>

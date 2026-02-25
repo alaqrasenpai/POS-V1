@@ -1,16 +1,16 @@
 <template>
-  <n-config-provider :locale="naiveLocale" :date-locale="naiveDateLocale" :theme-overrides="themeOverrides"
-    :dir="isRTL ? 'rtl' : 'ltr'">
+  <n-config-provider :locale="naiveLocale" :date-locale="naiveDateLocale" :theme="isDark ? darkTheme : null" :theme-overrides="themeOverrides">
+    <n-global-style />
     <n-message-provider>
       <n-dialog-provider>
         <n-notification-provider>
           <!-- إذا كانت الصفحة هي صفحة تسجيل الدخول أو كان المستخدم غير مسجل، نعرضها بدون الهيدر والمينيو -->
-          <div v-if="isLoginPage || !isAuthenticated">
+          <div v-if="isLoginPage || !isAuthenticated" :class="{ 'app-is-rtl': isRTL }">
             <NuxtPage />
           </div>
 
           <!-- باقي صفحات النظام التي تتطلب الهيدر والقائمة الجانبية -->
-          <div v-else class="app-container">
+          <div v-else class="app-container" :class="{ 'app-is-rtl': isRTL }">
             <div class="app-header">
               <div class="header-right">
                 <n-button quaternary v-if="isMobile" @click="showMobileMenu = true">
@@ -30,6 +30,16 @@
                   </n-dropdown>
                 </div>
                 <n-divider vertical v-if="!isMobile" />
+                
+                <n-button quaternary circle @click="toggleTheme" style="margin-right: -8px;" v-show="false">
+                  <template #icon>
+                    <n-icon>
+                      <MoonOutline v-if="!isDark" />
+                      <SunnyOutline v-else />
+                    </n-icon>
+                  </template>
+                </n-button>
+                
                 <Notifications />
               </div>
             </div>
@@ -55,11 +65,11 @@
 </template>
 
 <script setup>
-import { MenuOutline, PersonOutline, LogOutOutline, SettingsOutline } from '@vicons/ionicons5'
-import { ref, computed, onMounted, onUnmounted, h } from 'vue'
+import { MenuOutline, PersonOutline, LogOutOutline, SettingsOutline, MoonOutline, SunnyOutline } from '@vicons/ionicons5'
+import { ref, computed, onMounted, onUnmounted, h, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import * as NaiveUI from 'naive-ui'
-const { arDZ, dateArDZ, NIcon } = NaiveUI
+const { arDZ, dateArDZ, NIcon, darkTheme } = NaiveUI
 
 const route = useRoute()
 const isLoginPage = computed(() => ['/login', '/super-login'].includes(route.path))
@@ -69,6 +79,7 @@ const isMounted = ref(false)
 const { settings } = useSettings()
 const { checkAuth, currentUser, logout, isAuthenticated } = useAuth()
 const { t, currentLocale, isRTL } = useI18n()
+const { isDark, toggleTheme, setInitialTheme } = useTheme()
 
 const isMobile = computed(() => isMounted.value && windowWidth.value < 768)
 
@@ -94,6 +105,7 @@ const updateWidth = () => {
 onMounted(() => {
   isMounted.value = true
   checkAuth()
+  setInitialTheme()
   updateWidth()
   window.addEventListener('resize', updateWidth)
 })
@@ -118,8 +130,7 @@ const naiveLocale = computed(() => currentLocale.value === 'ar' ? NaiveUI.arDZ :
 const naiveDateLocale = computed(() => currentLocale.value === 'ar' ? NaiveUI.dateArDZ : NaiveUI.dateEnUS)
 
 const contentStyle = computed(() => ({
-  minHeight: 'calc(100vh - 56px)',
-  backgroundColor: '#f9fafb'
+  minHeight: 'calc(100vh - 56px)'
 }))
 
 onUnmounted(() => {
@@ -135,8 +146,27 @@ onUnmounted(() => {
 body {
   margin: 0;
   font-family: 'Tajawal', sans-serif;
-  background-color: #f9fafb;
+  /* background-color: #f9fafb;  <- Removed for Naive body sync */
 }
+
+/* Dark Theme Fixes for statically defined colors */
+body.dark-theme .app-header {
+  background: var(--n-color);
+  border-bottom: 1px solid var(--n-border-color);
+}
+
+body.dark-theme .main-content-card {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3) !important;
+}
+
+body.dark-theme .page-title {
+  color: var(--n-text-color) !important;
+}
+
+body.dark-theme .system-title {
+  color: #36ad6a;
+}
+
 
 .app-container {
   display: flex;
@@ -151,12 +181,13 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 0 16px;
-  background: white;
-  border-bottom: 1px solid #efeff5;
+  background: var(--n-color);
+  border-bottom: 1px solid var(--n-border-color);
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   z-index: 1000;
   position: sticky;
   top: 0;
+  transition: background 0.3s, border-color 0.3s;
 }
 
 .system-title {
@@ -247,5 +278,25 @@ body {
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+/* دعم اليمين لليسار للجداول فقط (RTL for tables overrides) */
+.app-is-rtl .n-data-table {
+  direction: rtl;
+}
+
+.app-is-rtl .n-data-table th,
+.app-is-rtl .n-data-table td {
+  text-align: right !important;
+}
+
+.app-is-rtl .n-data-table-th__title-wrapper {
+  display: flex;
+  justify-content: flex-start !important;
+}
+
+/* عكس الباجينيشن (Pagination) لو أمكن */
+.app-is-rtl .n-pagination {
+  direction: rtl;
 }
 </style>
