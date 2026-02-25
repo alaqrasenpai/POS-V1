@@ -1,5 +1,6 @@
 import { h } from 'vue'
-import { NIcon } from 'naive-ui'
+import pkg from 'naive-ui'
+const { NIcon } = pkg
 import {
     HomeOutline,
     CartOutline,

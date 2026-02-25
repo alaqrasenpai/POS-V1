@@ -57,7 +57,8 @@
 import { MenuOutline, PersonOutline, LogOutOutline, SettingsOutline } from '@vicons/ionicons5'
 import { ref, computed, onMounted, onUnmounted, h } from 'vue'
 import { useRoute } from 'vue-router'
-import { arDZ, dateArDZ, NIcon } from 'naive-ui'
+import pkg from 'naive-ui'
+const { arDZ, dateArDZ, NIcon } = pkg
 
 const route = useRoute()
 const isLoginPage = computed(() => ['/login', '/super-login'].includes(route.path))

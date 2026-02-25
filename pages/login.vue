@@ -64,7 +64,8 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 // تمت إزالة الاستيراد اليدوي للـ composable
-import { useMessage } from 'naive-ui'
+import pkg from 'naive-ui'
+const { useMessage } = pkg
 import {
   StorefrontOutline as StoreIcon,
   CallOutline as PhoneIcon,
