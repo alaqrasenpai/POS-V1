@@ -3,8 +3,8 @@
     <n-message-provider>
       <n-dialog-provider>
         <n-notification-provider>
-          <!-- إذا كانت الصفحة هي صفحة تسجيل الدخول (عادية أو سوبر)، نعرضها بدون الهيدر والمينيو -->
-          <div v-if="isLoginPage">
+          <!-- إذا كانت الصفحة هي صفحة تسجيل الدخول أو كان المستخدم غير مسجل، نعرضها بدون الهيدر والمينيو -->
+          <div v-if="isLoginPage || !isAuthenticated">
             <NuxtPage />
           </div>
 

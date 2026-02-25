@@ -17,13 +17,13 @@ export default defineNuxtConfig({
   },
 
   app: {
-    baseURL: '/pOS-V1/',
+    baseURL: process.env.NODE_ENV === 'production' ? '/pOS-V1/' : '/',
     buildAssetsDir: '_nuxt'
   },
 
   router: {
     options: {
-      hashMode: true
+      hashMode: process.env.NODE_ENV === 'production'
     }
   },
 

@@ -13,6 +13,11 @@ export const useAuth = () => {
   const authCookie = useCookie('pos_user_data')
   const loggedInCookie = useCookie('pos_demo_logged_in')
 
+  // تهيئة الحالة الأولية إذا كان الكوكي موجوداً
+  if (loggedInCookie.value === 'true' && !state.isAuthenticated) {
+    state.isAuthenticated = true
+  }
+
   const { getUsers } = useUsers()
   const { getStores } = useStores()
 
