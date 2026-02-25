@@ -22,12 +22,14 @@
               </div>
               <div class="header-left">
                 <div v-if="!isMobile && currentUser" class="user-info-wrapper">
-                  <n-dropdown :options="userMenuOptions" @select="handleUserMenuClick">
-                    <div class="user-info">
-                      <n-text strong>{{ currentUser.name }}</n-text>
-                      <n-text depth="3" style="font-size: 0.8rem;"> ({{ currentUser.role }})</n-text>
-                    </div>
-                  </n-dropdown>
+                  <CustomDropdown :options="userMenuOptions" :isRTL="isRTL" @select="handleUserMenuClick">
+                    <template #trigger>
+                      <div class="user-info">
+                        <n-text strong>{{ currentUser.name }}</n-text>
+                        <n-text depth="3" style="font-size: 0.8rem;"> ({{ currentUser.role }})</n-text>
+                      </div>
+                    </template>
+                  </CustomDropdown>
                 </div>
                 <n-divider vertical v-if="!isMobile" />
                 
@@ -47,7 +49,7 @@
             <n-layout has-sider class="main-layout" style="height: calc(100vh - 56px);">
               <Sidebar v-if="!isMobile" />
 
-              <n-drawer v-model:show="showMobileMenu" :width="240" placement="right">
+              <n-drawer v-model:show="showMobileMenu" :width="240" :placement="isRTL ? 'left' : 'right'">
                 <SidebarContent @select="showMobileMenu = false" />
               </n-drawer>
 
@@ -70,6 +72,7 @@ import { ref, computed, onMounted, onUnmounted, h, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import * as NaiveUI from 'naive-ui'
 const { arDZ, dateArDZ, NIcon, darkTheme } = NaiveUI
+import CustomDropdown from './components/CustomDropdown.vue'
 
 const route = useRoute()
 const isLoginPage = computed(() => ['/login', '/super-login'].includes(route.path))
@@ -175,6 +178,10 @@ body.dark-theme .system-title {
   overflow: hidden;
 }
 
+.app-is-rtl {
+  direction: rtl;
+}
+
 .app-header {
   height: 56px;
   display: flex;
@@ -200,6 +207,8 @@ body.dark-theme .system-title {
   padding: 4px 8px;
   border-radius: 8px;
   transition: background 0.2s;
+  display: flex;
+  align-items: center;
 }
 
 .user-info-wrapper:hover {
@@ -280,7 +289,7 @@ body.dark-theme .system-title {
   }
 }
 
-/* دعم اليمين لليسار للجداول فقط (RTL for tables overrides) */
+/* دعم اليمين لليسار للجداول والتبويبات */
 .app-is-rtl .n-data-table {
   direction: rtl;
 }
@@ -293,6 +302,15 @@ body.dark-theme .system-title {
 .app-is-rtl .n-data-table-th__title-wrapper {
   display: flex;
   justify-content: flex-start !important;
+}
+
+.app-is-rtl .n-tabs-nav {
+  direction: rtl;
+}
+
+.app-is-rtl .n-tabs-tab {
+  margin-left: 32px;
+  margin-right: 0;
 }
 
 /* عكس الباجينيشن (Pagination) لو أمكن */

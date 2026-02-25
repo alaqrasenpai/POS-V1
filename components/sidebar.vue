@@ -6,7 +6,7 @@
       :width="240" 
       show-trigger="arrow-circle"
       bordered 
-      placement="right"
+      :placement="isRTL ? 'left' : 'right'"
       :inverted="inverted" 
       @collapse="collapsed = true" 
       @expand="collapsed = false"
@@ -28,6 +28,9 @@
 <script setup>
 import { ref } from "vue";
 import { useMenu } from '@/composables/useMenu';
+import { useI18n } from '@/composables/useI18n';
+
+const { isRTL } = useI18n();
 
 const { menuOptions, handleMenuClick } = useMenu();
 const inverted = ref(false);
