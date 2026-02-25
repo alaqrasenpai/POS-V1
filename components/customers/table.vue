@@ -4,7 +4,7 @@
 
 <script lang="ts" setup>
 import { defineProps, h } from 'vue'
-import EditCustomer from '../customers/EditCustomer.vue'  // Ensure correct import path and case sensitivity
+import EditCustomer from './editcustomer.vue'  // Corrected case sensitivity for Linux/GitHub Actions
 import type { DataTableColumns } from 'naive-ui'
 
 // Define props to receive the list of customers
