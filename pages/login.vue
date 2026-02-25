@@ -63,9 +63,8 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-// تمت إزالة الاستيراد اليدوي للـ composable
-import pkg from 'naive-ui'
-const { useMessage } = pkg
+import * as NaiveUI from 'naive-ui'
+const { useMessage } = NaiveUI
 import {
   StorefrontOutline as StoreIcon,
   CallOutline as PhoneIcon,

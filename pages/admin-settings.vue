@@ -77,8 +77,8 @@ import {
   StorefrontOutline as StoreIcon
 } from '@vicons/ionicons5'
 import { useAuth } from '@/composables/useAuth'
-import pkg from 'naive-ui'
-const { useMessage } = pkg
+import * as NaiveUI from 'naive-ui'
+const { useMessage } = NaiveUI
 
 // Explicit imports
 import StoreProfile from '@/components/settings/StoreProfile.vue'
