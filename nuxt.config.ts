@@ -18,7 +18,20 @@ export default defineNuxtConfig({
 
   app: {
     baseURL: process.env.NODE_ENV === 'production' ? '/pOS-V1/' : '/',
-    buildAssetsDir: '_nuxt'
+    buildAssetsDir: '_nuxt',
+    head: {
+      title: 'نظام إدارة المبيعات',
+      titleTemplate: '%s - نظام POS المتكامل',
+      htmlAttrs: {
+        lang: 'ar',
+        dir: 'rtl'
+      },
+      meta: [
+        { charset: 'utf-8' },
+        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
+        { name: 'description', content: 'نظام متكامل لإدارة المبيعات والمخزون' }
+      ]
+    }
   },
 
   router: {

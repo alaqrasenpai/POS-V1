@@ -68,6 +68,7 @@
 
 <script setup>
 import { ref, computed, onMounted, h } from 'vue'
+useHead({ title: 'واجهة الطلبات المتعددة' })
 import { SearchOutline } from '@vicons/ionicons5'
 import { useCustomers } from '@/composables/useCustomers'
 import { useSellOrder } from '@/composables/useSellOrder'

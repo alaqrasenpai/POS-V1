@@ -36,6 +36,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+useHead({ title: 'إدارة العملاء' })
 import { SearchOutline } from '@vicons/ionicons5'
 import { useCustomers } from '@/composables/useCustomers'
 import { useScreen } from '@/composables/useScreen'

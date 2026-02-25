@@ -10,7 +10,9 @@
         <n-tab-pane name="general" tab="الإعدادات العامة">
           <template #tab>
             <n-space align="center" :size="4">
-              <n-icon><SettingsIcon /></n-icon>
+              <n-icon>
+                <SettingsIcon />
+              </n-icon>
               <span>الإعدادات العامة</span>
             </n-space>
           </template>
@@ -20,7 +22,9 @@
         <n-tab-pane name="users" tab="إدارة المستخدمين">
           <template #tab>
             <n-space align="center" :size="4">
-              <n-icon><UsersIcon /></n-icon>
+              <n-icon>
+                <UsersIcon />
+              </n-icon>
               <span>المستخدمين</span>
             </n-space>
           </template>
@@ -30,7 +34,9 @@
         <n-tab-pane name="activity" tab="سجل الأنشطة">
           <template #tab>
             <n-space align="center" :size="4">
-              <n-icon><LogIcon /></n-icon>
+              <n-icon>
+                <LogIcon />
+              </n-icon>
               <span>سجل الأنشطة</span>
             </n-space>
           </template>
@@ -42,10 +48,11 @@
 </template>
 
 <script setup>
-import { 
-  SettingsOutline as SettingsIcon, 
-  PeopleOutline as UsersIcon, 
-  ListOutline as LogIcon 
+useHead({ title: 'إعدادات المتجر' })
+import {
+  SettingsOutline as SettingsIcon,
+  PeopleOutline as UsersIcon,
+  ListOutline as LogIcon
 } from '@vicons/ionicons5'
 import { useAuth } from '@/composables/useAuth'
 import { useMessage } from 'naive-ui'
@@ -65,13 +72,16 @@ const message = useMessage()
 .settings-page {
   padding: 0;
 }
+
 .page-header {
   margin-bottom: 24px;
 }
+
 .main-card {
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
+
 :deep(.n-tabs-nav) {
   padding-right: 12px;
 }

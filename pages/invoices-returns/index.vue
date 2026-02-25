@@ -53,6 +53,7 @@
 
 <script setup>
 import { ref, computed, onMounted, h } from 'vue'
+useHead({ title: 'الفواتير والمرتجعات' })
 import { NButton, NTag } from 'naive-ui'
 import { SearchOutline } from '@vicons/ionicons5'
 import { useSellOrder } from '@/composables/useSellOrder'

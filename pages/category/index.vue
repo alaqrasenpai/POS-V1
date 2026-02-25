@@ -36,6 +36,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+useHead({ title: 'إدارة الأقسام' })
 import { SearchOutline } from '@vicons/ionicons5'
 import { useScreen } from '@/composables/useScreen'
 import { useCategory } from '@/composables/useCategory'

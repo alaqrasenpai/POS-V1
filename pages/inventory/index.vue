@@ -57,6 +57,7 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+useHead({ title: 'إدارة المخزن' })
 import { SearchOutline } from '@vicons/ionicons5'
 import { useInventory } from '@/composables/useInventory'
 import { useScreen } from '@/composables/useScreen'

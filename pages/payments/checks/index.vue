@@ -13,18 +13,14 @@
     </div>
 
     <n-card :bordered="false" class="main-card">
-      <n-data-table
-        :columns="columns"
-        :data="checks"
-        :pagination="pagination"
-        :bordered="false"
-      />
+      <n-data-table :columns="columns" :data="checks" :pagination="pagination" :bordered="false" />
     </n-card>
   </div>
 </template>
 
 <script setup>
 import { computed, h } from 'vue'
+useHead({ title: 'إدارة الشيكات' })
 import { NTag, NButton, NSpace, NText, useMessage } from 'naive-ui'
 import { usePayments } from '@/composables/usePayments'
 
@@ -45,8 +41,8 @@ const columns = [
   { title: 'اسم المشتري', key: 'customerName' },
   { title: 'المبلغ', key: 'amount', render(row) { return `${row.amount} د.أ` } },
   { title: 'تاريخ الاستحقاق', key: 'dueDate' },
-  { 
-    title: 'الحالة', 
+  {
+    title: 'الحالة',
     key: 'status',
     render(row) {
       const typeMap = { pending: 'warning', cashed: 'success', returned: 'error' }
@@ -61,17 +57,17 @@ const columns = [
       if (row.status !== 'pending') return '-'
       return h(NSpace, null, {
         default: () => [
-          h(NButton, { 
-            size: 'small', 
-            type: 'success', 
+          h(NButton, {
+            size: 'small',
+            type: 'success',
             onClick: () => {
               updateCheckStatus(row.id, 'cashed')
               message.success('تم تحديث حالة الشيك إلى: تم الصرف')
             }
           }, { default: () => 'صرف' }),
-          h(NButton, { 
-            size: 'small', 
-            type: 'error', 
+          h(NButton, {
+            size: 'small',
+            type: 'error',
             onClick: () => {
               updateCheckStatus(row.id, 'returned')
               message.error('تم تحديث حالة الشيك إلى: مرفوض')
@@ -91,6 +87,7 @@ const columns = [
   align-items: center;
   margin-bottom: 24px;
 }
+
 .main-card {
   border-radius: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);

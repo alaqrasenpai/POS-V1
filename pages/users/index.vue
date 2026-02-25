@@ -7,7 +7,9 @@
       </div>
       <n-button type="primary" @click="openAddModal" size="large">
         <template #icon>
-          <n-icon><AddIcon /></n-icon>
+          <n-icon>
+            <AddIcon />
+          </n-icon>
         </template>
         إضافة مستخدم جديد
       </n-button>
@@ -16,27 +18,16 @@
     <n-grid :cols="1" :x-gap="16" :y-gap="16">
       <n-gi>
         <n-card :bordered="false" class="main-card">
-          <n-data-table
-            :columns="columns"
-            :data="users"
-            :pagination="pagination"
-            :bordered="false"
-            scroll-x="1000"
-          />
+          <n-data-table :columns="columns" :data="users" :pagination="pagination" :bordered="false" scroll-x="1000" />
         </n-card>
       </n-gi>
     </n-grid>
 
     <!-- Modal لإضافة/تعديل مستخدم -->
     <n-modal v-model:show="showAddModal" transform-origin="center">
-      <n-card
-        style="width: 700px; max-width: 95vw; border-radius: 16px"
-        :title="isEditing ? 'تعديل بيانات مستخدم' : 'إنشاء حساب مستخدم جديد'"
-        :bordered="false"
-        size="huge"
-        role="dialog"
-        aria-modal="true"
-      >
+      <n-card style="width: 700px; max-width: 95vw; border-radius: 16px"
+        :title="isEditing ? 'تعديل بيانات مستخدم' : 'إنشاء حساب مستخدم جديد'" :bordered="false" size="huge"
+        role="dialog" aria-modal="true">
         <n-form :model="formModel">
           <n-grid :cols="isMobile ? 1 : 2" :x-gap="16">
             <n-gi>
@@ -51,28 +42,20 @@
             </n-gi>
             <n-gi>
               <n-form-item label="كلمة المرور">
-                <n-input
-                  v-model:value="formModel.password"
-                  type="password"
-                  show-password-on="click"
-                  placeholder="أدخل كلمة مرور قوية"
-                />
+                <n-input v-model:value="formModel.password" type="password" show-password-on="click"
+                  placeholder="أدخل كلمة مرور قوية" />
               </n-form-item>
             </n-gi>
             <n-gi>
               <n-form-item label="الدور الوظيفي">
-                <n-select
-                  v-model:value="formModel.role"
-                  :options="roleOptions"
-                  placeholder="اختر دور المستخدم"
-                  @update:value="handleRoleChange"
-                />
+                <n-select v-model:value="formModel.role" :options="roleOptions" placeholder="اختر دور المستخدم"
+                  @update:value="handleRoleChange" />
               </n-form-item>
             </n-gi>
           </n-grid>
 
           <n-divider title-placement="right">تخصيص الصلاحيات</n-divider>
-          
+
           <n-form-item label="الصلاحيات الممنوحة لهذا الحساب:">
             <n-checkbox-group v-model:value="formModel.permissions">
               <n-grid :cols="isMobile ? 1 : 3">
@@ -83,7 +66,7 @@
             </n-checkbox-group>
           </n-form-item>
         </n-form>
-        
+
         <template #footer>
           <n-space justify="end">
             <n-button quaternary @click="showAddModal = false">إلغاء</n-button>
@@ -97,6 +80,7 @@
 
 <script setup>
 import { ref, h, computed, onMounted } from 'vue'
+useHead({ title: 'إدارة المستخدمين' })
 import { AddOutline as AddIcon, TrashOutline as DeleteIcon, CreateOutline as EditIcon, ShieldCheckmarkOutline as ShieldIcon } from '@vicons/ionicons5'
 import { NTag, NButton, NIcon, NSpace, NSwitch, useMessage, NDivider, NCheckboxGroup, NCheckbox, NText } from 'naive-ui'
 import { useUsers } from '@/composables/useUsers'
@@ -300,16 +284,19 @@ const resetForm = () => {
 .users-page {
   padding: 0;
 }
+
 .page-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
 }
+
 .main-card {
   border-radius: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
+
 :deep(.n-data-table .n-data-table-th) {
   background-color: #f9fafb;
 }

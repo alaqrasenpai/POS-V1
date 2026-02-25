@@ -70,6 +70,7 @@
 </template>
 
 <script setup>
+useHead({ title: 'إعدادات النظام' })
 import {
   SettingsOutline as SettingsIcon,
   PeopleOutline as UsersIcon,

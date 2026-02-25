@@ -7,7 +7,9 @@
           <n-text class="page-subtitle">التحكم في المتاجر المشتركة وإحصائيات المنصة العامة</n-text>
         </div>
         <n-button type="primary" @click="openAddModal">
-          <template #icon><n-icon><AddIcon /></n-icon></template>
+          <template #icon><n-icon>
+              <AddIcon />
+            </n-icon></template>
           إضافة متجر جديد
         </n-button>
       </div>
@@ -17,21 +19,27 @@
         <n-gi>
           <n-card class="platform-stat-card">
             <n-statistic label="إجمالي المتاجر" :value="stores.length">
-              <template #prefix><n-icon><StoreIcon /></n-icon></template>
+              <template #prefix><n-icon>
+                  <StoreIcon />
+                </n-icon></template>
             </n-statistic>
           </n-card>
         </n-gi>
         <n-gi>
           <n-card class="platform-stat-card">
             <n-statistic label="المتاجر النشطة" :value="activeStoresCount">
-               <template #prefix><n-icon color="#18a058"><CheckIcon /></n-icon></template>
+              <template #prefix><n-icon color="#18a058">
+                  <CheckIcon />
+                </n-icon></template>
             </n-statistic>
           </n-card>
         </n-gi>
         <n-gi>
           <n-card class="platform-stat-card">
             <n-statistic label="المتاجر المتوقفة" :value="suspendedStoresCount">
-               <template #prefix><n-icon color="#d03050"><CloseIcon /></n-icon></template>
+              <template #prefix><n-icon color="#d03050">
+                  <CloseIcon />
+                </n-icon></template>
             </n-statistic>
           </n-card>
         </n-gi>
@@ -44,16 +52,13 @@
 
       <!-- قائمة المتاجر -->
       <n-card title="سجل المتاجر المشتركة" class="main-content-card" :bordered="false">
-        <n-data-table 
-          :columns="columns" 
-          :data="stores" 
-          :bordered="false" 
-        />
+        <n-data-table :columns="columns" :data="stores" :bordered="false" />
       </n-card>
 
       <!-- Modal إضافة / تعديل متجر -->
       <n-modal v-model:show="showStoreModal">
-        <n-card style="width: 500px" :title="isEditing ? 'تعديل بيانات المتجر' : 'تسجيل متجر جديد'" bordered size="huge">
+        <n-card style="width: 500px" :title="isEditing ? 'تعديل بيانات المتجر' : 'تسجيل متجر جديد'" bordered
+          size="huge">
           <n-form :model="editableStore">
             <n-form-item label="اسم المتجر">
               <n-input v-model:value="editableStore.name" placeholder="مثال: مطعم الشرق" />
@@ -66,7 +71,7 @@
             </n-form-item>
             <n-grid :cols="2" :x-gap="12">
               <n-gi>
-                 <n-form-item label="العملة">
+                <n-form-item label="العملة">
                   <n-input v-model:value="editableStore.currency" placeholder="ريال" />
                 </n-form-item>
               </n-gi>
@@ -80,7 +85,8 @@
           <template #footer>
             <n-flex justify="end">
               <n-button @click="showStoreModal = false">إلغاء</n-button>
-              <n-button type="primary" @click="handleSaveStore">{{ isEditing ? 'حفظ التغييرات' : 'تأكيد الإضافة' }}</n-button>
+              <n-button type="primary" @click="handleSaveStore">{{ isEditing ? 'حفظ التغييرات' : 'تأكيد الإضافة'
+                }}</n-button>
             </n-flex>
           </template>
         </n-card>
@@ -90,8 +96,8 @@
 </template>
 
 <script setup>
-import { 
-  StorefrontOutline as StoreIcon, 
+import {
+  StorefrontOutline as StoreIcon,
   AddOutline as AddIcon,
   CheckmarkCircleOutline as CheckIcon,
   CloseCircleOutline as CloseIcon,
@@ -100,6 +106,7 @@ import {
   CreateOutline as EditIcon
 } from '@vicons/ionicons5';
 import { ref, computed, h } from 'vue';
+useHead({ title: 'لوحة الإدارة المركزية' });
 import { useMessage, NTag, NButton, NFlex } from 'naive-ui';
 import { useStores } from '@/composables/useStores';
 import { useUsers } from '@/composables/useUsers';
@@ -140,12 +147,12 @@ const openAddModal = () => {
 const openEditModal = (row) => {
   isEditing.value = true;
   currentEditingId.value = row.id;
-  editableStore.value = { 
-    name: row.name, 
-    slug: row.slug, 
+  editableStore.value = {
+    name: row.name,
+    slug: row.slug,
     registeredPhone: row.registeredPhone || '',
-    currency: row.settings?.currency || 'ريال', 
-    plan: row.plan 
+    currency: row.settings?.currency || 'ريال',
+    plan: row.plan
   };
   showStoreModal.value = true;
 };
@@ -154,13 +161,13 @@ const columns = [
   { title: 'ID', key: 'id', width: 60 },
   { title: 'اسم المتجر', key: 'name', render: (row) => h('strong', row.name) },
   { title: 'الباقة', key: 'plan', render: (row) => h(NTag, { type: row.plan === 'Pro' ? 'warning' : 'info' }, { default: () => row.plan }) },
-  { 
-    title: 'الحالة', 
-    key: 'status', 
-    render: (row) => h(NTag, { 
+  {
+    title: 'الحالة',
+    key: 'status',
+    render: (row) => h(NTag, {
       type: row.active ? 'success' : 'error',
       bordered: false
-    }, { default: () => row.active ? 'نشط' : 'متوقف' }) 
+    }, { default: () => row.active ? 'نشط' : 'متوقف' })
   },
   { title: 'تاريخ الاشتراك', key: 'createdAt' },
   {
@@ -172,9 +179,9 @@ const columns = [
           size: 'small',
           tertiary: true,
           onClick: () => openEditModal(row)
-        }, { 
+        }, {
           icon: () => h(EditIcon),
-          default: () => 'تعديل' 
+          default: () => 'تعديل'
         }),
         h(NButton, {
           size: 'small',
@@ -184,9 +191,9 @@ const columns = [
             toggleStoreStatus(row.id);
             message.info(row.active ? `تم إيقاف متجر ${row.name}` : `تم تفعيل متجر ${row.name}`);
           }
-        }, { 
+        }, {
           icon: () => h(row.active ? PauseIcon : PlayIcon),
-          default: () => row.active ? 'إيقاف' : 'تفعيل' 
+          default: () => row.active ? 'إيقاف' : 'تفعيل'
         })
       ]
     })
@@ -198,7 +205,7 @@ const handleSaveStore = () => {
     message.error("يرجى إكمال البيانات الأساسية");
     return;
   }
-  
+
   const storeData = {
     name: editableStore.value.name,
     slug: editableStore.value.slug,
@@ -217,7 +224,7 @@ const handleSaveStore = () => {
     addStore(storeData);
     message.success("تم إنشاء المتجر بنجاح");
   }
-  
+
   showStoreModal.value = false;
 };
 </script>

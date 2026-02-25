@@ -25,6 +25,7 @@
 
 <script setup>
 import { h, computed, onMounted } from 'vue'
+useHead({ title: 'سجل الأنشطة' })
 import { TrashOutline as TrashIcon, TimeOutline as TimeIcon } from '@vicons/ionicons5'
 import { NTag, NText, NIcon, NSpace, useMessage } from 'naive-ui'
 import { useActivityLog } from '@/composables/useActivityLog'

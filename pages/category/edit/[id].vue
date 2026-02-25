@@ -3,18 +3,16 @@
     <div class="page-header">
       <n-button quaternary circle @click="router.back()">
         <template #icon>
-          <n-icon><BackIcon /></n-icon>
+          <n-icon>
+            <BackIcon />
+          </n-icon>
         </template>
       </n-button>
       <n-h1 style="margin: 0">تعديل التصنيف</n-h1>
     </div>
 
     <n-card class="form-card" v-if="categoryId">
-      <CategoryCategoryform 
-        :isAdd="false" 
-        :categoryId="categoryId" 
-        :close="handleSuccess" 
-      />
+      <CategoryCategoryform :isAdd="false" :categoryId="categoryId" :close="handleSuccess" />
     </n-card>
     <n-alert v-else type="error" title="خطأ">
       لم يتم العثور على معرف التصنيف
@@ -24,6 +22,7 @@
 
 <script setup>
 import { computed } from 'vue'
+useHead({ title: 'تعديل القسم' })
 import { useRoute, useRouter } from 'vue-router'
 import { ArrowForwardOutline as BackIcon } from '@vicons/ionicons5'
 

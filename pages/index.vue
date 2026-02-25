@@ -32,7 +32,7 @@
           </div>
           <n-statistic label="إجمالي المبيعات" :value="totalSales">
             <template #prefix><n-text depth="3" style="font-size: 14px; margin-inline-end: 4px;">{{ currency
-                }}</n-text></template>
+            }}</n-text></template>
           </n-statistic>
           <div class="stat-footer">
             <n-text depth="3">إجمالي {{ totalSellOrders }} عملية بيع</n-text>
@@ -74,7 +74,7 @@
           </div>
           <n-statistic label="متوسط قيمة الطلب" :value="averageOrderValue">
             <template #prefix><n-text depth="3" style="font-size: 14px; margin-inline-end: 4px;">{{ currency
-                }}</n-text></template>
+            }}</n-text></template>
           </n-statistic>
           <div class="stat-footer">
             <n-text depth="3">أداء مستقر</n-text>
@@ -139,7 +139,7 @@
                     <n-flex align="center" :size="8">
                       <n-text depth="3">الكمية المتبقية: </n-text>
                       <n-tag :type="item.quantity === 0 ? 'error' : 'warning'" size="small" round>{{ item.quantity
-                        }}</n-tag>
+                      }}</n-tag>
                     </n-flex>
                   </template>
                 </n-thing>
@@ -166,6 +166,7 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue';
+useHead({ title: 'لوحة التحكم' });
 import {
   PeopleOutline as PeopleIcon,
   CubeOutline as CubeIcon,

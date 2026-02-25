@@ -11,17 +11,13 @@
     </div>
 
     <n-card :bordered="false" class="main-card">
-      <n-data-table
-        :columns="columns"
-        :data="installments"
-        :pagination="pagination"
-        :bordered="false"
-      />
+      <n-data-table :columns="columns" :data="installments" :pagination="pagination" :bordered="false" />
     </n-card>
 
     <n-modal v-model:show="showPaymentModal" preset="card" style="width: 400px;" title="تسجيل دفعة قسط">
       <n-form-item label="المبلغ المدفوع">
-        <n-input-number v-model:value="paymentAmount" :min="1" :max="selectedInstallment?.remainingAmount" style="width: 100%;" />
+        <n-input-number v-model:value="paymentAmount" :min="1" :max="selectedInstallment?.remainingAmount"
+          style="width: 100%;" />
       </n-form-item>
       <template #footer>
         <n-button type="primary" block @click="confirmPayment">تأكيد الدفع</n-button>
@@ -32,6 +28,7 @@
 
 <script setup>
 import { computed, ref, h } from 'vue'
+useHead({ title: 'إدارة الأقساط' })
 import { NTag, NButton, NSpace, NProgress, useMessage } from 'naive-ui'
 import { usePayments } from '@/composables/usePayments'
 
@@ -66,14 +63,14 @@ const columns = [
   { title: 'إجمالي المبلغ', key: 'totalAmount', render(row) { return `${row.totalAmount} د.أ` } },
   { title: 'المدفوع', key: 'paidAmount', render(row) { return `${row.paidAmount} د.أ` } },
   { title: 'المتبقي', key: 'remainingAmount', render(row) { return `${row.remainingAmount} د.أ` } },
-  { 
-    title: 'التقدم', 
+  {
+    title: 'التقدم',
     key: 'progress',
     render(row) {
       const percentage = Math.round((row.paidAmount / row.totalAmount) * 100)
-      return h(NProgress, { 
-        type: 'line', 
-        percentage, 
+      return h(NProgress, {
+        type: 'line',
+        percentage,
         status: percentage === 100 ? 'success' : 'default',
         indicatorPlacement: 'inside'
       })
@@ -84,9 +81,9 @@ const columns = [
     key: 'actions',
     render(row) {
       if (row.remainingAmount <= 0) return h(NTag, { type: 'success' }, { default: () => 'مكتمل' })
-      return h(NButton, { 
-        size: 'small', 
-        type: 'primary', 
+      return h(NButton, {
+        size: 'small',
+        type: 'primary',
         onClick: () => handlePayment(row)
       }, { default: () => 'دفع قسط' })
     }
@@ -101,6 +98,7 @@ const columns = [
   align-items: center;
   margin-bottom: 24px;
 }
+
 .main-card {
   border-radius: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);

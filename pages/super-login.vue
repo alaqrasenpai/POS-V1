@@ -3,55 +3,42 @@
     <div class="login-card">
       <div class="login-header">
         <div class="app-icon">
-          <n-icon size="40" color="#d03050"><ShieldIcon /></n-icon>
+          <n-icon size="40" color="#d03050">
+            <ShieldIcon />
+          </n-icon>
         </div>
         <h1>بوابة المدير العام</h1>
         <p>الوصول إلى لوحة تحكم المنصة المركزية</p>
       </div>
-      
+
       <div class="login-form">
         <div class="form-group">
           <label for="username">اسم المستخدم المسؤول</label>
-          <n-input
-            id="username"
-            v-model:value="username"
-            type="text"
-            placeholder="super"
-            size="large"
-          >
-             <template #prefix>
-              <n-icon><UserIcon /></n-icon>
+          <n-input id="username" v-model:value="username" type="text" placeholder="super" size="large">
+            <template #prefix>
+              <n-icon>
+                <UserIcon />
+              </n-icon>
             </template>
           </n-input>
         </div>
-        
+
         <div class="form-group">
           <label for="password">كلمة المرور</label>
-          <n-input
-            id="password"
-            v-model:value="password"
-            type="password"
-            show-password-on="mousedown"
-            placeholder="كلمة المرور"
-            size="large"
-          >
-             <template #prefix>
-              <n-icon><LockIcon /></n-icon>
+          <n-input id="password" v-model:value="password" type="password" show-password-on="mousedown"
+            placeholder="كلمة المرور" size="large">
+            <template #prefix>
+              <n-icon>
+                <LockIcon />
+              </n-icon>
             </template>
           </n-input>
         </div>
-        
-        <n-button 
-          @click="handleSuperLogin" 
-          type="error" 
-          block 
-          size="large"
-          :loading="loading"
-          class="login-button"
-        >
+
+        <n-button @click="handleSuperLogin" type="error" block size="large" :loading="loading" class="login-button">
           دخول المسؤول العام
         </n-button>
-        
+
         <div class="links-footer">
           <n-button text @click="router.push('/login')">
             العودة لدخول المتاجر
@@ -64,11 +51,12 @@
 
 <script setup>
 import { ref } from 'vue'
+useHead({ title: 'بوابة المدير العام' })
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 import { useMessage } from 'naive-ui'
-import { 
-  ShieldCheckmarkOutline as ShieldIcon, 
+import {
+  ShieldCheckmarkOutline as ShieldIcon,
   PersonOutline as UserIcon,
   LockClosedOutline as LockIcon
 } from '@vicons/ionicons5'
@@ -89,7 +77,7 @@ const handleSuperLogin = () => {
 
   loading.value = true
   const result = superLogin(username.value, password.value)
-  
+
   if (result.success) {
     message.success(`مرحباً بك في لوحة القيادة المركزية`)
     router.push('/super-admin')
@@ -106,7 +94,8 @@ const handleSuperLogin = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #0f172a; /* لون داكن مهيب للمدير العام */
+  background: #0f172a;
+  /* لون داكن مهيب للمدير العام */
   direction: rtl;
 }
 

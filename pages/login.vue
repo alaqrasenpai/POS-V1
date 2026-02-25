@@ -62,6 +62,7 @@
 
 <script setup>
 import { ref } from 'vue'
+useHead({ title: 'تسجيل الدخول' })
 import { useRouter } from 'vue-router'
 import * as NaiveUI from 'naive-ui'
 const { useMessage } = NaiveUI

@@ -4,31 +4,25 @@
     <n-tabs v-if="isMobile" type="line" animated justify-content="space-evenly" class="mobile-tabs">
       <n-tab-pane name="products" tab="الأصناف">
         <div class="products-section mobile">
-          <n-input 
-            v-model:value="searchTerm" 
-            placeholder="البحث باسم المنتج..." 
-            clearable
-            class="mobile-search"
-          >
+          <n-input v-model:value="searchTerm" placeholder="البحث باسم المنتج..." clearable class="mobile-search">
             <template #prefix>
-              <n-icon><SearchOutline /></n-icon>
+              <n-icon>
+                <SearchOutline />
+              </n-icon>
             </template>
           </n-input>
-          
+
           <n-flex align="center" style="margin-bottom: 12px; padding: 0 8px;">
-            <n-select
-              v-model:value="selectedCategory"
-              :options="categoryOptions"
-              placeholder="التصنيف"
-              clearable
-              size="small"
-              style="flex: 1"
-            />
-            <n-button quaternary size="small" @click="showFavorites = !showFavorites" :type="showFavorites ? 'primary' : 'default'">
-                <template #icon><n-icon><StarIcon /></n-icon></template>
+            <n-select v-model:value="selectedCategory" :options="categoryOptions" placeholder="التصنيف" clearable
+              size="small" style="flex: 1" />
+            <n-button quaternary size="small" @click="showFavorites = !showFavorites"
+              :type="showFavorites ? 'primary' : 'default'">
+              <template #icon><n-icon>
+                  <StarIcon />
+                </n-icon></template>
             </n-button>
           </n-flex>
-          
+
           <ItemItems :listOfItems="filteredAndSortedItems" />
         </div>
       </n-tab-pane>
@@ -41,12 +35,7 @@
 
     <!-- لسطح المكتب -->
     <n-layout v-else has-sider style="height: calc(100vh - 84px); background: transparent;">
-      <n-layout-sider 
-        width="400" 
-        content-style="padding: 0; background: white;" 
-        :native-scrollbar="false" 
-        bordered
-      >
+      <n-layout-sider width="400" content-style="padding: 0; background: white;" :native-scrollbar="false" bordered>
         <cart />
       </n-layout-sider>
 
@@ -57,14 +46,12 @@
             <n-text class="page-subtitle">اختر المنتجات لإتمام عملية البيع</n-text>
           </div>
           <n-flex align="center">
-            <n-input 
-              v-model:value="searchTerm" 
-              placeholder="البحث باسم المنتج أو الباركود..." 
-              clearable
-              style="width: 300px;"
-            >
+            <n-input v-model:value="searchTerm" placeholder="البحث باسم المنتج أو الباركود..." clearable
+              style="width: 300px;">
               <template #prefix>
-                <n-icon><SearchOutline /></n-icon>
+                <n-icon>
+                  <SearchOutline />
+                </n-icon>
               </template>
             </n-input>
             <ItemAddItem />
@@ -76,13 +63,8 @@
           <n-flex align="center" justify="space-between">
             <n-flex align="center">
               <n-text depth="3" strong>تصفية النتائج:</n-text>
-              <n-select
-                v-model:value="selectedCategory"
-                :options="categoryOptions"
-                placeholder="كل التصنيفات"
-                clearable
-                style="width: 200px;"
-              />
+              <n-select v-model:value="selectedCategory" :options="categoryOptions" placeholder="كل التصنيفات" clearable
+                style="width: 200px;" />
               <n-checkbox v-model:checked="showFavorites">
                 المفضلة فقط
               </n-checkbox>
@@ -99,6 +81,7 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
+useHead({ title: 'شاشة البيع' })
 import { SearchOutline, Star as StarIcon } from '@vicons/ionicons5'
 import { useInventory } from '@/composables/useInventory'
 import { useScreen } from '@/composables/useScreen'
@@ -123,7 +106,7 @@ const categoryOptions = computed(() => {
 
 const filteredAndSortedItems = computed(() => {
   let result = [...items]
-  
+
   if (searchTerm.value) {
     // عند البحث: تظهر جميع المنتجات المتطابقة حتى لو كانت الكمية صفر
     result = getItemsFiltered(searchTerm.value)
@@ -131,21 +114,21 @@ const filteredAndSortedItems = computed(() => {
     // الحالة الافتراضية: تظهر فقط المنتجات المتوفرة في المخزن
     result = result.filter(item => item.quantity > 0)
   }
-  
+
   if (selectedCategory.value) {
     result = result.filter(item => item.category === selectedCategory.value)
   }
-  
+
   if (showFavorites.value) {
     result = result.filter(item => item.isFav === true)
   }
-  
+
   result.sort((a, b) => {
     if (a.isFav && !b.isFav) return -1
     if (!a.isFav && b.isFav) return 1
     return a.name.localeCompare(b.name)
   })
-  
+
   return result
 })
 </script>
