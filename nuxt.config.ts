@@ -18,7 +18,7 @@ export default defineNuxtConfig({
 
   app: {
     baseURL: '/pOS-V1/',
-    buildAssetsDir: 'assets'
+    buildAssetsDir: '_nuxt'
   },
 
   router: {
