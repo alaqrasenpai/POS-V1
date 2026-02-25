@@ -1,5 +1,5 @@
 <template>
-  <div class="login-background">
+  <div class="login-background" :dir="isRTL ? 'rtl' : 'ltr'">
     <div class="login-card">
       <div class="login-header">
         <div class="app-icon">
@@ -7,13 +7,13 @@
             <StoreIcon />
           </n-icon>
         </div>
-        <h1>دخول المتجر</h1>
-        <p>يرجى إدخال بيانات متجرك وحسابك</p>
+        <h1>{{ t('login.title') }}</h1>
+        <p>{{ isRTL ? 'يرجى إدخال بيانات متجرك وحسابك' : 'Please enter your shop and account details' }}</p>
       </div>
 
       <div class="login-form">
         <div class="form-group">
-          <label for="phone">رقم جوال المتجر المسجل</label>
+          <label for="phone">{{ isRTL ? 'رقم جوال المتجر المسجل' : 'Registered Shop Phone Number' }}</label>
           <n-input id="phone" v-model:value="phone" type="text" placeholder="01xxxxxxxxx" size="large">
             <template #prefix>
               <n-icon>
@@ -24,8 +24,8 @@
         </div>
 
         <div class="form-group">
-          <label for="username">اسم المستخدم</label>
-          <n-input id="username" v-model:value="username" type="text" placeholder="اسم المستخدم" size="large">
+          <label for="username">{{ t('login.username') }}</label>
+          <n-input id="username" v-model:value="username" type="text" :placeholder="t('login.username')" size="large">
             <template #prefix>
               <n-icon>
                 <UserIcon />
@@ -35,9 +35,9 @@
         </div>
 
         <div class="form-group">
-          <label for="password">كلمة المرور</label>
+          <label for="password">{{ t('login.password') }}</label>
           <n-input id="password" v-model:value="password" type="password" show-password-on="mousedown"
-            placeholder="كلمة المرور" size="large">
+            :placeholder="t('login.password')" size="large">
             <template #prefix>
               <n-icon>
                 <LockIcon />
@@ -47,12 +47,12 @@
         </div>
 
         <n-button @click="handleLogin" type="primary" block size="large" :loading="loading" class="login-button">
-          دخول إلى المتجر
+          {{ t('login.loginBtn') }}
         </n-button>
 
         <div class="links-footer">
           <n-button text @click="router.push('/super-login')">
-            دخول إدارة المنصة (Super Admin)
+            {{ isRTL ? 'دخول إدارة المنصة (Super Admin)' : 'Central Platform Management (Super Admin)' }}
           </n-button>
         </div>
       </div>
@@ -62,16 +62,18 @@
 
 <script setup>
 import { ref } from 'vue'
-useHead({ title: 'تسجيل الدخول' })
 import { useRouter } from 'vue-router'
-import * as NaiveUI from 'naive-ui'
-const { useMessage } = NaiveUI
+import { useMessage } from 'naive-ui'
+import { useI18n } from '@/composables/useI18n'
 import {
   StorefrontOutline as StoreIcon,
   CallOutline as PhoneIcon,
   PersonOutline as UserIcon,
   LockClosedOutline as LockIcon
 } from '@vicons/ionicons5'
+
+const { t, isRTL } = useI18n()
+useHead({ title: t('login.title') })
 
 const router = useRouter()
 const { login } = useAuth()
@@ -85,7 +87,7 @@ const loading = ref(false)
 
 const handleLogin = () => {
   if (!phone.value || !username.value || !password.value) {
-    message.warning("يرجى إكمال جميع الحقول");
+    message.warning(isRTL.value ? "يرجى إكمال جميع الحقول" : "Please complete all fields");
     return;
   }
 
@@ -93,7 +95,7 @@ const handleLogin = () => {
   const result = login(phone.value, username.value, password.value)
 
   if (result.success) {
-    message.success(`مرحباً بك في ${result.user.name}`)
+    message.success(isRTL.value ? `مرحباً بك في ${result.user.name}` : `Welcome to ${result.user.name}`)
     router.push('/')
   } else {
     message.error(result.message)
@@ -113,7 +115,6 @@ const handleLogin = () => {
     radial-gradient(at 0% 0%, hsla(253, 16%, 7%, 1) 0, transparent 50%),
     radial-gradient(at 50% 0%, hsla(225, 39%, 30%, 1) 0, transparent 50%),
     radial-gradient(at 100% 0%, hsla(339, 49%, 30%, 1) 0, transparent 50%);
-  direction: rtl;
 }
 
 .login-card {
@@ -145,7 +146,7 @@ const handleLogin = () => {
 }
 
 .login-form {
-  text-align: right;
+  /* removed text-align: right to follow dir */
 }
 
 .form-group {

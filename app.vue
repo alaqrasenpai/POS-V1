@@ -1,5 +1,6 @@
 <template>
-  <n-config-provider :locale="arDZ" :date-locale="dateArDZ" :theme-overrides="themeOverrides">
+  <n-config-provider :locale="naiveLocale" :date-locale="naiveDateLocale" :theme-overrides="themeOverrides"
+    :dir="isRTL ? 'rtl' : 'ltr'">
     <n-message-provider>
       <n-dialog-provider>
         <n-notification-provider>
@@ -67,17 +68,18 @@ const windowWidth = ref(0)
 const isMounted = ref(false)
 const { settings } = useSettings()
 const { checkAuth, currentUser, logout, isAuthenticated } = useAuth()
+const { t, currentLocale, isRTL } = useI18n()
 
 const isMobile = computed(() => isMounted.value && windowWidth.value < 768)
 
 const renderIcon = (icon) => () => h(NIcon, null, { default: () => h(icon) })
 
-const userMenuOptions = [
-  { label: 'الملف الشخصي', key: 'profile', icon: renderIcon(PersonOutline) },
-  { label: 'الإعدادات', key: 'settings', icon: renderIcon(SettingsOutline) },
+const userMenuOptions = computed(() => [
+  { label: t('common.profile'), key: 'profile', icon: renderIcon(PersonOutline) },
+  { label: t('common.settings'), key: 'settings', icon: renderIcon(SettingsOutline) },
   { type: 'divider', key: 'd1' },
-  { label: 'تسجيل الخروج', key: 'logout', icon: renderIcon(LogOutOutline) }
-]
+  { label: t('common.logout'), key: 'logout', icon: renderIcon(LogOutOutline) }
+])
 
 const handleUserMenuClick = (key) => {
   if (key === 'logout') logout()
@@ -94,26 +96,26 @@ onMounted(() => {
   checkAuth()
   updateWidth()
   window.addEventListener('resize', updateWidth)
-
-  if (typeof document !== 'undefined') {
-    document.documentElement.setAttribute('dir', 'ltr')
-  }
 })
 
-const themeOverrides = {
+const themeOverrides = computed(() => ({
   common: {
     primaryColor: '#18a058',
     primaryColorHover: '#36ad6a',
     primaryColorPressed: '#0c7a43',
     primaryColorSuppl: '#36ad6a',
     borderRadius: '12px',
-    fontFamily: "'Tajawal', sans-serif"
+    fontFamily: isRTL.value ? "'Tajawal', sans-serif" : "Inter, system-ui, sans-serif"
   },
   Card: {
     borderRadius: '16px',
     boxShadow: '0 4px 16px rgba(0,0,0,0.04)'
   }
-}
+}))
+
+// dynamic naive-ui locale
+const naiveLocale = computed(() => currentLocale.value === 'ar' ? NaiveUI.arDZ : NaiveUI.enUS)
+const naiveDateLocale = computed(() => currentLocale.value === 'ar' ? NaiveUI.dateArDZ : NaiveUI.dateEnUS)
 
 const contentStyle = computed(() => ({
   minHeight: 'calc(100vh - 56px)',

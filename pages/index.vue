@@ -2,21 +2,21 @@
   <div class="page-container">
     <div class="page-title-section">
       <div class="page-header-text">
-        <n-h1 class="page-title">نظرة عامة على النظام</n-h1>
-        <n-text class="page-subtitle">مرحباً بك مجدداً، إليك ملخص أداء متجرك اليوم</n-text>
+        <n-h1 class="page-title">{{ t('dashboard.summary') }}</n-h1>
+        <n-text class="page-subtitle">{{ t('dashboard.welcome') }}</n-text>
       </div>
       <n-flex v-if="!isMobile" :size="16">
         <n-button type="primary" secondary @click="refreshDashboard">
           <template #icon><n-icon>
               <RefreshIcon />
             </n-icon></template>
-          تحديث البيانات
+          {{ t('dashboard.refresh') }}
         </n-button>
         <n-button type="primary" @click="$router.push('/sellorder')">
           <template #icon><n-icon>
               <CartIcon />
             </n-icon></template>
-          فتح شاشة البيع
+          {{ t('dashboard.openSales') }}
         </n-button>
       </n-flex>
     </div>
@@ -30,12 +30,12 @@
               <CashIcon />
             </n-icon>
           </div>
-          <n-statistic label="إجمالي المبيعات" :value="totalSales">
+          <n-statistic :label="t('dashboard.totalSales')" :value="totalSales">
             <template #prefix><n-text depth="3" style="font-size: 14px; margin-inline-end: 4px;">{{ currency
             }}</n-text></template>
           </n-statistic>
           <div class="stat-footer">
-            <n-text depth="3">إجمالي {{ totalSellOrders }} عملية بيع</n-text>
+            <n-text depth="3">{{ totalSellOrders }} {{ t('dashboard.recentSales') }}</n-text>
           </div>
         </n-card>
       </n-gi>
@@ -46,9 +46,9 @@
               <CubeIcon />
             </n-icon>
           </div>
-          <n-statistic label="أصناف المخزون" :value="totalItems" />
+          <n-statistic :label="t('dashboard.inventoryItems')" :value="totalItems" />
           <div class="stat-footer">
-            <n-text depth="3">{{ lowStockItems.length }} أصناف أوشكت على النفاد</n-text>
+            <n-text depth="3">{{ lowStockItems.length }} {{ t('dashboard.lowStock') }}</n-text>
           </div>
         </n-card>
       </n-gi>
@@ -59,9 +59,9 @@
               <PeopleIcon />
             </n-icon>
           </div>
-          <n-statistic label="قاعدة العملاء" :value="totalCustomers" />
+          <n-statistic :label="t('dashboard.customerBase')" :value="totalCustomers" />
           <div class="stat-footer">
-            <n-text depth="3">{{ favCustomers }} عملاء مميزين</n-text>
+            <n-text depth="3">{{ favCustomers }} {{ t('common.customers') }} المميزين</n-text>
           </div>
         </n-card>
       </n-gi>
@@ -72,7 +72,7 @@
               <TrendingUpIcon />
             </n-icon>
           </div>
-          <n-statistic label="متوسط قيمة الطلب" :value="averageOrderValue">
+          <n-statistic :label="t('dashboard.avgOrderValue')" :value="averageOrderValue">
             <template #prefix><n-text depth="3" style="font-size: 14px; margin-inline-end: 4px;">{{ currency
             }}</n-text></template>
           </n-statistic>
@@ -86,7 +86,7 @@
     <n-grid :cols="isMobile ? 1 : 12" :x-gap="24" :y-gap="24" style="margin-top: 40px;">
       <!-- مخطط مبيعات الأسبوع -->
       <n-gi span="8">
-        <n-card title="حركة المبيعات (آخر 7 أيام)" class="main-content-card" :bordered="false">
+        <n-card :title="t('dashboard.salesMovement')" class="main-content-card" :bordered="false">
           <template #header-extra>
             <n-tag type="success" size="small" round>مباشر</n-tag>
           </template>
@@ -98,7 +98,7 @@
 
       <!-- توزيع التصنيفات -->
       <n-gi span="4">
-        <n-card title="توزيع مبيعات التصنيفات" class="main-content-card" :bordered="false">
+        <n-card :title="t('dashboard.categoryDistribution')" class="main-content-card" :bordered="false">
           <div style="padding: 10px 0;">
             <Chart type="donut" :options="categoryChartOptions" :series="categorySeries" />
           </div>
@@ -117,10 +117,10 @@
 
       <!-- تنبيهات المخزون المنخفض -->
       <n-gi :span="isMobile ? 12 : 5">
-        <n-card title="تنببهات المخزون (تحتاج لطلب)" class="main-content-card" :bordered="false"
+        <n-card :title="t('dashboard.lowStock')" class="main-content-card" :bordered="false"
           header-style="color: #d03050">
           <template #header-extra>
-            <n-button text type="error" @click="$router.push('/inventory')">عرض الكل</n-button>
+            <n-button text type="error" @click="$router.push('/inventory')">{{ t('common.search') }}</n-button>
           </template>
           <n-empty v-if="lowStockItems.length === 0" description="كل الأصناف متوفرة بشكل جيد"
             style="padding: 40px 0;" />
@@ -151,7 +151,7 @@
 
       <!-- أحدث العمليات -->
       <n-gi :span="isMobile ? 12 : 7">
-        <n-card title="أحدث عمليات البيع" class="main-content-card" :bordered="false">
+        <n-card :title="t('dashboard.recentSales')" class="main-content-card" :bordered="false">
           <div style="margin-bottom: 16px;">
             <n-data-table :columns="recentOrdersColumns" :data="recentOrders" :bordered="false" size="small" />
           </div>
@@ -185,6 +185,7 @@ const { getItems } = useInventory();
 const { getSuppliers } = useSuppliers();
 const { getAlldSellOrders } = useSellOrder();
 const { getSettings } = useSettings();
+const { t, isRTL } = useI18n();
 
 const currency = computed(() => getSettings().currency || 'ريال');
 
@@ -200,15 +201,15 @@ const recentOrders = ref([]);
 
 // Chart Sales Series (Mocking some growth data based on total sales)
 const salesSeries = ref([{
-  name: 'المبيعات اليومية',
+  name: t('dashboard.totalSales'),
   data: [450, 520, 480, 610, 590, 720, 850]
 }]);
 
-const salesChartOptions = ref({
+const salesChartOptions = computed(() => ({
   chart: {
     type: 'area',
     toolbar: { show: false },
-    fontFamily: 'Tajawal, sans-serif'
+    fontFamily: isRTL.value ? 'Tajawal, sans-serif' : 'Inter, sans-serif'
   },
   colors: ['#18a058'],
   fill: {
@@ -223,7 +224,7 @@ const salesChartOptions = ref({
   dataLabels: { enabled: false },
   stroke: { curve: 'smooth', width: 3 },
   xaxis: {
-    categories: ['السبت', 'الأحد', 'الاثنين', 'الثلاثاء', 'الأربعاء', 'الخميس', 'الجمعة'],
+    categories: t('dashboard.days'),
     axisBorder: { show: false },
     axisTicks: { show: false }
   },
@@ -232,12 +233,12 @@ const salesChartOptions = ref({
     borderColor: '#f1f1f1',
     strokeDashArray: 4
   }
-});
+}));
 
 // Category Donut
 const categorySeries = ref([]);
-const categoryChartOptions = ref({
-  labels: [],
+const categoryChartOptions = computed(() => ({
+  labels: topCategories.value.map(c => c.name),
   chart: { type: 'donut', fontFamily: 'Tajawal, sans-serif' },
   colors: ['#18a058', '#2080f0', '#f0a020', '#d03050', '#722ed1'],
   legend: { position: 'bottom' },
@@ -249,35 +250,35 @@ const categoryChartOptions = ref({
           show: true,
           total: {
             show: true,
-            label: 'إجمالي القطع',
+            label: t('dashboard.inventoryItems'),
             formatter: (w) => w.globals.seriesTotals.reduce((a, b) => a + b, 0)
           }
         }
       }
     }
   }
-});
+}));
 
 const topCategories = ref([]);
 
 // Orders Table Columns
-const recentOrdersColumns = [
+const recentOrdersColumns = computed(() => [
   {
-    title: 'رقم العملية',
+    title: t('common.actions'),
     key: 'id',
     render: (row) => h('span', { style: 'font-weight: 600' }, `#${row.id}`)
   },
   {
-    title: 'الوقت',
+    title: t('common.date'),
     key: 'selldate',
-    render: (row) => h('span', {}, new Date(row.selldate).toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' }))
+    render: (row) => h('span', {}, new Date(row.selldate).toLocaleTimeString(isRTL.value ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit' }))
   },
   {
-    title: 'الإجمالي',
+    title: t('common.currency'),
     key: 'totalPrice',
     render: (row) => h('n-tag', { type: 'success', bordered: false }, { default: () => `${row.totalPrice} ${currency.value}` })
   }
-];
+]);
 
 const refreshDashboard = () => {
   const customers = getCustomers();
