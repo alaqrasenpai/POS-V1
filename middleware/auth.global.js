@@ -9,12 +9,12 @@ export default defineNuxtRouteMiddleware((to) => {
   const publicPages = ['/login', '/super-login']
 
   // 1. إذا لم يكن المستخدم مسجلاً دخوله ويحاول الوصول لصفحة محمية
-  if (isLoggedIn.value !== 'true' && !publicPages.includes(to.path)) {
+  if (!isLoggedIn.value && !publicPages.includes(to.path)) {
     return navigateTo('/login')
   }
 
   // 2. إذا كان المستخدم مسجلاً دخوله ويحاول الوصول لصفحة تسجيل الدخول
-  if (isLoggedIn.value === 'true' && publicPages.includes(to.path)) {
+  if (isLoggedIn.value && publicPages.includes(to.path)) {
     // منع المستخدم العادي من الوصول لصفحة الـ super-login والعكس لو أردت
     auth.checkAuth()
     const user = auth.currentUser.value
@@ -26,7 +26,7 @@ export default defineNuxtRouteMiddleware((to) => {
   }
 
   // 3. التحقق من صلاحيات الـ Super Admin
-  if (isLoggedIn.value === 'true' && to.path.startsWith('/super-admin')) {
+  if (isLoggedIn.value && to.path.startsWith('/super-admin')) {
     auth.checkAuth()
     const user = auth.currentUser.value
 

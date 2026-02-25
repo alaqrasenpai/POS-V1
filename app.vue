@@ -66,7 +66,7 @@ const showMobileMenu = ref(false)
 const windowWidth = ref(0)
 const isMounted = ref(false)
 const { settings } = useSettings()
-const { checkAuth, currentUser, logout } = useAuth()
+const { checkAuth, currentUser, logout, isAuthenticated } = useAuth()
 
 const isMobile = computed(() => isMounted.value && windowWidth.value < 768)
 

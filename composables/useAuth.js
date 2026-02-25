@@ -14,7 +14,7 @@ export const useAuth = () => {
   const loggedInCookie = useCookie('pos_demo_logged_in')
 
   // تهيئة الحالة الأولية إذا كان الكوكي موجوداً
-  if (loggedInCookie.value === 'true' && !state.isAuthenticated) {
+  if ((loggedInCookie.value === 'true' || loggedInCookie.value === true) && !state.isAuthenticated) {
     state.isAuthenticated = true
   }
 
