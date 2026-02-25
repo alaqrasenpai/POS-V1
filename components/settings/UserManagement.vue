@@ -4,30 +4,21 @@
       <n-text depth="3">تحكم في هوية من يدخل للنظام وما يمكنه فعله</n-text>
       <n-button type="primary" @click="openAddModal">
         <template #icon>
-          <n-icon><AddIcon /></n-icon>
+          <n-icon>
+            <AddIcon />
+          </n-icon>
         </template>
         إضافة مستخدم جديد
       </n-button>
     </n-flex>
 
-    <n-data-table
-      :columns="columns"
-      :data="users"
-      :pagination="pagination"
-      :bordered="false"
-      scroll-x="1000"
-    />
+    <n-data-table :columns="columns" :data="users" :pagination="pagination" :bordered="false" scroll-x="1000" />
 
     <!-- Modal لإضافة/تعديل مستخدم -->
     <n-modal v-model:show="showAddModal" transform-origin="center">
-      <n-card
-        style="width: 700px; max-width: 95vw; border-radius: 16px"
-        :title="isEditing ? 'تعديل بيانات مستخدم' : 'إنشاء حساب مستخدم جديد'"
-        :bordered="false"
-        size="huge"
-        role="dialog"
-        aria-modal="true"
-      >
+      <n-card style="width: 700px; max-width: 95vw; border-radius: 16px"
+        :title="isEditing ? 'تعديل بيانات مستخدم' : 'إنشاء حساب مستخدم جديد'" :bordered="false" size="huge"
+        role="dialog" aria-modal="true">
         <n-form :model="formModel">
           <n-grid :cols="isMobile ? 1 : 2" :x-gap="16">
             <n-gi>
@@ -42,28 +33,25 @@
             </n-gi>
             <n-gi>
               <n-form-item label="كلمة المرور">
-                <n-input
-                  v-model:value="formModel.password"
-                  type="password"
-                  show-password-on="click"
-                  placeholder="أدخل كلمة مرور قوية"
-                />
+                <n-input v-model:value="formModel.password" type="password" show-password-on="click"
+                  placeholder="أدخل كلمة مرور قوية" />
               </n-form-item>
             </n-gi>
             <n-gi>
               <n-form-item label="الدور الوظيفي">
-                <n-select
-                  v-model:value="formModel.role"
-                  :options="roleOptions"
-                  placeholder="اختر دور المستخدم"
-                  @update:value="handleRoleChange"
-                />
+                <n-select v-model:value="formModel.role" :options="roleOptions" placeholder="اختر دور المستخدم"
+                  @update:value="handleRoleChange" />
+              </n-form-item>
+            </n-gi>
+            <n-gi v-if="currentUser?.role === 'super_admin'">
+              <n-form-item label="المتجر التابع له">
+                <n-select v-model:value="formModel.storeId" :options="storeOptions" placeholder="اختر المتجر" />
               </n-form-item>
             </n-gi>
           </n-grid>
 
           <n-divider title-placement="right">تخصيص الصلاحيات</n-divider>
-          
+
           <n-form-item label="الصلاحيات الممنوحة لهذا الحساب:">
             <n-checkbox-group v-model:value="formModel.permissions">
               <n-grid :cols="isMobile ? 1 : 3">
@@ -74,7 +62,7 @@
             </n-checkbox-group>
           </n-form-item>
         </n-form>
-        
+
         <template #footer>
           <n-space justify="end">
             <n-button quaternary @click="showAddModal = false">إلغاء</n-button>
@@ -92,12 +80,30 @@ import { AddOutline as AddIcon, TrashOutline as DeleteIcon, CreateOutline as Edi
 import { NTag, NButton, NIcon, NSpace, NSwitch, useMessage } from 'naive-ui'
 import { useUsers } from '@/composables/useUsers'
 import { useScreen } from '@/composables/useScreen'
+import { useAuth } from '@/composables/useAuth'
+import { useStores } from '@/composables/useStores'
 
 const { isMobile } = useScreen()
 const { getUsers, addUser, updateUser, deleteUser, toggleUserStatus, availablePermissions } = useUsers()
+const { currentUser } = useAuth()
+const { getStores } = useStores()
 const message = useMessage()
 
-const users = computed(() => getUsers())
+const users = computed(() => {
+  const allUsers = getUsers()
+  if (currentUser.value?.role === 'super_admin') {
+    return allUsers
+  }
+  return allUsers.filter(u => u.storeId === currentUser.value?.storeId)
+})
+
+const storeOptions = computed(() => {
+  return getStores().map(s => ({
+    label: s.name,
+    value: s.id
+  }))
+})
+
 const showAddModal = ref(false)
 const isEditing = ref(false)
 const editingId = ref(null)
@@ -107,7 +113,8 @@ const formModel = ref({
   username: '',
   password: '',
   role: 'cashier',
-  permissions: ['view_dashboard', 'sell_orders', 'view_customers']
+  permissions: ['view_dashboard', 'sell_orders', 'view_customers'],
+  storeId: currentUser.value?.storeId || 0
 })
 
 const roleOptions = [
@@ -148,6 +155,14 @@ const columns = [
       return h(NTag, { type: typeMap[row.role], bordered: false, round: true }, { default: () => labelMap[row.role] })
     }
   },
+  ...(currentUser.value?.role === 'super_admin' ? [{
+    title: 'المتجر',
+    key: 'storeId',
+    render(row) {
+      const store = getStores().find(s => s.id === row.storeId)
+      return h(NTag, { quaternary: true, size: 'small' }, { default: () => store ? store.name : 'المنصة' })
+    }
+  }] : []),
   {
     title: 'الصلاحيات',
     key: 'permissions',

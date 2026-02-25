@@ -9,7 +9,21 @@
 
     <n-card :bordered="false" class="main-content-card">
       <n-tabs type="line" animated size="large" justify-content="start" style="padding: 12px 0;">
-        <n-tab-pane name="general" tab="الإعدادات العامة">
+        <n-tab-pane name="store-profile" tab="بيانات المتجر">
+          <template #tab>
+            <n-space align="center" :size="8">
+              <n-icon>
+                <StoreIcon />
+              </n-icon>
+              <span>بيانات المتجر</span>
+            </n-space>
+          </template>
+          <div style="padding: 24px 0">
+            <StoreProfile />
+          </div>
+        </n-tab-pane>
+
+        <n-tab-pane name="general" tab="الإعدادات المالية">
           <template #tab>
             <n-space align="center" :size="8">
               <n-icon>
@@ -59,12 +73,14 @@
 import {
   SettingsOutline as SettingsIcon,
   PeopleOutline as UsersIcon,
-  ListOutline as LogIcon
+  ListOutline as LogIcon,
+  StorefrontOutline as StoreIcon
 } from '@vicons/ionicons5'
 import { useAuth } from '@/composables/useAuth'
 import { useMessage } from 'naive-ui'
 
 // Explicit imports
+import StoreProfile from '@/components/settings/StoreProfile.vue'
 import GeneralSettings from '@/components/settings/GeneralSettings.vue'
 import UserManagement from '@/components/settings/UserManagement.vue'
 import ActivityLogManagement from '@/components/settings/ActivityLogManagement.vue'

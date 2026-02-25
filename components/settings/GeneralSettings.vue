@@ -2,43 +2,23 @@
   <div class="general-settings">
     <n-form :model="settings" label-placement="top">
       <n-grid :cols="2" :x-gap="24">
-        <n-form-item-gi :span="2" label="اسم المحل (المنشأة)">
-          <n-input v-model:value="settings.shopName" placeholder="أدخل اسم المحل ليظهر في الفواتير والتقارير" />
-        </n-form-item-gi>
-        
         <n-form-item-gi label="العملة المستخدمة">
-          <n-select
-            v-model:value="settings.currency"
-            :options="currencyOptions"
-            placeholder="اختر العملة"
-          />
+          <n-select v-model:value="settings.currency" :options="currencyOptions" placeholder="اختر العملة" />
         </n-form-item-gi>
-        
+
         <n-form-item-gi label="نسبة الضريبة (%)">
           <n-input-number v-model:value="settings.taxRate" :min="0" :max="100" style="width: 100%" />
         </n-form-item-gi>
-        
-        <n-form-item-gi label="عنوان المحل">
-          <n-input v-model:value="settings.address" placeholder="العنوان بالتفصيل" />
-        </n-form-item-gi>
-        
-        <n-form-item-gi label="رقم الهاتف">
-          <n-input v-model:value="settings.phone" placeholder="رقم الموبايل أو الهاتف الأرضي" />
-        </n-form-item-gi>
-        
-        <n-form-item-gi :span="2" label="نص التذييل (Footer)">
-          <n-input
-            v-model:value="settings.footerText"
-            type="textarea"
-            placeholder="نص يظهر في أسفل الفاتورة"
-            :autosize="{ minRows: 2 }"
-          />
+
+        <n-form-item-gi :span="2" label="نص التذييل في الفاتورة (Footer)">
+          <n-input v-model:value="settings.footerText" type="textarea" placeholder="نص يظهر في أسفل الفاتورة المطبوعة"
+            :autosize="{ minRows: 2 }" />
         </n-form-item-gi>
       </n-grid>
-      
+
       <n-flex justify="end" style="margin-top: 24px;">
         <n-button type="primary" size="large" @click="handleSave" :loading="saving">
-          حفظ الإعدادات العامة
+          حفظ الإعدادات المالية
         </n-button>
       </n-flex>
     </n-form>
