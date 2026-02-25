@@ -11,7 +11,7 @@ export const useStores = () => {
             active: true,
             registeredPhone: '0123456789',
             createdAt: '2024-01-10',
-            plan: 'Pro',
+            plan: 'pro',
             status: 'paid',
             settings: {
                 currency: 'ريال',
@@ -27,7 +27,7 @@ export const useStores = () => {
             active: true,
             registeredPhone: '0555555555',
             createdAt: '2024-02-15',
-            plan: 'Basic',
+            plan: 'basic',
             status: 'trial',
             settings: {
                 currency: 'جنيه',

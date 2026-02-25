@@ -60,7 +60,7 @@ export const useMenu = () => {
             key: "shifts",
             icon: renderIcon(TimeOutline),
             to: "/shifts",
-            permission: "view_dashboard"
+            permission: "shifts"
         },
         {
             label: t('common.categories'),

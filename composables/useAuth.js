@@ -1,6 +1,7 @@
 // composables/useAuth.js
 import { reactive, computed } from 'vue'
 import { useStores } from '@/composables/useStores'
+import { useSubscriptions } from '@/composables/useSubscriptions'
 
 const state = reactive({
   user: null,
@@ -116,9 +117,28 @@ export const useAuth = () => {
 
   const hasPermission = (permission) => {
     if (!state.user) return false
+
+    // 1. Super Admin has all power
     if (state.user.role === 'super_admin') return true
+
+    // 2. Normal users can never be super admins
     if (permission === 'super_admin') return false
 
+    // 3. Subscription Check
+    const { getStoreById } = useStores()
+    const { getPlanById } = useSubscriptions()
+
+    const store = getStoreById(state.user.storeId)
+    if (store) {
+      const plan = getPlanById(store.plan)
+      if (plan) {
+        // If plan is not 'all' and requested permission is not in plan features
+        const hasPlanAccess = plan.features.includes('all') || plan.features.includes(permission)
+        if (!hasPlanAccess) return false
+      }
+    }
+
+    // 4. User Role/Permission Check
     if (state.user.permissions && (state.user.permissions.includes('all') || state.user.role === 'admin')) return true
     return state.user.permissions && state.user.permissions.includes(permission)
   }
