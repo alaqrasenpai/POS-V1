@@ -1,22 +1,18 @@
 <template>
   <div class="activity-log-section">
     <n-flex justify="space-between" align="center" style="margin-bottom: 24px;">
-      <n-text depth="3">مراقبة جميع العمليات والحركات التي تمت على النظام</n-text>
+      <n-text depth="3">{{ t('activityLog.subtitle') }}</n-text>
       <n-button quaternary type="error" @click="handleClearLogs">
         <template #icon>
-          <n-icon><TrashIcon /></n-icon>
+          <n-icon>
+            <TrashIcon />
+          </n-icon>
         </template>
-        مسح السجل بالكامل
+        {{ t('common.clearLog') }}
       </n-button>
     </n-flex>
 
-    <n-data-table
-      :columns="columns"
-      :data="logs"
-      :pagination="pagination"
-      :bordered="false"
-      scroll-x="900"
-    />
+    <n-data-table :columns="columns" :data="logs" :pagination="pagination" :bordered="false" scroll-x="900" />
   </div>
 </template>
 
@@ -25,7 +21,9 @@ import { h, computed } from 'vue'
 import { TrashOutline as TrashIcon, TimeOutline as TimeIcon } from '@vicons/ionicons5'
 import { NTag, NText, NIcon, NSpace, useMessage } from 'naive-ui'
 import { useActivityLog } from '@/composables/useActivityLog'
+import { useI18n } from '@/composables/useI18n'
 
+const { t } = useI18n()
 const { getLogs, clearLogs } = useActivityLog()
 const message = useMessage()
 
@@ -35,12 +33,12 @@ const pagination = { pageSize: 15 }
 
 const handleClearLogs = () => {
   clearLogs()
-  message.success('تم مسح سجل الأنشطة بنجاح')
+  message.success(t('activityLog.clearSuccess', 'Logs cleared'))
 }
 
-const columns = [
+const columns = computed(() => [
   {
-    title: 'الوقت والتاريخ',
+    title: t('common.date'),
     key: 'timestamp',
     width: 200,
     render(row) {
@@ -53,7 +51,7 @@ const columns = [
     }
   },
   {
-    title: 'المستخدم',
+    title: t('activityLog.user'),
     key: 'user',
     width: 150,
     render(row) {
@@ -61,7 +59,7 @@ const columns = [
     }
   },
   {
-    title: 'العملية',
+    title: t('activityLog.action'),
     key: 'action',
     width: 150,
     render(row) {
@@ -70,11 +68,11 @@ const columns = [
     }
   },
   {
-    title: 'التفاصيل',
+    title: t('activityLog.details'),
     key: 'details',
     render(row) {
       return h(NText, { depth: 2 }, { default: () => row.details })
     }
   }
-]
+])
 </script>

@@ -1,43 +1,43 @@
 <template>
   <div class="settings-page">
     <div class="page-header">
-      <n-h1 style="margin-bottom: 4px;">إعدادات النظام</n-h1>
-      <n-text depth="3">تحكم في هوية المحل، المستخدمين، وسجلات النظام</n-text>
+      <n-h1 style="margin-bottom: 4px;">{{ t('settings.title') }}</n-h1>
+      <n-text depth="3">{{ t('settings.subtitle') }}</n-text>
     </div>
 
     <n-card :bordered="false" class="main-card">
       <n-tabs type="line" animated size="large" justify-content="start">
-        <n-tab-pane name="general" tab="الإعدادات العامة">
+        <n-tab-pane name="general" :tab="t('settings.general')">
           <template #tab>
             <n-space align="center" :size="4">
               <n-icon>
                 <SettingsIcon />
               </n-icon>
-              <span>الإعدادات العامة</span>
+              <span>{{ t('settings.general') }}</span>
             </n-space>
           </template>
           <GeneralSettings style="padding: 20px 0" />
         </n-tab-pane>
 
-        <n-tab-pane name="users" tab="إدارة المستخدمين">
+        <n-tab-pane name="users" :tab="t('settings.users')">
           <template #tab>
             <n-space align="center" :size="4">
               <n-icon>
                 <UsersIcon />
               </n-icon>
-              <span>المستخدمين</span>
+              <span>{{ t('settings.users') }}</span>
             </n-space>
           </template>
           <UserManagement style="padding: 20px 0" />
         </n-tab-pane>
 
-        <n-tab-pane name="activity" tab="سجل الأنشطة">
+        <n-tab-pane name="activity" :tab="t('settings.activity')">
           <template #tab>
             <n-space align="center" :size="4">
               <n-icon>
                 <LogIcon />
               </n-icon>
-              <span>سجل الأنشطة</span>
+              <span>{{ t('settings.activity') }}</span>
             </n-space>
           </template>
           <ActivityLogManagement style="padding: 20px 0" />
@@ -55,9 +55,10 @@ import {
   ListOutline as LogIcon
 } from '@vicons/ionicons5'
 import { useAuth } from '@/composables/useAuth'
+import { useI18n } from '@/composables/useI18n'
 import { useMessage } from 'naive-ui'
 
-// Explicit imports
+const { t } = useI18n()
 import GeneralSettings from '@/components/settings/GeneralSettings.vue'
 import UserManagement from '@/components/settings/UserManagement.vue'
 import ActivityLogManagement from '@/components/settings/ActivityLogManagement.vue'

@@ -2,8 +2,8 @@
   <div class="page-container">
     <div class="page-title-section">
       <div class="page-header-text">
-        <n-h1 class="page-title">إدارة التصنيفات</n-h1>
-        <n-text class="page-subtitle">تنظيم المنتجات في مجموعات لتسهيل الوصول والبيع</n-text>
+        <n-h1 class="page-title">{{ t('categories.title') }}</n-h1>
+        <n-text class="page-subtitle">{{ t('categories.subtitle') }}</n-text>
       </div>
       <n-flex v-if="!isMobile" :size="16">
         <CategoryAddCategory />
@@ -12,7 +12,7 @@
 
     <n-card class="main-content-card" :bordered="false">
       <n-flex justify="space-between" align="center" :size="16">
-        <n-input v-model:value="searchTerm" placeholder="البحث باسم التصنيف" clearable
+        <n-input v-model:value="searchTerm" :placeholder="t('categories.searchPlaceholder')" clearable
           :style="{ width: isMobile ? '100%' : '320px' }">
           <template #prefix>
             <n-icon>
@@ -36,10 +36,13 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-useHead({ title: 'إدارة الأقسام' })
 import { SearchOutline } from '@vicons/ionicons5'
 import { useScreen } from '@/composables/useScreen'
 import { useCategory } from '@/composables/useCategory'
+import { useI18n } from '@/composables/useI18n'
+
+const { t } = useI18n()
+useHead({ title: t('categories.title') })
 
 const { isMobile } = useScreen()
 const searchTerm = ref('')

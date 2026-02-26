@@ -2,12 +2,12 @@
   <div class="checks-page">
     <div class="page-header">
       <div class="header-left">
-        <n-h1 style="margin-bottom: 4px;">إدارة الشيكات</n-h1>
-        <n-text depth="3">متابعة تحصيل الشيكات الآجلة وحالاتها</n-text>
+        <n-h1 style="margin-bottom: 4px;">{{ t('checks.title') }}</n-h1>
+        <n-text depth="3">{{ t('checks.subtitle') }}</n-text>
       </div>
       <n-space>
         <n-tag type="warning" size="large" round>
-          بانتظار التحصيل: {{ pendingTotal }} {{ currency }}
+          {{ t('checks.pendingTotal') }}: {{ pendingTotal }} {{ currency }}
         </n-tag>
       </n-space>
     </div>
@@ -20,10 +20,13 @@
 
 <script setup>
 import { computed, h } from 'vue'
-useHead({ title: 'إدارة الشيكات' })
 import { NTag, NButton, NSpace, NText, useMessage } from 'naive-ui'
 import { usePayments } from '@/composables/usePayments'
 import { useSettings } from '@/composables/useSettings'
+import { useI18n } from '@/composables/useI18n'
+
+const { t } = useI18n()
+useHead({ title: t('checks.title') })
 
 const { getChecks, updateCheckStatus } = usePayments()
 const { getCurrency } = useSettings()
@@ -39,22 +42,22 @@ const pendingTotal = computed(() => {
 
 const pagination = { pageSize: 10 }
 
-const columns = [
-  { title: 'رقم الشيك', key: 'checkNumber' },
-  { title: 'اسم المشتري', key: 'customerName' },
-  { title: 'المبلغ', key: 'amount', render(row) { return `${row.amount} ${currency}` } },
-  { title: 'تاريخ الاستحقاق', key: 'dueDate' },
+const columns = computed(() => [
+  { title: t('cart.checkNumber'), key: 'checkNumber' },
+  { title: t('customers.customerName'), key: 'customerName' },
+  { title: t('common.total'), key: 'amount', render(row) { return `${row.amount} ${currency}` } },
+  { title: t('cart.dueDate'), key: 'dueDate' },
   {
-    title: 'الحالة',
+    title: t('common.status'),
     key: 'status',
     render(row) {
       const typeMap = { pending: 'warning', cashed: 'success', returned: 'error' }
-      const labelMap = { pending: 'بانتظار التحصيل', cashed: 'تم الصرف', returned: 'مرفوض/راجع' }
+      const labelMap = { pending: t('checks.pendingTotal'), cashed: t('checks.cashed'), returned: t('checks.returned') }
       return h(NTag, { type: typeMap[row.status], bordered: false }, { default: () => labelMap[row.status] })
     }
   },
   {
-    title: 'الإجراءات',
+    title: t('common.actions'),
     key: 'actions',
     render(row) {
       if (row.status !== 'pending') return '-'
@@ -65,22 +68,22 @@ const columns = [
             type: 'success',
             onClick: () => {
               updateCheckStatus(row.id, 'cashed')
-              message.success('تم تحديث حالة الشيك إلى: تم الصرف')
+              message.success(t('checks.statusUpdateSuccess'))
             }
-          }, { default: () => 'صرف' }),
+          }, { default: () => t('checks.cashBtn') }),
           h(NButton, {
             size: 'small',
             type: 'error',
             onClick: () => {
               updateCheckStatus(row.id, 'returned')
-              message.error('تم تحديث حالة الشيك إلى: مرفوض')
+              message.error(t('checks.statusUpdateSuccess'))
             }
-          }, { default: () => 'رفض' })
+          }, { default: () => t('checks.rejectBtn') })
         ]
       })
     }
   }
-]
+])
 </script>
 
 <style scoped>

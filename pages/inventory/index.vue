@@ -59,13 +59,13 @@
 
 <script setup>
 import { ref, computed } from 'vue'
-useHead({ title: 'إدارة المخزن' })
 import { SearchOutline } from '@vicons/ionicons5'
 import { useInventory } from '@/composables/useInventory'
 import { useScreen } from '@/composables/useScreen'
 import { useI18n } from '@/composables/useI18n'
 
 const { t } = useI18n()
+useHead({ title: t('inventory.title') })
 
 const { isMobile, isTablet } = useScreen()
 const searchTerm = ref('')

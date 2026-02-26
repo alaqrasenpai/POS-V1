@@ -10,12 +10,12 @@
           <n-select v-model:value="settings.currency" :options="currencyOptions" :placeholder="t('common.search')" />
         </n-form-item-gi>
 
-        <n-form-item-gi label="نسبة الضريبة (%)">
+        <n-form-item-gi :label="t('inventory.taxRate')">
           <n-input-number v-model:value="settings.taxRate" :min="0" :max="100" style="width: 100%" />
         </n-form-item-gi>
 
-        <n-form-item-gi :span="2" label="نص التذييل في الفاتورة (Footer)">
-          <n-input v-model:value="settings.footerText" type="textarea" placeholder="نص يظهر في أسفل الفاتورة المطبوعة"
+        <n-form-item-gi :span="2" :label="t('inventory.footerText')">
+          <n-input v-model:value="settings.footerText" type="textarea" :placeholder="t('inventory.footerText')"
             :autosize="{ minRows: 2 }" />
         </n-form-item-gi>
       </n-grid>
@@ -30,7 +30,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { useMessage } from 'naive-ui'
 import { useSettings } from '@/composables/useSettings'
 import { useActivityLog } from '@/composables/useActivityLog'
@@ -44,18 +44,18 @@ const saving = ref(false)
 
 const currentLang = ref(currentLocale.value)
 
-const langOptions = [
-  { label: 'العربية', value: 'ar' },
-  { label: 'English', value: 'en' }
-]
+const langOptions = computed(() => [
+  { label: t('settings.arabic'), value: 'ar' },
+  { label: t('settings.english'), value: 'en' }
+])
 
-const currencyOptions = [
-  { label: 'دينار أردني (د.أ)', value: 'د.أ' },
-  { label: 'ريال سعودي (ر.س)', value: 'ر.س' },
-  { label: 'دولار أمريكي ($)', value: '$' },
-  { label: 'شيكل (₪)', value: '₪' },
-  { label: 'جنيه مصري (ج.م)', value: 'ج.م' }
-]
+const currencyOptions = computed(() => [
+  { label: `دينار أردني (د.أ)`, value: 'د.أ' },
+  { label: `ريال سعودي (ر.س)`, value: 'ر.س' },
+  { label: `دولار أمريكي ($)`, value: '$' },
+  { label: `شيكل (₪)`, value: '₪' },
+  { label: `جنيه مصري (ج.م)`, value: 'ج.م' }
+])
 
 const handleLangChange = (val) => {
   setLocale(val)
@@ -65,8 +65,8 @@ const handleSave = () => {
   saving.value = true
   setTimeout(() => {
     updateSettings(settings.value)
-    addLog('تحديث الإعدادات', 'قام المدير بتحديث إعدادات النظام العامة', 'warning')
-    message.success(currentLocale.value === 'ar' ? 'تم حفظ الإعدادات بنجاح' : 'Settings saved successfully')
+    addLog(t('settings.title'), t('settings.title'), 'warning')
+    message.success(t('common.saveSuccess', 'Settings saved successfully'))
     saving.value = false
   }, 500)
 }

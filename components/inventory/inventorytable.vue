@@ -10,7 +10,7 @@
                             <DownloadOutline />
                         </n-icon>
                     </template>
-                    تصدير البيانات
+                    {{ t('common.export') }}
                 </n-button>
 
                 <!-- زر طباعة الجدول -->
@@ -20,7 +20,7 @@
                             <PrintOutline />
                         </n-icon>
                     </template>
-                    طباعة
+                    {{ t('common.print') }}
                 </n-button>
             </n-flex>
         </n-flex>
@@ -38,7 +38,9 @@ import type { DataTableColumns, DataTableInst } from 'naive-ui'
 import EditItem from '../item/editItem.vue'
 import { DownloadOutline, PrintOutline } from '@vicons/ionicons5'
 import { useSettings } from '@/composables/useSettings'
+import { useI18n } from '@/composables/useI18n'
 
+const { t } = useI18n()
 const { getCurrency } = useSettings()
 const currency = getCurrency()
 
@@ -64,11 +66,11 @@ const message = useMessage()
 // دالة للحصول على حالة المنتج
 const getStatus = (quantity: number, deleted: boolean) => {
     if (deleted) {
-        return { text: 'محذوف', color: 'error' }
+        return { text: t('inventory.deleted'), color: 'error' }
     } else if (quantity > 0) {
-        return { text: 'في المخزن', color: 'success' }
+        return { text: t('inventory.inStock'), color: 'success' }
     } else {
-        return { text: 'غير متوفر', color: 'warning' }
+        return { text: t('inventory.notAvailable'), color: 'warning' }
     }
 }
 
@@ -76,7 +78,7 @@ const getStatus = (quantity: number, deleted: boolean) => {
 const exportData = () => {
     try {
         // تحويل البيانات إلى CSV
-        const headers = ['اسم المنتج', 'التصنيف', 'السعر', 'الكمية', 'الحالة']
+        const headers = [t('inventory.productName'), t('common.categories'), t('common.price'), t('common.quantity'), t('common.status')]
         const rows = props.listOfItems.map(item => [
             item.name,
             item.category,
@@ -95,15 +97,15 @@ const exportData = () => {
         const url = URL.createObjectURL(blob)
         const link = document.createElement('a')
         link.setAttribute('href', url)
-        link.setAttribute('download', 'المنتجات.csv')
+        link.setAttribute('download', `${t('inventory.title')}.csv`)
         link.style.visibility = 'hidden'
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
 
-        message.success('تم تصدير البيانات بنجاح')
+        message.success(t('inventory.exportSuccess'))
     } catch (error) {
-        message.error('حدث خطأ أثناء تصدير البيانات')
+        message.error(t('inventory.exportError'))
     }
 }
 
@@ -111,40 +113,40 @@ const exportData = () => {
 const printTable = () => {
     try {
         window.print()
-        message.success('جاري الطباعة...')
+        message.success(t('inventory.printSuccess'))
     } catch (error) {
-        message.error('حدث خطأ أثناء الطباعة')
+        message.error(t('inventory.printError'))
     }
 }
 
 // تكوين أعمدة الجدول مع خاصية الفرز
-const columns: DataTableColumns<any> = [
+const columns = computed<DataTableColumns<any>>(() => [
     {
-        title: 'صورة المنتج',
+        title: t('inventory.productImage'),
         key: 'image',
         width: 80,
         render(row) {
             if (row.images && row.images.length > 0) {
                 return h('img', { src: row.images[0], style: 'width: 40px; height: 40px; border-radius: 6px; object-fit: cover;' })
             }
-            return h('div', { style: 'width: 40px; height: 40px; border-radius: 6px; background: var(--n-action-color); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--n-text-color-3);' }, 'لا توجد')
+            return h('div', { style: 'width: 40px; height: 40px; border-radius: 6px; background: var(--n-action-color); display: flex; align-items: center; justify-content: center; font-size: 10px; color: var(--n-text-color-3);' }, t('inventory.none'))
         }
     },
     {
-        title: 'اسم المنتج',
+        title: t('inventory.productName'),
         key: 'name',
         sorter: 'default',
         width: 200,
         fixed: 'left'
     },
     {
-        title: 'التصنيف',
+        title: t('common.categories'),
         key: 'category',
         sorter: 'default',
         width: 150
     },
     {
-        title: 'السعر',
+        title: t('common.price'),
         key: 'price',
         sorter: (row1, row2) => row1.price - row2.price,
         render(row) {
@@ -153,13 +155,13 @@ const columns: DataTableColumns<any> = [
         width: 120
     },
     {
-        title: 'الكمية',
+        title: t('common.quantity'),
         key: 'quantity',
         sorter: 'default',
         width: 120
     },
     {
-        title: 'الحالة',
+        title: t('common.status'),
         key: 'status',
         sorter: (row1, row2) => {
             const status1 = getStatus(row1.quantity, row1.deleted).text
@@ -178,7 +180,7 @@ const columns: DataTableColumns<any> = [
         width: 150
     },
     {
-        title: 'تعديل',
+        title: t('common.edit'),
         key: 'edit',
         render(row) {
             return h(EditItem, { itemId: row.id })
@@ -186,7 +188,7 @@ const columns: DataTableColumns<any> = [
         width: 120,
         fixed: 'right'
     }
-]
+])
 
 // تكوين ترقيم الصفحات
 const pagination = computed(() => ({

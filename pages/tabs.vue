@@ -2,18 +2,18 @@
   <div class="page-container">
     <div class="page-title-section">
       <div class="page-header-text">
-        <n-h1 class="page-title">إدارة الطلبات والتقارير</n-h1>
-        <n-text class="page-subtitle">مراجعة تاريخ المبيعات، تفاصيل العمليات، وسجل المخزون</n-text>
+        <n-h1 class="page-title">{{ t('tabs.title') }}</n-h1>
+        <n-text class="page-subtitle">{{ t('tabs.subtitle') }}</n-text>
       </div>
     </div>
 
     <n-card class="main-content-card" :bordered="false">
       <n-tabs type="line" animated size="large" justify-content="start" style="padding: 12px 0;">
         <!-- تبويب طلبات البيع -->
-        <n-tab-pane name="sell-orders" tab="طلبات البيع">
+        <n-tab-pane name="sell-orders" :tab="t('tabs.sellOrders')">
           <div style="padding: 24px 0">
             <n-flex justify="end" style="margin-bottom: 24px">
-              <n-input v-model:value="searchTermOrders" placeholder="البحث في الطلبات..." clearable
+              <n-input v-model:value="searchTermOrders" :placeholder="t('common.search')" clearable
                 :style="{ width: isMobile ? '100%' : '320px' }">
                 <template #prefix>
                   <n-icon>
@@ -28,10 +28,10 @@
         </n-tab-pane>
 
         <!-- تبويب تفاصيل الطلبات -->
-        <n-tab-pane name="order-details" tab="تفاصيل الطلبات">
+        <n-tab-pane name="order-details" :tab="t('tabs.orderDetails')">
           <div style="padding: 24px 0">
             <n-flex justify="end" style="margin-bottom: 24px">
-              <n-input v-model:value="searchTermDetails" placeholder="البحث في التفاصيل..." clearable
+              <n-input v-model:value="searchTermDetails" :placeholder="t('common.search')" clearable
                 :style="{ width: isMobile ? '100%' : '320px' }">
                 <template #prefix>
                   <n-icon>
@@ -46,10 +46,10 @@
         </n-tab-pane>
 
         <!-- تبويب المعاملات -->
-        <n-tab-pane name="transactions" tab="سجل المخزون">
+        <n-tab-pane name="transactions" :tab="t('inventory.movements', 'Movements')">
           <div style="padding: 24px 0">
             <n-flex justify="end" style="margin-bottom: 24px">
-              <n-input v-model:value="searchTermTransactions" placeholder="البحث في المعاملات..." clearable
+              <n-input v-model:value="searchTermTransactions" :placeholder="t('common.search')" clearable
                 :style="{ width: isMobile ? '100%' : '320px' }">
                 <template #prefix>
                   <n-icon>
@@ -68,7 +68,6 @@
 
 <script setup>
 import { ref, computed, onMounted, h } from 'vue'
-useHead({ title: 'واجهة الطلبات المتعددة' })
 import { SearchOutline } from '@vicons/ionicons5'
 import { useCustomers } from '@/composables/useCustomers'
 import { useSellOrder } from '@/composables/useSellOrder'
@@ -76,6 +75,10 @@ import { useSellOrderDtl } from '@/composables/useSellOrderDtl'
 import { useInventoryTrans } from '@/composables/useInventoryTrans'
 import { useSettings } from '@/composables/useSettings'
 import { useScreen } from '@/composables/useScreen'
+import { useI18n } from '@/composables/useI18n'
+
+const { t } = useI18n()
+useHead({ title: t('tabs.title') })
 
 const { isMobile } = useScreen()
 const { settings } = useSettings()
@@ -97,38 +100,38 @@ const sellOrdersDtl = ref([])
 const transactions = ref([])
 
 const getCustomerNameById = (customerId) => {
-  if (!customerId) return 'عميل مجهول'
+  if (!customerId) return t('common.unknown')
   const customer = getCustomerById(customerId)
-  return customer ? customer.name : 'عميل غير موجود'
+  return customer ? customer.name : t('common.unknown')
 }
 
-const ordersColumns = [
+const ordersColumns = computed(() => [
   {
-    title: 'رقم الطلب',
+    title: t('common.id'),
     key: 'id',
     width: 100,
     sorter: 'default',
     fixed: 'left'
   },
   {
-    title: 'رقم المسلسل',
+    title: t('invoicesReturns.serialNum'),
     key: 'serialnumber',
     width: 150,
     sorter: 'default'
   },
   {
-    title: 'تاريخ البيع',
+    title: t('common.date'),
     key: 'selldate',
     width: 180,
     sorter: (row1, row2) => new Date(row1.selldate) - new Date(row2.selldate),
     render(row) {
       if (!row.selldate) return '-'
       const date = new Date(row.selldate)
-      return date.toLocaleDateString('ar-SA')
+      return date.toLocaleDateString()
     }
   },
   {
-    title: 'اسم العميل',
+    title: t('customers.customerName'),
     key: 'customerId',
     width: 200,
     sorter: (row1, row2) => {
@@ -141,7 +144,7 @@ const ordersColumns = [
     }
   },
   {
-    title: 'الخصم',
+    title: t('cart.discount'),
     key: 'totalDisc',
     width: 120,
     sorter: 'default',
@@ -150,7 +153,7 @@ const ordersColumns = [
     }
   },
   {
-    title: 'السعر الإجمالي',
+    title: t('common.total'),
     key: 'totalPrice',
     width: 120,
     sorter: 'default',
@@ -159,30 +162,30 @@ const ordersColumns = [
       return `${row.totalPrice || 0} ${settings.value.currency}`
     }
   }
-]
+])
 
-const detailsColumns = [
+const detailsColumns = computed(() => [
   {
-    title: 'رقم الطلب',
+    title: t('common.id'),
     key: 'orderId',
     width: 100,
     sorter: 'default',
     fixed: 'left'
   },
   {
-    title: 'اسم المنتج',
+    title: t('inventory.productName'),
     key: 'itemName',
     width: 200,
     sorter: 'default'
   },
   {
-    title: 'الكمية',
+    title: t('common.quantity'),
     key: 'itemQuan',
     width: 100,
     sorter: 'default'
   },
   {
-    title: 'السعر للوحدة',
+    title: t('common.price'),
     key: 'totalPrice',
     width: 120,
     sorter: (row1, row2) => row1.totalPrice - row2.totalPrice,
@@ -192,7 +195,7 @@ const detailsColumns = [
     }
   },
   {
-    title: 'السعر الإجمالي',
+    title: t('common.total'),
     key: 'totalPrice',
     width: 120,
     sorter: 'default',
@@ -201,7 +204,7 @@ const detailsColumns = [
       return `${row.totalPrice || 0} ${settings.value.currency}`
     }
   }
-]
+])
 
 onMounted(async () => {
   loadingOrders.value = true

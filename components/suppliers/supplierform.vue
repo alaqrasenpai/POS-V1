@@ -2,25 +2,25 @@
     <div style="padding-top: 10px;">
         <n-form :model="newSupplier" label-placement="top">
             <n-grid :cols="2" :x-gap="16">
-                <n-form-item-gi label="اسم المورد / الشركة">
-                    <n-input placeholder="مثال: شركة القدس للتجارة" v-model:value="newSupplier.name" />
+                <n-form-item-gi :label="t('suppliers.supplierName')">
+                    <n-input :placeholder="t('suppliers.searchPlaceholder')" v-model:value="newSupplier.name" />
                 </n-form-item-gi>
-                <n-form-item-gi label="رقم الهاتف">
-                    <n-input placeholder="رقم التواصل" v-model:value="newSupplier.phonenumber" />
+                <n-form-item-gi :label="t('common.phone')">
+                    <n-input :placeholder="t('common.phone')" v-model:value="newSupplier.phonenumber" />
                 </n-form-item-gi>
-                
-                <n-form-item-gi label="العنوان">
-                    <n-input placeholder="المدينة، الشارع" v-model:value="newSupplier.address" />
+
+                <n-form-item-gi :label="t('common.address')">
+                    <n-input :placeholder="t('common.address')" v-model:value="newSupplier.address" />
                 </n-form-item-gi>
-                <n-form-item-gi label="ملاحظات">
-                    <n-input placeholder="أي معلومات إضافية" v-model:value="newSupplier.notes" />
+                <n-form-item-gi :label="t('common.notes')">
+                    <n-input :placeholder="t('common.notes')" v-model:value="newSupplier.notes" />
                 </n-form-item-gi>
             </n-grid>
 
             <n-flex justify="end" style="margin-top: 24px;">
-                <n-button quaternary @click="props.close()">إلغاء</n-button>
+                <n-button quaternary @click="props.close()">{{ t('common.cancel') }}</n-button>
                 <n-button type="primary" size="large" @click="handleSubmit" style="min-width: 120px;">
-                    {{ props.isAdd ? 'إضافة المورد' : 'حفظ التغييرات' }}
+                    {{ props.isAdd ? t('suppliers.addSupplier') : t('common.save') }}
                 </n-button>
             </n-flex>
         </n-form>
@@ -32,6 +32,9 @@ import { ref } from 'vue'
 import { useMessage } from 'naive-ui'
 import { useSuppliers } from '@/composables/useSuppliers'
 
+import { useI18n } from '@/composables/useI18n'
+
+const { t } = useI18n()
 const { getSupplierById, addSupplier, editSupplier } = useSuppliers()
 const message = useMessage()
 
@@ -67,16 +70,16 @@ if (!props.isAdd) {
 
 const handleSubmit = () => {
     if (!newSupplier.value.name) {
-        message.error('يرجى إدخال اسم المورد')
+        message.error(t('suppliers.enterNameError'))
         return
     }
 
     if (props.isAdd) {
         addSupplier(newSupplier.value)
-        message.success('تم إضافة المورد بنجاح')
+        message.success(t('suppliers.addSuccess'))
     } else {
         editSupplier(props.supplierId, newSupplier.value)
-        message.success('تم تحديث بيانات المورد')
+        message.success(t('suppliers.updateSuccess'))
     }
     props.close()
 }

@@ -32,7 +32,7 @@
             <n-descriptions bordered column="1" label-placement="left" style="margin-bottom: 20px;">
               <n-descriptions-item :label="t('common.id')">{{ activeShift.id }}</n-descriptions-item>
               <n-descriptions-item :label="t('shifts.startTime')">{{ new Date(activeShift.startTime).toLocaleString()
-                }}</n-descriptions-item>
+              }}</n-descriptions-item>
               <n-descriptions-item :label="t('shifts.startingCash')">
                 <n-tag type="info">{{ activeShift.startingCash.toFixed(2) }} {{ settings.currency }}</n-tag>
               </n-descriptions-item>
@@ -196,6 +196,7 @@ import { useI18n } from '@/composables/useI18n';
 
 const { settings } = useSettings();
 const { t } = useI18n();
+useHead({ title: t('shifts.title') })
 const { getActiveShift, openShift, closeShift, addCashTransaction, getShiftHistory } = useShifts();
 const { getAlldSellOrders } = useSellOrder();
 const { getAllSellOrdeDtl } = useSellOrderDtl();

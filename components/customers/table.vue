@@ -3,9 +3,12 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps, h } from 'vue'
+import { h, computed } from 'vue'
 import EditCustomer from './editcustomer.vue'  // Corrected case sensitivity for Linux/GitHub Actions
 import type { DataTableColumns } from 'naive-ui'
+import { useI18n } from '@/composables/useI18n'
+
+const { t } = useI18n()
 
 // Define props to receive the list of customers
 const props = defineProps({
@@ -16,29 +19,29 @@ const props = defineProps({
 })
 
 // Define the columns configuration for the n-data-table
-const columns: DataTableColumns<any> = [
+const columns = computed<DataTableColumns<any>>(() => [
     {
-        title: 'اسم العميل',
+        title: t('customers.customerName'),
         key: 'name', // Match the property in listOfCustomers for Customer name
     },
     {
-        title: 'البريد الإلكتروني',
+        title: t('common.email'),
         key: 'email', // Match the property in listOfCustomers for Email
     },
     {
-        title: 'العنوان',
+        title: t('common.address'),
         key: 'address', // Match the property in listOfCustomers for Address
     },
     {
-        title: 'رقم الهاتف',
+        title: t('common.phone'),
         key: 'phoneNumber', // Match the property in listOfCustomers for Phone number
     },
     {
-        title: 'إجراءات',
+        title: t('common.actions'),
         key: 'edit',
         render(row) {
             return h(EditCustomer, { customerId: row.id }) // Render EditCustomer component with customerId
         }
     }
-]
+])
 </script>

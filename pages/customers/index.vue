@@ -2,8 +2,8 @@
   <div class="page-container">
     <div class="page-title-section">
       <div class="page-header-text">
-        <n-h1 class="page-title">إدارة العملاء</n-h1>
-        <n-text class="page-subtitle">بيانات العملاء، سجلات الشراء، والمستحقات</n-text>
+        <n-h1 class="page-title">{{ t('customers.title') }}</n-h1>
+        <n-text class="page-subtitle">{{ t('customers.subtitle') }}</n-text>
       </div>
       <n-flex v-if="!isMobile" :size="16">
         <CustomersAddcustomer />
@@ -12,7 +12,7 @@
 
     <n-card class="main-content-card" :bordered="false">
       <n-flex justify="space-between" align="center" :size="16">
-        <n-input v-model:value="searchTerm" placeholder="البحث باسم العميل أو رقم الهاتف" clearable
+        <n-input v-model:value="searchTerm" :placeholder="t('customers.searchPlaceholder')" clearable
           :style="{ width: isMobile ? '100%' : '320px' }">
           <template #prefix>
             <n-icon>
@@ -40,6 +40,9 @@ useHead({ title: 'إدارة العملاء' })
 import { SearchOutline } from '@vicons/ionicons5'
 import { useCustomers } from '@/composables/useCustomers'
 import { useScreen } from '@/composables/useScreen'
+import { useI18n } from '@/composables/useI18n'
+
+const { t } = useI18n()
 
 const { isMobile } = useScreen()
 const searchTerm = ref('')

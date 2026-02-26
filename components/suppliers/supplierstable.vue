@@ -1,17 +1,14 @@
 <template>
-    <n-data-table 
-        :columns="columns" 
-        :data="listOfItems" 
-        :pagination="pagination" 
-        :bordered="false"
-        :single-line="false"
-        class="premium-table"
-    />
+    <n-data-table :columns="columns" :data="listOfItems" :pagination="pagination" :bordered="false" :single-line="false"
+        class="premium-table" />
 </template>
 
 <script setup>
-import { h, reactive } from 'vue'
+import { h, reactive, computed } from 'vue'
 import EditSupplier from './editSupplier.vue'
+import { useI18n } from '@/composables/useI18n'
+
+const { t } = useI18n()
 
 const props = defineProps({
     listOfItems: {
@@ -24,9 +21,9 @@ const pagination = reactive({
     pageSize: 10
 })
 
-const columns = [
+const columns = computed(() => [
     {
-        title: 'اسم المورد / الشركة',
+        title: t('suppliers.supplierName'),
         key: 'name',
         sorter: 'default',
         render(row) {
@@ -34,15 +31,15 @@ const columns = [
         }
     },
     {
-        title: 'العنوان',
+        title: t('common.address'),
         key: 'address',
     },
     {
-        title: 'رقم الهاتف',
+        title: t('common.phone'),
         key: 'phonenumber',
     },
     {
-        title: 'الإجراءات',
+        title: t('common.actions'),
         key: 'actions',
         width: 100,
         align: 'center',
@@ -50,7 +47,7 @@ const columns = [
             return h(EditSupplier, { supplierId: row.id })
         }
     }
-]
+])
 </script>
 
 <style scoped>

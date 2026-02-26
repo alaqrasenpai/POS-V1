@@ -2,11 +2,11 @@
   <div class="installments-page">
     <div class="page-header">
       <div class="header-left">
-        <n-h1 style="margin-bottom: 4px;">إدارة الأقساط</n-h1>
-        <n-text depth="3">متابعة مبيعات التقسيط والمبالغ المتبقية</n-text>
+        <n-h1 style="margin-bottom: 4px;">{{ t('installments.title') }}</n-h1>
+        <n-text depth="3">{{ t('installments.subtitle') }}</n-text>
       </div>
       <n-tag type="info" size="large" round>
-        إجمالي المبالغ المستحقة: {{ totalRemaining }} {{ currency }}
+        {{ t('installments.totalDue') }}: {{ totalRemaining }} {{ currency }}
       </n-tag>
     </div>
 
@@ -14,13 +14,14 @@
       <n-data-table :columns="columns" :data="installments" :pagination="pagination" :bordered="false" />
     </n-card>
 
-    <n-modal v-model:show="showPaymentModal" preset="card" style="width: 400px;" title="تسجيل دفعة قسط">
-      <n-form-item label="المبلغ المدفوع">
+    <n-modal v-model:show="showPaymentModal" preset="card" style="width: 400px;"
+      :title="t('installments.payInstallment')">
+      <n-form-item :label="t('installments.amountPaid')">
         <n-input-number v-model:value="paymentAmount" :min="1" :max="selectedInstallment?.remainingAmount"
           style="width: 100%;" />
       </n-form-item>
       <template #footer>
-        <n-button type="primary" block @click="confirmPayment">تأكيد الدفع</n-button>
+        <n-button type="primary" block @click="confirmPayment">{{ t('installments.confirmPay') }}</n-button>
       </template>
     </n-modal>
   </div>
@@ -28,10 +29,13 @@
 
 <script setup>
 import { computed, ref, h } from 'vue'
-useHead({ title: 'إدارة الأقساط' })
 import { NTag, NButton, NSpace, NProgress, useMessage } from 'naive-ui'
 import { usePayments } from '@/composables/usePayments'
 import { useSettings } from '@/composables/useSettings'
+import { useI18n } from '@/composables/useI18n'
+
+const { t } = useI18n()
+useHead({ title: t('installments.title') })
 
 const { getInstallments, addInstallmentPayment } = usePayments()
 const { getCurrency } = useSettings()
@@ -55,19 +59,20 @@ const handlePayment = (row) => {
 
 const confirmPayment = () => {
   addInstallmentPayment(selectedInstallment.value.id, paymentAmount.value)
-  message.success(`تم تسجيل دفعة بقيمة ${paymentAmount.value} ${currency}`)
+  let params = { amount: `${paymentAmount.value} ${currency}` }
+  message.success(t('installments.paymentSuccess', params))
   showPaymentModal.value = false
 }
 
 const pagination = { pageSize: 10 }
 
-const columns = [
-  { title: 'اسم المشتري', key: 'customerName' },
-  { title: 'إجمالي المبلغ', key: 'totalAmount', render(row) { return `${row.totalAmount} ${currency}` } },
-  { title: 'المدفوع', key: 'paidAmount', render(row) { return `${row.paidAmount} ${currency}` } },
-  { title: 'المتبقي', key: 'remainingAmount', render(row) { return `${row.remainingAmount} ${currency}` } },
+const columns = computed(() => [
+  { title: t('customers.customerName'), key: 'customerName' },
+  { title: t('common.total'), key: 'totalAmount', render(row) { return `${row.totalAmount} ${currency}` } },
+  { title: t('installments.paid'), key: 'paidAmount', render(row) { return `${row.paidAmount} ${currency}` } },
+  { title: t('installments.remaining'), key: 'remainingAmount', render(row) { return `${row.remainingAmount} ${currency}` } },
   {
-    title: 'التقدم',
+    title: t('installments.progress'),
     key: 'progress',
     render(row) {
       const percentage = Math.round((row.paidAmount / row.totalAmount) * 100)
@@ -80,18 +85,18 @@ const columns = [
     }
   },
   {
-    title: 'الإجراءات',
+    title: t('common.actions'),
     key: 'actions',
     render(row) {
-      if (row.remainingAmount <= 0) return h(NTag, { type: 'success' }, { default: () => 'مكتمل' })
+      if (row.remainingAmount <= 0) return h(NTag, { type: 'success' }, { default: () => t('installments.completed') })
       return h(NButton, {
         size: 'small',
         type: 'primary',
         onClick: () => handlePayment(row)
-      }, { default: () => 'دفع قسط' })
+      }, { default: () => t('installments.payInstallment') })
     }
   }
-]
+])
 </script>
 
 <style scoped>

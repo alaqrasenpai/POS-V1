@@ -83,7 +83,6 @@
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-useHead({ title: 'شاشة البيع' })
 import { SearchOutline, Star as StarIcon } from '@vicons/ionicons5'
 import { useInventory } from '@/composables/useInventory'
 import { useScreen } from '@/composables/useScreen'
@@ -91,6 +90,7 @@ import { useCategory } from '@/composables/useCategory'
 import { useI18n } from '@/composables/useI18n'
 
 const { t } = useI18n()
+useHead({ title: t('common.sales') })
 
 const { isMobile } = useScreen()
 const searchTerm = ref('')

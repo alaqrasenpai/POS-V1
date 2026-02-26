@@ -2,8 +2,8 @@
   <div class="page-container">
     <div class="page-title-section">
       <div class="page-header-text">
-        <n-h1 class="page-title">سجل أنشطة النظام</n-h1>
-        <n-text class="page-subtitle">مراقبة جميع العمليات والحركات التي تمت على النظام</n-text>
+        <n-h1 class="page-title">{{ t('activityLog.title') }}</n-h1>
+        <n-text class="page-subtitle">{{ t('activityLog.subtitle') }}</n-text>
       </div>
       <n-button quaternary type="error" @click="handleClearLogs" v-if="hasPermission('all')">
         <template #icon>
@@ -11,7 +11,7 @@
             <TrashIcon />
           </n-icon>
         </template>
-        مسح السجل
+        {{ t('common.clearLog') }}
       </n-button>
     </div>
 
@@ -30,7 +30,9 @@ import { TrashOutline as TrashIcon, TimeOutline as TimeIcon } from '@vicons/ioni
 import { NTag, NText, NIcon, NSpace, useMessage } from 'naive-ui'
 import { useActivityLog } from '@/composables/useActivityLog'
 import { useAuth } from '@/composables/useAuth'
+import { useI18n } from '@/composables/useI18n'
 
+const { t } = useI18n()
 const { getLogs, clearLogs } = useActivityLog()
 const { hasPermission } = useAuth()
 const message = useMessage()
@@ -38,7 +40,7 @@ const message = useMessage()
 // حماية الصفحة
 onMounted(() => {
   if (!hasPermission('view_reports') && !hasPermission('all')) {
-    message.error('ليس لديك صلاحية لمشاهدة سجل الأنشطة')
+    message.error(t('common.error')) // Using a general error or specific i18n key for permission
     navigateTo('/')
   }
 })
@@ -51,12 +53,12 @@ const pagination = {
 
 const handleClearLogs = () => {
   clearLogs()
-  message.success('تم مسح سجل الأنشطة')
+  message.success(t('activityLog.clearSuccess'))
 }
 
-const columns = [
+const columns = computed(() => [
   {
-    title: 'الوقت والتاريخ',
+    title: t('common.date'),
     key: 'timestamp',
     width: 200,
     render(row) {
@@ -69,7 +71,7 @@ const columns = [
     }
   },
   {
-    title: 'المستخدم',
+    title: t('activityLog.user'),
     key: 'user',
     width: 150,
     render(row) {
@@ -77,7 +79,7 @@ const columns = [
     }
   },
   {
-    title: 'العملية',
+    title: t('activityLog.action'),
     key: 'action',
     width: 150,
     render(row) {
@@ -91,13 +93,13 @@ const columns = [
     }
   },
   {
-    title: 'التفاصيل',
+    title: t('activityLog.details'),
     key: 'details',
     render(row) {
       return h(NText, { depth: 2 }, { default: () => row.details })
     }
   }
-]
+])
 </script>
 
 <style scoped>
