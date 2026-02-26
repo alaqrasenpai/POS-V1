@@ -15,13 +15,17 @@ export const useI18n = () => {
      * Translation function
      * Usage: t('common.save')
      */
-    const t = (path) => {
+    const t = (path, params = {}) => {
         const keys = path.split('.')
         let current = t_data.value
 
         for (const key of keys) {
             if (current[key] === undefined) return path
             current = current[key]
+        }
+
+        if (typeof current === 'string' && params) {
+            return current.replace(/\{(\w+)\}/g, (_, k) => params[k] !== undefined ? params[k] : `{${k}}`)
         }
 
         return current

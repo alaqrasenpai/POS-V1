@@ -7,13 +7,13 @@
             <ShieldIcon />
           </n-icon>
         </div>
-        <h1>بوابة المدير العام</h1>
-        <p>الوصول إلى لوحة تحكم المنصة المركزية</p>
+        <h1>{{ t('superLogin.title') }}</h1>
+        <p>{{ t('superLogin.subtitle') }}</p>
       </div>
 
       <div class="login-form">
         <div class="form-group">
-          <label for="username">اسم المستخدم المسؤول</label>
+          <label for="username">{{ t('superLogin.adminUser') }}</label>
           <n-input id="username" v-model:value="username" type="text" placeholder="super" size="large">
             <template #prefix>
               <n-icon>
@@ -24,9 +24,9 @@
         </div>
 
         <div class="form-group">
-          <label for="password">كلمة المرور</label>
+          <label for="password">{{ t('login.password') }}</label>
           <n-input id="password" v-model:value="password" type="password" show-password-on="mousedown"
-            placeholder="كلمة المرور" size="large">
+            :placeholder="t('login.password')" size="large">
             <template #prefix>
               <n-icon>
                 <LockIcon />
@@ -36,12 +36,12 @@
         </div>
 
         <n-button @click="handleSuperLogin" type="error" block size="large" :loading="loading" class="login-button">
-          دخول المسؤول العام
+          {{ t('superLogin.loginBtn') }}
         </n-button>
 
         <div class="links-footer">
           <n-button text @click="router.push('/login')">
-            العودة لدخول المتاجر
+            {{ t('superLogin.backBtn') }}
           </n-button>
         </div>
       </div>
@@ -60,6 +60,9 @@ import {
   PersonOutline as UserIcon,
   LockClosedOutline as LockIcon
 } from '@vicons/ionicons5'
+import { useI18n } from '@/composables/useI18n'
+
+const { t } = useI18n()
 
 const router = useRouter()
 const { superLogin } = useAuth()
@@ -71,7 +74,7 @@ const loading = ref(false)
 
 const handleSuperLogin = () => {
   if (!username.value || !password.value) {
-    message.warning("تم إدخال بيانات غير مكتملة");
+    message.warning(t('common.warning'));
     return;
   }
 
@@ -79,7 +82,7 @@ const handleSuperLogin = () => {
   const result = superLogin(username.value, password.value)
 
   if (result.success) {
-    message.success(`مرحباً بك في لوحة القيادة المركزية`)
+    message.success(t('superLogin.welcome'))
     router.push('/super-admin')
   } else {
     message.error(result.message)
@@ -96,7 +99,6 @@ const handleSuperLogin = () => {
   justify-content: center;
   background: #0f172a;
   /* لون داكن مهيب للمدير العام */
-  direction: rtl;
 }
 
 .login-card {
@@ -127,9 +129,7 @@ const handleSuperLogin = () => {
   font-size: 1rem;
 }
 
-.login-form {
-  text-align: right;
-}
+.login-form {}
 
 .form-group {
   margin-bottom: 20px;

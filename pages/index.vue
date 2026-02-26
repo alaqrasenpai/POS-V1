@@ -61,7 +61,7 @@
           </div>
           <n-statistic :label="t('dashboard.customerBase')" :value="totalCustomers" />
           <div class="stat-footer">
-            <n-text depth="3">{{ favCustomers }} {{ t('common.customers') }} المميزين</n-text>
+            <n-text depth="3">{{ favCustomers }} {{ t('common.customers') }} {{ t('dashboard.preferred') }}</n-text>
           </div>
         </n-card>
       </n-gi>
@@ -77,7 +77,7 @@
             }}</n-text></template>
           </n-statistic>
           <div class="stat-footer">
-            <n-text depth="3">أداء مستقر</n-text>
+            <n-text depth="3">{{ t('dashboard.stablePerformance') }}</n-text>
           </div>
         </n-card>
       </n-gi>
@@ -88,7 +88,7 @@
       <n-gi span="8">
         <n-card :title="t('dashboard.salesMovement')" class="main-content-card" :bordered="false">
           <template #header-extra>
-            <n-tag type="success" size="small" round>مباشر</n-tag>
+            <n-tag type="success" size="small" round>{{ t('dashboard.live') }}</n-tag>
           </template>
           <div style="padding: 10px 0;">
             <Chart type="area" :options="salesChartOptions" :series="salesSeries" />
@@ -107,7 +107,7 @@
               <n-list-item v-for="(cat, index) in topCategories" :key="index">
                 <n-flex justify="space-between" align="center">
                   <n-text strong>{{ cat.name }}</n-text>
-                  <n-tag :bordered="false" size="small" type="info">{{ cat.count }} قطعة</n-tag>
+                  <n-tag :bordered="false" size="small" type="info">{{ cat.count }} {{ t('common.pcs') }}</n-tag>
                 </n-flex>
               </n-list-item>
             </n-list>
@@ -122,7 +122,7 @@
           <template #header-extra>
             <n-button text type="error" @click="$router.push('/inventory')">{{ t('common.search') }}</n-button>
           </template>
-          <n-empty v-if="lowStockItems.length === 0" description="كل الأصناف متوفرة بشكل جيد"
+          <n-empty v-if="lowStockItems.length === 0" :description="t('dashboard.allStockGood')"
             style="padding: 40px 0;" />
           <n-scrollbar v-else style="max-height: 350px;">
             <n-list hoverable clickable>
@@ -137,7 +137,7 @@
                 <n-thing :title="item.name" :description="item.category">
                   <template #footer>
                     <n-flex align="center" :size="8">
-                      <n-text depth="3">الكمية المتبقية: </n-text>
+                      <n-text depth="3">{{ t('dashboard.remainingQty') }}</n-text>
                       <n-tag :type="item.quantity === 0 ? 'error' : 'warning'" size="small" round>{{ item.quantity
                       }}</n-tag>
                     </n-flex>
@@ -156,7 +156,8 @@
             <n-data-table :columns="recentOrdersColumns" :data="recentOrders" :bordered="false" size="small" />
           </div>
           <n-flex justify="center" style="margin-top: 24px; padding-bottom: 10px;">
-            <n-button quaternary type="primary" @click="$router.push('/tabs')">عرض سجل العمليات الكامل</n-button>
+            <n-button quaternary type="primary" @click="$router.push('/tabs')">{{ t('dashboard.viewFullLog')
+            }}</n-button>
           </n-flex>
         </n-card>
       </n-gi>
@@ -176,8 +177,8 @@ import {
   RefreshOutline as RefreshIcon,
   AlertCircleOutline as WarningIcon
 } from '@vicons/ionicons5';
-// تمت إزالة الاستيرادات اليدوية للـ composables
 import Chart from '@/components/Chart.vue';
+import { NTag } from 'naive-ui';
 
 const { isMobile } = useScreen();
 const { getCustomers, getFavCustomers } = useCustomers();
@@ -276,7 +277,7 @@ const recentOrdersColumns = computed(() => [
   {
     title: t('common.currency'),
     key: 'totalPrice',
-    render: (row) => h('n-tag', { type: 'success', bordered: false }, { default: () => `${row.totalPrice} ${currency.value}` })
+    render: (row) => h(NTag, { type: 'success', bordered: false }, { default: () => `${row.totalPrice} ${currency.value}` })
   }
 ]);
 

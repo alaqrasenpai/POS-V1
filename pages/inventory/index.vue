@@ -2,8 +2,8 @@
   <div class="page-container">
     <div class="page-title-section">
       <div class="page-header-text">
-        <n-h1 class="page-title">إدارة المخزون</n-h1>
-        <n-text class="page-subtitle">تتبع الكميات، الأسعار، وحركات المنتجات</n-text>
+        <n-h1 class="page-title">{{ t('inventory.title') }}</n-h1>
+        <n-text class="page-subtitle">{{ t('inventory.subtitle') }}</n-text>
       </div>
       <n-flex v-if="!isMobile" :size="16">
         <ItemAddItem />
@@ -15,7 +15,7 @@
     <n-card class="main-content-card" :bordered="false">
       <n-grid :cols="isMobile ? 1 : isTablet ? 2 : 4" :x-gap="20" :y-gap="20">
         <n-gi>
-          <n-input v-model:value="searchTerm" placeholder="البحث باسم المنتج" clearable>
+          <n-input v-model:value="searchTerm" :placeholder="t('inventory.searchPlaceholder')" clearable>
             <template #prefix>
               <n-icon>
                 <SearchOutline />
@@ -24,15 +24,17 @@
           </n-input>
         </n-gi>
         <n-gi>
-          <n-select v-model:value="selectedCategory" :options="categoryOptions" placeholder="التصنيف" clearable />
+          <n-select v-model:value="selectedCategory" :options="categoryOptions" :placeholder="t('common.categories')"
+            clearable />
         </n-gi>
         <n-gi>
-          <n-select v-model:value="selectedStatus" :options="statusOptions" placeholder="الحالة" clearable />
+          <n-select v-model:value="selectedStatus" :options="statusOptions" :placeholder="t('common.status')"
+            clearable />
         </n-gi>
         <n-gi>
           <div style="display: flex; gap: 8px; width: 100%;">
-            <n-input-number v-model:value="minPrice" placeholder="أدنى سعر" style="flex: 1;" />
-            <n-input-number v-model:value="maxPrice" placeholder="أعلى سعر" style="flex: 1;" />
+            <n-input-number v-model:value="minPrice" :placeholder="t('common.price') + ' (-)'" style="flex: 1;" />
+            <n-input-number v-model:value="maxPrice" :placeholder="t('common.price') + ' (+)'" style="flex: 1;" />
           </div>
         </n-gi>
       </n-grid>
@@ -61,6 +63,9 @@ useHead({ title: 'إدارة المخزن' })
 import { SearchOutline } from '@vicons/ionicons5'
 import { useInventory } from '@/composables/useInventory'
 import { useScreen } from '@/composables/useScreen'
+import { useI18n } from '@/composables/useI18n'
+
+const { t } = useI18n()
 
 const { isMobile, isTablet } = useScreen()
 const searchTerm = ref('')
@@ -83,11 +88,11 @@ const categoryOptions = computed(() => {
 })
 
 // إعداد خيارات الحالات
-const statusOptions = [
-  { label: 'في المخزن', value: 'available' },
-  { label: 'غير متوفر', value: 'unavailable' },
-  { label: 'محذوف', value: 'deleted' }
-]
+const statusOptions = computed(() => [
+  { label: t('inventory.inStock'), value: 'available' },
+  { label: t('inventory.notAvailable'), value: 'unavailable' },
+  { label: t('inventory.deleted'), value: 'deleted' }
+])
 
 // دالة للحصول على حالة المنتج
 const getItemStatus = (quantity, deleted) => {

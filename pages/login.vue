@@ -8,12 +8,12 @@
           </n-icon>
         </div>
         <h1>{{ t('login.title') }}</h1>
-        <p>{{ isRTL ? 'يرجى إدخال بيانات متجرك وحسابك' : 'Please enter your shop and account details' }}</p>
+        <p>{{ t('login.subtitle') }}</p>
       </div>
 
       <div class="login-form">
         <div class="form-group">
-          <label for="phone">{{ isRTL ? 'رقم جوال المتجر المسجل' : 'Registered Shop Phone Number' }}</label>
+          <label for="phone">{{ t('login.shopPhone') }}</label>
           <n-input id="phone" v-model:value="phone" type="text" placeholder="01xxxxxxxxx" size="large">
             <template #prefix>
               <n-icon>
@@ -52,7 +52,7 @@
 
         <div class="links-footer">
           <n-button text @click="router.push('/super-login')">
-            {{ isRTL ? 'دخول إدارة المنصة (Super Admin)' : 'Central Platform Management (Super Admin)' }}
+            {{ t('login.superAdminBtn') }}
           </n-button>
         </div>
       </div>
@@ -87,7 +87,7 @@ const loading = ref(false)
 
 const handleLogin = () => {
   if (!phone.value || !username.value || !password.value) {
-    message.warning(isRTL.value ? "يرجى إكمال جميع الحقول" : "Please complete all fields");
+    message.warning(t('common.warning'));
     return;
   }
 
@@ -95,7 +95,7 @@ const handleLogin = () => {
   const result = login(phone.value, username.value, password.value)
 
   if (result.success) {
-    message.success(isRTL.value ? `مرحباً بك في ${result.user.name}` : `Welcome to ${result.user.name}`)
+    message.success(`${t('common.success')}: ${result.user.name}`)
     router.push('/')
   } else {
     message.error(result.message)
