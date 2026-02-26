@@ -11,6 +11,7 @@ export default {
         installments: 'إدارة الأقساط',
         reports: 'التقارير',
         users: 'المستخدمين',
+        shifts: 'إدارة الورديات',
         settings: 'إعدادات النظام',
         logout: 'تسجيل الخروج',
         profile: 'الملف الشخصي',

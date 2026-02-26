@@ -11,6 +11,7 @@ export default {
         installments: 'Installments Management',
         reports: 'Reports',
         users: 'Users',
+        shifts: 'Shifts Management',
         settings: 'System Settings',
         logout: 'Logout',
         profile: 'Profile',

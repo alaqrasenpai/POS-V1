@@ -56,7 +56,7 @@ export const useMenu = () => {
             permission: "manage_inventory"
         },
         {
-            label: "إدارة الورديات",
+            label: t('common.shifts'),
             key: "shifts",
             icon: renderIcon(TimeOutline),
             to: "/shifts",
