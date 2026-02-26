@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>دليل المطور - نظام المبيعات (POS)</title>
+    <style>
+        :root {
+            --primary-color: #18a058;
+            --secondary-color: #2080f0;
+            --bg-color: #f5f7fa;
+            --card-bg: #ffffff;
+            --text-main: #333639;
+            --text-muted: #767c82;
+            --border-color: #efeff5;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Cairo', 'Tajawal';
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+        }
+
+        header p {
+            margin-top: 0.5rem;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: flex;
+            gap: 2rem;
+        }
+
+        .sidebar {
+            flex: 0 0 250px;
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            align-self: flex-start;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .sidebar h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 0.5rem;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar ul li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar ul li a {
+            text-decoration: none;
+            color: var(--text-main);
+            display: block;
+            padding: 0.5rem;
+            border-radius: 4px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .sidebar ul li a:hover {
+            background: var(--border-color);
+            color: var(--primary-color);
+        }
+
+        .content {
+            flex: 1;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        section {
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 2rem;
+        }
+
+        section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        h2 {
+            color: var(--secondary-color);
+            margin-top: 0;
+        }
+
+        h3 {
+            color: var(--primary-color);
+            margin-top: 1.5rem;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #d03050;
+        }
+
+        .func-box {
+            background: #fafafc;
+            border: 1px solid var(--border-color);
+            padding: 1rem;
+            border-radius: 6px;
+            margin-bottom: 1rem;
+        }
+
+        .func-box h4 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+
+        .tag {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            margin-left: 5px;
+        }
+
+        .tag.state { background: #f0a020; }
+        .tag.page { background: #2080f0; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>دليل شامل للمطورين (POS System)</h1>
+        <p>توثيق الكود، الهيكلية، والدوال لنظام المبيعات المبني بـ Nuxt 3 و Vue 3 (Composition API)</p>
+    </header>
+
+    <div class="container">
+        <aside class="sidebar">
+            <h3>المحتويات</h3>
+            <ul>
+                <li><a href="#overview">نظرة عامة</a></li>
+                <li><a href="#architecture">المعمارية والهيكلية</a></li>
+                <li><a href="#composables">مخازن البيانات والدوال (Composables)</a></li>
+                <li><a href="#pages">الصفحات (Pages)</a></li>
+                <li><a href="#i18n">نظام الترجمة (i18n)</a></li>
+                <li><a href="#future">نصائح للمطورين مستقبلاً</a></li>
+            </ul>
+        </aside>
+
+        <main class="content">
+            
+            <!-- Overview -->
+            <section id="overview">
+                <h2>نظرة عامة على المشروع</h2>
+                <p>هذا المشروع هو عبارة عن <strong>نظام نقاط بيع مخصص (POS)</strong> يدعم تعدد اللغات (العربية والإنجليزية) ومبني ليكون خفيفاً وسريعاً. تم بناء النظام بالاعتماد على إطار عمل <code>Nuxt 3</code> للاستفادة من قوته وسرعته، ومكتبة <code>Naive UI</code> لمكونات واجهة المستخدم بسبب مرونتها.</p>
+                <p>يعتمد النظام حالياً على إدارة البيانات داخلياً ضمن الواجهة الأمامية (State Management) باستخدام <code>useState()</code> التي توفرها Nuxt كبديل لـ Pinia أو Vuex، مما يسهل تحويل البيانات إلى API حقيقي (Backend) في المستقبل.</p>
+            </section>
+
+            <!-- Architecture -->
+            <section id="architecture">
+                <h2>المعمارية وهيكلية الملفات</h2>
+                <p>تم تقسيم المشروع إلى المجلدات التالية لضمان سهولة القراءة والصيانة:</p>
+                <ul>
+                    <li><code>/pages</code>: يحتوي على الشاشات والواجهات الرئيسية (الراوتينج التلقائي الخاص بـ Nuxt).</li>
+                    <li><code>/components</code>: يحتوي على المكونات القابلة لإعادة الاستخدام مقسمة حسب الوحدات (مثلاً مخزون، مبيعات، إعدادات).</li>
+                    <li><code>/composables</code>: يحتوي على دوال الحالة (State) المدمجة مع المنطق البرمجي (Business Logic). يمثل هذا المجلد "القلب" للنظام وبديل قواعد البيانات حالياً.</li>
+                    <li><code>/locales</code>: يحتوي على ملفات الترجمة للنظام <code>ar.js</code> و <code>en.js</code>.</li>
+                </ul>
+            </section>
+
+            <!-- Composables -->
+            <section id="composables">
+                <h2>مخازن البيانات والدوال (Composables) <span class="tag">مهم جداً</span></h2>
+                <p>كل ملف من هذه الملفات يقوم بتخزين بيانات لجدول معين، ويوفر دوال للتعامل مع هذا الجدول (إضافة، تعديل، حذف، جلب).</p>
+
+                <div class="func-box">
+                    <h4><code>useAuth.js</code></h4>
+                    <p>المسؤول عن تسجيل الدخول وصلاحيات المستخدمين.</p>
+                    <ul>
+                        <li><code>login(username, password)</code>: تسجيل الدخول وتحديد دور المستخدم.</li>
+                        <li><code>hasPermission(permissionName)</code>: التحقق مما إذا كان المستخدم يملك صلاحية معينة.</li>
+                    </ul>
+                </div>
+
+                <div class="func-box">
+                    <h4><code>useInventory.js</code></h4>
+                    <p>مسؤول عن المنتجات، توفرها، وإدارتها.</p>
+                    <ul>
+                        <li><code>getItems()</code>: إرجاع كافة المنتجات.</li>
+                        <li><code>addItem(item) / updateItem(id, item)</code>: إضافة/تعديل المنتجات وإضافة حركات مخزون جديدة.</li>
+                    </ul>
+                </div>
+
+                <div class="func-box">
+                    <h4><code>useCategory.js</code> & <code>useSuppliers.js</code></h4>
+                    <p>لإدارة التصنيفات والموردين في النظام.</p>
+                    <ul>
+                        <li>يوفران دوال لإضافة، حفظ، واستدعاء القوائم، وتصفيتها للإستخدام في القوائم المنسدلة (Select).</li>
+                    </ul>
+                </div>
+
+                <div class="func-box">
+                    <h4><code>useShifts.js</code></h4>
+                    <p>إدارة الورديات والقاصة (الدرج) وهو من أهم الأنظمة المحاسبية في الكود.</p>
+                    <ul>
+                        <li><code>openShift(startingCash)</code>: يفتح الوردية ويبدأ بتسجيل الأموال.</li>
+                        <li><code>closeShift(actualCash)</code>: يغلق الوردية ويحسب الفروقات بين المتوقع والفعلي لإنتاج الزي-ريبورت (Z-Report).</li>
+                        <li><code>addCashTransaction(amount, type)</code>: لإيداع أو سحب نقدي يدوي خلال الوردية.</li>
+                    </ul>
+                </div>
+
+                <div class="func-box">
+                    <h4><code>useSellOrder.js</code> & <code>useSellOrderDtl.js</code></h4>
+                    <p>مسؤولان عن فواتير البيع (الجداول الرئيسية وجداول التفاصيل للصنف).</p>
+                    <ul>
+                        <li><code>addSellOrder(...)</code>: يقوم بإنشاء فاتورة جديدة، إضافة المبيعات للوردية المفتوحة حالياً، وينقص الكميات المباعة من المخزن تلقائياً.</li>
+                    </ul>
+                </div>
+
+                <div class="func-box">
+                    <h4><code>usePayments.js</code></h4>
+                    <p>إدارة الشيكات والأقساط وتتبع الدفعات الخاصة بها.</p>
+                    <ul>
+                        <li><code>getChecks() / updateCheckStatus(id, status)</code>: لجلب قوائم الشيكات وتغيير حالة الشيك (مقبول، مرفوض) وتسجيلها في السجل الخاص بحركات الشيكات.</li>
+                        <li><code>addInstallmentPayment(id, amount)</code>: إضافة دفعة لقسط مالي، وتحديث الرصيد المتبقي له، وتسجيل حركة السداد في السجل.</li>
+                        <li><code>getPaymentLogs()</code>: يجلب سجل حركة الأقساط والشيكات.</li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Pages -->
+            <section id="pages">
+                <h2>شاشات النظام (Pages)</h2>
+                <p>يتم تقديم كل شاشة عبر مسار (Route) مستقل. معظم هذه الشاشات تستدعي الـ Composables لعرض وتعديل البيانات.</p>
+
+                <ul>
+                    <li><span class="tag page">/index.vue</span> <strong>الرئيسية (Dashboard):</strong> تعرض ملخص وأرباح النظام السريعة، تعتمد على استدعاء دوال المبيعات وإعدادات المخزون للحصول على الإحصائيات.</li>
+                    <li><span class="tag page">/sellorder/index.vue</span> <strong>شاشة المبيعات والكاشير:</strong> تنقسم لقسمين، قسم عرض المنتجات (ItemItems) وقسم السلة (Cart). تعتمد بشكل أساسي على البحث السريع، وتحتاج إلى التحقق من وجود "وردية مفتوحة" قبل إتمام البيع.</li>
+                    <li><span class="tag page">/inventory/index.vue</span> <strong>المخزن:</strong> يحتوي على جداول <code>inventorytable</code> المربوطة بمخزن المنتجات وتتيح التصدير للـ Excel أو الطباعة.</li>
+                    <li><span class="tag page">/shifts/index.vue</span> <strong>الورديات (Shifts):</strong> لمعرفة حالة الدرج، إدخال السيولة، وإصدار التقرير النهائي للوردية لمعرفة الأرباح اليومية لكل كاشير.</li>
+                    <li><span class="tag page">/payments/checks</span> <strong>الشيكات:</strong> شاشة لعرض حالة الشيكات المستلمة والمستحقة. بالإضافة لتبويب يحتوي على كل تحديثات الحالات وتاريخها الدقيق.</li>
+                    <li><span class="tag page">/payments/installments</span> <strong>الأقساط:</strong> شاشة لعرض الديون المقسطة على العملاء وشاشة فرعية لدفع الأقساط وسجل متابعة بالدفعات.</li>
+                    <li><span class="tag page">/tabs.vue</span> <strong>التقارير:</strong> تستخدم لعرض الفواتير السابقة، وطلبات البيع بالتفصيل لمراقبة العمليات بشكل واسع.</li>
+                </ul>
+            </section>
+
+            <!-- i18n -->
+            <section id="i18n">
+                <h2>نظام الترجمة (Internationalization)</h2>
+                <p>لا يعتمد النظام على مكاتب معقدة، تم بناء <code>useI18n.js</code> كمحرك ترجمة مبسط وخفيف. </p>
+                <ul>
+                    <li><strong>المسارات:</strong> الترجمات مخزنة في <code>locales/ar.js</code> و <code>locales/en.js</code> ككائنات JavaScript عادية (Objects).</li>
+                    <li><strong>آلية العمل:</strong> يتم استدعاء الدالة كالتالي <code>const { t } = useI18n()</code> ومن ثم في القالب يتم الاستخدام بـ <code>t('cart.item')</code>.</li>
+                    <li><strong>إصلاح الأخطاء (Note):</strong> في ملفات الصفحات (Pages) التي تستخدم <code>useHead</code> لتغيير عنوان المتصفح، يجب دائماً تعريف <code>t</code> قبل استدعاء <code>useHead({ title: t('...') })</code> لتجنب حدوث خطأ ReferenceError.</li>
+                </ul>
+            </section>
+
+            <!-- Tips for Future Developers -->
+            <section id="future">
+                <h2>نصائح للمطور مستقبلاً (Backend Transition)</h2>
+                <p>إذا أردت ربط النظام بقاعدة بيانات خلفية (Node.js/Laravel) مستقبلاً، فلن تضطر لتغيير الكثير، فقط قم بالخطوات التالية:</p>
+                <ol>
+                    <li>افتح ملفات الـ <strong>Composables</strong> فقط (مثل <code>useInventory.js</code>).</li>
+                    <li>استبدل دالة <code>useState()</code> المخصصة للتخزين المحلي، بدوال <code>$fetch()</code> أو <code>useAsyncData()</code> لجلب البيانات من الـ API الخاصة بك.</li>
+                    <li>في دوال الإضافة مثل <code>addItem</code>، قم بإرسال البيانات عن طريق <code>await $fetch('/api/items', { method: 'POST', body: item })</code> بدلاً من وضعها داخل الـ Array الموجودة.</li>
+                    <li>لن تحتاج للمس أي ملف داخل مجلد الواجهات <code>/pages</code> سوى للتأكد من حالة التحميل (Loading).</li>
+                </ol>
+            </section>
+
+        </main>
+    </div>
+
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted); border-top: 1px solid var(--border-color); margin-top: 2rem;">
+        تم إنشاء هذا الدليل لتسهيل إستمرارية العمل على الكود الخاص بنظام إدارة نقاط البيع.
+    </footer>
+
+</body>
+</html>
