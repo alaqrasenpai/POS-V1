@@ -11,7 +11,14 @@
     </div>
 
     <n-card :bordered="false" class="main-card">
-      <n-data-table :columns="columns" :data="installments" :pagination="pagination" :bordered="false" />
+      <n-tabs type="line" animated size="large">
+        <n-tab-pane name="list" :tab="t('installments.title')">
+          <n-data-table :columns="columns" :data="installments" :pagination="pagination" :bordered="false" />
+        </n-tab-pane>
+        <n-tab-pane name="logs" :tab="t('installments.logs')">
+          <n-data-table :columns="logColumns" :data="installmentLogs" :pagination="pagination" :bordered="false" />
+        </n-tab-pane>
+      </n-tabs>
     </n-card>
 
     <n-modal v-model:show="showPaymentModal" preset="card" style="width: 400px;"
@@ -37,11 +44,15 @@ import { useI18n } from '@/composables/useI18n'
 const { t } = useI18n()
 useHead({ title: t('installments.title') })
 
-const { getInstallments, addInstallmentPayment } = usePayments()
+const { getInstallments, addInstallmentPayment, getPaymentLogs } = usePayments()
 const { getCurrency } = useSettings()
 const currency = getCurrency()
 const message = useMessage()
 const installments = computed(() => getInstallments())
+
+const installmentLogs = computed(() => {
+  return getPaymentLogs().filter(log => log.type === 'installment').sort((a, b) => new Date(b.date) - new Date(a.date))
+})
 
 const totalRemaining = computed(() => {
   return installments.value.reduce((sum, i) => sum + i.remainingAmount, 0)
@@ -94,6 +105,18 @@ const columns = computed(() => [
         type: 'primary',
         onClick: () => handlePayment(row)
       }, { default: () => t('installments.payInstallment') })
+    }
+  }
+])
+
+const logColumns = computed(() => [
+  { title: t('customers.customerName'), key: 'customerName' },
+  { title: t('installments.amountPaid'), key: 'amount', render(row) { return `${row.amount} ${currency}` } },
+  {
+    title: t('installments.logDate'),
+    key: 'date',
+    render(row) {
+      return new Date(row.date).toLocaleString()
     }
   }
 ])

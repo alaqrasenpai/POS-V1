@@ -311,6 +311,9 @@ export default {
         cashBtn: 'صرف',
         rejectBtn: 'رفض',
         statusUpdateSuccess: 'تم تحديث حالة الشيك بنجاح',
+        logs: 'سجل حركات الشيكات',
+        logAction: 'الإجراء',
+        logDate: 'تاريخ الحركة'
     },
     installments: {
         title: 'إدارة الأقساط',
@@ -324,6 +327,8 @@ export default {
         remaining: 'المتبقي',
         progress: 'التقدم',
         completed: 'مكتمل',
+        logs: 'سجل دفعات الأقساط',
+        logDate: 'تاريخ الدفع'
     },
     settings: {
         title: 'إعدادات النظام',

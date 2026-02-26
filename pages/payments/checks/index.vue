@@ -13,7 +13,14 @@
     </div>
 
     <n-card :bordered="false" class="main-card">
-      <n-data-table :columns="columns" :data="checks" :pagination="pagination" :bordered="false" />
+      <n-tabs type="line" animated size="large">
+        <n-tab-pane name="list" :tab="t('checks.title')">
+          <n-data-table :columns="columns" :data="checks" :pagination="pagination" :bordered="false" />
+        </n-tab-pane>
+        <n-tab-pane name="logs" :tab="t('checks.logs')">
+          <n-data-table :columns="logColumns" :data="checkLogs" :pagination="pagination" :bordered="false" />
+        </n-tab-pane>
+      </n-tabs>
     </n-card>
   </div>
 </template>
@@ -28,11 +35,15 @@ import { useI18n } from '@/composables/useI18n'
 const { t } = useI18n()
 useHead({ title: t('checks.title') })
 
-const { getChecks, updateCheckStatus } = usePayments()
+const { getChecks, updateCheckStatus, getPaymentLogs } = usePayments()
 const { getCurrency } = useSettings()
 const currency = getCurrency()
 const message = useMessage()
 const checks = computed(() => getChecks())
+
+const checkLogs = computed(() => {
+  return getPaymentLogs().filter(log => log.type === 'check').sort((a, b) => new Date(b.date) - new Date(a.date))
+})
 
 const pendingTotal = computed(() => {
   return checks.value
@@ -81,6 +92,28 @@ const columns = computed(() => [
           }, { default: () => t('checks.rejectBtn') })
         ]
       })
+    }
+  }
+])
+
+const logColumns = computed(() => [
+  { title: t('cart.checkNumber'), key: 'checkNumber' },
+  { title: t('customers.customerName'), key: 'customerName' },
+  { title: t('common.total'), key: 'amount', render(row) { return `${row.amount} ${currency}` } },
+  {
+    title: t('checks.logAction'),
+    key: 'action',
+    render(row) {
+      const typeMap = { cashed: 'success', returned: 'error' }
+      const labelMap = { cashed: t('checks.cashed'), returned: t('checks.returned') }
+      return h(NTag, { type: typeMap[row.action] || 'default', bordered: false }, { default: () => labelMap[row.action] || row.action })
+    }
+  },
+  {
+    title: t('checks.logDate'),
+    key: 'date',
+    render(row) {
+      return new Date(row.date).toLocaleString()
     }
   }
 ])

@@ -311,6 +311,9 @@ export default {
         cashBtn: 'Cash',
         rejectBtn: 'Reject',
         statusUpdateSuccess: 'Check status updated successfully',
+        logs: 'Checks Logs',
+        logAction: 'Action',
+        logDate: 'Date'
     },
     installments: {
         title: 'Installments Management',
@@ -324,6 +327,8 @@ export default {
         remaining: 'Remaining',
         progress: 'Progress',
         completed: 'Completed',
+        logs: 'Installments Logs',
+        logDate: 'Date'
     },
     settings: {
         title: 'System Settings',

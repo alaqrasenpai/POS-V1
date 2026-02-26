@@ -32,9 +32,23 @@ export const usePayments = () => {
         }
     ])
 
+    // سجل حركات الدفع
+    const paymentLogs = useState('system_payment_logs', () => [
+        {
+            id: 1,
+            type: 'installment', // installment, check
+            referenceId: 1,
+            amount: 1000,
+            action: 'payment',
+            customerName: 'سارة محمود',
+            date: new Date().toISOString()
+        }
+    ])
+
     // وظائف البحث والإضافة
     const getChecks = () => checks.value
     const getInstallments = () => installments.value
+    const getPaymentLogs = () => paymentLogs.value
 
     const addCheck = (check) => {
         const newId = checks.value.length ? Math.max(...checks.value.map(c => c.id)) + 1 : 1
@@ -49,7 +63,20 @@ export const usePayments = () => {
     const updateCheckStatus = (id, status) => {
         const index = checks.value.findIndex(c => c.id === id)
         if (index !== -1) {
-            checks.value[index].status = status
+            const check = checks.value[index]
+            check.status = status
+
+            // إضافة سجل للحركة
+            paymentLogs.value.push({
+                id: Date.now(),
+                type: 'check',
+                referenceId: check.id,
+                checkNumber: check.checkNumber,
+                amount: check.amount,
+                action: status,
+                customerName: check.customerName,
+                date: new Date().toISOString()
+            })
         }
     }
 
@@ -73,17 +100,29 @@ export const usePayments = () => {
             inst.payments.push({
                 id: inst.payments.length + 1,
                 amount,
-                date: new Date().toISOString().split('T')[0]
+                date: new Date().toISOString()
             })
             if (inst.remainingAmount <= 0) {
                 inst.status = 'completed'
             }
+
+            // إضافة سجل للحركة
+            paymentLogs.value.push({
+                id: Date.now(),
+                type: 'installment',
+                referenceId: inst.id,
+                amount: amount,
+                action: 'payment',
+                customerName: inst.customerName,
+                date: new Date().toISOString()
+            })
         }
     }
 
     return {
         getChecks,
         getInstallments,
+        getPaymentLogs,
         addCheck,
         updateCheckStatus,
         addInstallment,
